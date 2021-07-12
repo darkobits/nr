@@ -1,0 +1,49 @@
+name: CI/CD
+on:
+  - push
+  - pull_request
+jobs:
+  build-test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.6.0
+        with:
+          access_token: ${{ github.token }}
+
+      - name: Clone Repository
+        uses: actions/checkout@v2
+        with:
+          # This ensures all tags are fetched so that if any release management
+          # tasks are performed, they will be able to introspect the project's
+          # history and tags.
+          fetch-depth: 0
+
+      - name: Set Up Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14
+
+      # Attempt to load a cache of the node_modules folder based on the content
+      # hash of package-lock.json.
+      - name: Use Dependencies Cache
+        id: dependencies-cache
+        uses: actions/cache@v1
+        with:
+          key: dependencies-${{ hashFiles('package-lock.json') }}
+          path: node_modules
+
+      # If a cache was found, we can skip installing dependencies.
+      - name: Install Dependencies
+        if: steps.dependencies-cache.outputs.cache-hit != 'true'
+        run: npm ci
+
+      - name: Build Project
+        run: npx nps build
+
+      - name: Run Unit Tests
+        run: npx nps test.coverage
+
+      - name: Upload Coverage Report
+        run: bash <(curl -s https://codecov.io/bash)
