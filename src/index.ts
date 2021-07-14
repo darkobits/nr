@@ -1,1 +1,2 @@
-export { default } from 'lib/add';
+export { createCommand } from 'lib/commands';
+export { createScript } from 'lib/scripts';
