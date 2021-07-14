@@ -1,22 +1,38 @@
 {
-  "name": "PROJECT_NAME",
+  "name": "@darkobits/nr",
   "version": "0.1.0",
   "license": "WTFPL",
-  "description": "PROJECT_DESCRIPTION",
-  "author": "AUTHOR_NAME",
+  "description": "Replacement for 'npm run'.",
+  "author": "darkobits",
   "repository": {
     "type": "git",
-    "url": "REPOSITORY_URL"
+    "url": "https://github.com/darkobits/nr"
   },
   "files": [
     "dist"
   ],
+  "bin": {
+    "nr": "dist/bin/cli.js"
+  },
   "main": "dist/index.js",
   "scripts": {
     "prepare": "nps prepare",
     "help": "nps --scripts"
   },
+  "dependencies": {
+    "@darkobits/log": "^2.0.0-beta.15",
+    "@darkobits/saffron": "^0.1.17",
+    "execa": "^5.1.1",
+    "kebabcase-keys": "^1.0.0",
+    "micromatch": "^3.1.10",
+    "ow": "^0.17.0",
+    "p-all": "^3.0.0",
+    "p-series": "^2.1.0",
+    "yargs-unparser": "^2.0.0"
+  },
   "devDependencies": {
-    "@darkobits/ts": "^0.3.3"
+    "@darkobits/ts": "^0.3.3",
+    "@types/micromatch": "^4.0.2",
+    "@types/yargs-unparser": "^2.0.1"
   }
 }

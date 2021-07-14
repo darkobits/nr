@@ -2,7 +2,8 @@
   "extends": "@darkobits/ts/tsconfig.json",
   "compilerOptions": {
     "baseUrl": "src",
-    "outDir": "dist"
+    "outDir": "dist",
+    "module": "ESNext"
   },
   "include": ["src"]
 }

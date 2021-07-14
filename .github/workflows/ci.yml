@@ -43,7 +43,7 @@ jobs:
         run: npx nps build
 
       - name: Run Unit Tests
-        run: npx nps test.coverage
+        run: npx nps t.c -- -- --passWithNoTests
 
       - name: Upload Coverage Report
         run: bash <(curl -s https://codecov.io/bash)
