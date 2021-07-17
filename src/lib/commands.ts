@@ -72,24 +72,6 @@ function parseArguments(args: CreateCommandArguments, preserveArguments?: boolea
 }
 
 
-// createCommand('babel.watch', [
-//   'babel', ['src'], { outDir: 'dist', copyFiles: true }
-// ], {
-//   prefix: () => {}, preserveArguments: true
-// });
-
-// createCommand.from('babel.watch', [
-//   ['otherSrc'], { foo: 'bar' }
-// ], {
-//   preserveArguments: true
-// });
-
-
-// createScript('babel.watch', )
-//
-//
-
-
 /**
  * Provided a command options object, creates a function that, when invoked,
  * will execute the command. This function is then added to the commands
@@ -169,6 +151,8 @@ export function createCommand(name: CommandName, args: CreateCommandArguments, o
     }, {
       [IS_COMMAND_THUNK]: true
     });
+
+    Reflect.defineProperty(commandThunk, 'name', { value: name });
 
     commands.set(name, commandThunk);
     commandConfigs.set(commandThunk, [args, opts]);

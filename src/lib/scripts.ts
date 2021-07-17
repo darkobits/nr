@@ -174,9 +174,10 @@ export function createScript(name: string, opts: CreateScriptOptions) {
         log.verbose(log.prefix('script'), log.chalk.gray(`Script ${log.chalk.green.dim(name)} done in ${runTime}.`));
       }
     }, {
-      name,
       [IS_SCRIPT_THUNK]: true
     });
+
+    Reflect.defineProperty(scriptThunk, 'name', { value: name });
 
     scripts.set(name, scriptThunk);
     scriptConfigs.set(name, {...opts, name });
