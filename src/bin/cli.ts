@@ -2,7 +2,7 @@
 
 import cli from '@darkobits/saffron';
 
-import type { CLIArguments, CreateScriptOptions } from 'etc/types';
+import type { CLIArguments, ScriptConfiguration } from 'etc/types';
 import loadConfig from 'lib/configuration';
 import log from 'lib/log';
 import { matchScript, executeScript, printAvailableScripts } from 'lib/scripts';
@@ -37,7 +37,7 @@ cli.command<CLIArguments, any>({
     });
   },
   handler: async opts => {
-    let matchedScript: CreateScriptOptions | undefined;
+    let scriptConfig: ScriptConfiguration | undefined;
 
     try {
       const { argv } = opts;
@@ -60,11 +60,11 @@ cli.command<CLIArguments, any>({
 
       // Otherwise, match and execute the indicated script.
       const runTime = log.createTimer();
-      matchedScript = matchScript(argv.script);
-      await executeScript(matchedScript.name);
+      scriptConfig = matchScript(argv.script);
+      await executeScript(scriptConfig.name);
 
       // If the parent script is configured to log timing, do so.
-      if (matchedScript.timing) {
+      if (scriptConfig.timing) {
         log.info(log.chalk.gray(`Done in ${runTime}.`));
       }
     } catch (err) {
@@ -73,7 +73,7 @@ cli.command<CLIArguments, any>({
       log.error(log.chalk.red.bold(
         command ? [
           `Command "${command}"`,
-          matchedScript && `in script "${matchedScript.name}"`,
+          scriptConfig && `in script "${scriptConfig.name}"`,
           `failed with exit code ${err.exitCode}.`
         ].filter(Boolean).join(' ') : message
       ));

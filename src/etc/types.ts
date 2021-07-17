@@ -10,31 +10,41 @@ import type { createScript } from 'lib/scripts';
 // ----- Commands --------------------------------------------------------------
 
 /**
+ * Name of the command. Only necessary if this command will be referenced
+ * using a string in the `commands` of a Script. Otherwise, the command may be
+ * referenced by providing the return value of `createCommand`.
+ */
+export type CommandName = string;
+
+
+/**
+ * Shape of the second argument passed to `createCommand`. The first item in
+ * this array should be the command to execute.
+ *
+ * If passing only positional arguments, these may be provided as an array of
+ * strings in the second position.
+ *
+ * If passing only flags, this may be provided as an object in the second
+ * position.
+ *
+ * If passing both positional arguments and flags, positionals should be
+ * provided in the second position and flags in the third position.
+ */
+export type CreateCommandArguments =
+  // Command only.
+  [string] |
+  // Command and positional arguments.
+  [string, Array<string>] |
+  // Command and flags.
+  [string, Record<string, any>] |
+  // Command, positional arguments, and flags.
+  [string, Array<string>, Record<string, any>];
+
+
+/**
  * Object describing a command. Passed to `createCommand`.
  */
 export interface CreateCommandOptions {
-  /**
-   * Name of the command. Only necessary if this command will be referenced
-   * using a string in the `commands` of a Script. Otherwise, the command may be
-   * referenced by providing the return value of `createCommand`.
-   */
-  name?: string;
-
-  /**
-   * Name of the executable to run. This may be any executable in $PATH.
-   */
-  command: string;
-
-  /**
-   * Optional arguments to pass to <command>. This object is parsed by
-   * `yargs-unparser` and conforms to the Yargs spec for parsed arguments.
-   * Positional arguments should be declared using the key "_" whose value
-   * should be an array of strings. Flags should be defined as keys in camel
-   * case (they will be converted to kebab case, see below) and values should
-   * be a primitive (string, number, boolean).
-   */
-  arguments?: Partial<Arguments>;
-
   /**
    * Function that will be passed a Chalk instance and should return a string.
    * This string will be used to prefix all output from the command.
@@ -91,7 +101,7 @@ export interface CreateScriptOptions {
    *
    * For example, a script named `build.watch` could be run using `nr b.w`.
    */
-  name: string;
+  // name: string;
 
   /**
    * Description of what the script does. This will be printed if the --scripts
@@ -132,12 +142,21 @@ export interface CreateScriptOptions {
    *   ['lint', 'test', 'build']
    * ]
    */
-  commands: Array<Instruction | Array<Instruction>>;
+  run: Array<Instruction | Array<Instruction>>;
 
   /**
    * Set to `true` to print a script's total run time.
    */
   timing?: boolean;
+}
+
+
+/**
+ * A script's configuration consists of all the options provided to
+ * `createScript` in addition to its `name`.
+ */
+export interface ScriptConfiguration extends CreateScriptOptions {
+  name: string;
 }
 
 

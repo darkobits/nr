@@ -13,6 +13,7 @@ import {
   CommandThunk,
   CreateScriptOptions,
   Instruction,
+  ScriptConfiguration,
   ScriptThunk
 } from 'etc/types';
 import { commands } from 'lib/commands';
@@ -30,8 +31,9 @@ export const scripts = new Map<string, ScriptThunk>();
  * @private
  *
  * Map of registered script thunks to their provided configurations.
+ * Configurations stored here also contain the script's `name`.
  */
-const scriptConfigs = new Map<ScriptThunk, CreateScriptOptions>();
+const scriptConfigs = new Map<string, ScriptConfiguration>();
 
 
 /**
@@ -103,21 +105,28 @@ function resolveInstruction(value: Instruction): ScriptThunk | CommandThunk {
 }
 
 
+// createScript('build', {
+//   group: 'Build',
+//   run: [
+//
+//   ],
+// })
+
+
 /**
  * Provided a script options object, returns a function that, when invoked, will
  * execute the script. This function is then added to the scripts registry.
  */
-export function createScript(opts: CreateScriptOptions) {
+export function createScript(name: string, opts: CreateScriptOptions) {
   try {
+    // Validate name.
+    ow(name, 'script name', ow.string);
+
     // Validate options.
     ow<CreateScriptOptions>(opts, ow.object.exactShape({
-      name: ow.string,
       description: ow.string,
-      group: ow.any(
-        ow.undefined,
-        ow.string
-      ),
-      commands: ow.array.ofType(ow.any(
+      group: ow.any(ow.undefined, ow.string),
+      run: ow.array.ofType(ow.any(
         ow.string,
         ow.function,
         ow.array.ofType(ow.any(
@@ -125,16 +134,13 @@ export function createScript(opts: CreateScriptOptions) {
           ow.function
         ))
       )),
-      timing: ow.any(
-        ow.undefined,
-        ow.boolean
-      )
+      timing: ow.any(ow.undefined, ow.boolean)
     }));
 
     // Map each entry in the instruction sequence to its corresponding command
     // thunk or script thunk. For nested arrays, map the array to a thunk that
     // runs each entry in parallel.
-    const validatedInstructions = opts.commands.map(value => {
+    const validatedInstructions = opts.run.map(value => {
       if (Array.isArray(value)) {
         return async () => {
           await pAll(value.map(resolveInstruction));
@@ -152,31 +158,32 @@ export function createScript(opts: CreateScriptOptions) {
       // it is possible that a script has zero instructions under certain
       // conditions. When this is the case, issue a warning and bail.
       if (validatedInstructions.length === 0) {
-        log.warn(log.prefix(opts.name), 'Script contains no instructions.');
+        log.warn(log.prefix('script'), log.chalk.yellow.bold(`Script "${name}" contains no instructions.`));
         return;
       }
 
-      log.verbose(log.prefix('script'), 'exec:', log.chalk.green(opts.name));
+      log.verbose(log.prefix('script'), 'exec:', log.chalk.green(name));
 
-      const time = log.createTimer();
+      const runTime = log.createTimer();
 
       // Run each item in the command list in series. If an item is itself an
       // array, all commands in that step will be run in parallel.
       await pSeries(validatedInstructions);
 
       if (opts.timing) {
-        log.verbose(log.prefix('script'), log.chalk.gray(`Script ${log.chalk.green.dim(opts.name)} done in ${time}.`));
+        log.verbose(log.prefix('script'), log.chalk.gray(`Script ${log.chalk.green.dim(name)} done in ${runTime}.`));
       }
     }, {
+      name,
       [IS_SCRIPT_THUNK]: true
     });
 
-    scripts.set(opts.name, scriptThunk);
-    scriptConfigs.set(scriptThunk, opts);
+    scripts.set(name, scriptThunk);
+    scriptConfigs.set(name, {...opts, name });
 
     return scriptThunk;
   } catch (err) {
-    throw new Error(`Unable to create script "${opts.name}": ${err.message}`);
+    throw new Error(`Unable to create script "${name}": ${err.message}`);
   }
 }
 
@@ -197,8 +204,9 @@ export function printAvailableScripts() {
     }, scriptConfigs);
 
     console.log('');
-  }, R.groupBy<CreateScriptOptions>(scriptConfig => scriptConfig.group ?? 'Other', allConfigs));
-
+  }, R.groupBy<CreateScriptOptions & { name: string }>(scriptConfig => {
+    return scriptConfig.group ?? 'Other';
+  }, allConfigs));
 }
 
 
@@ -222,7 +230,7 @@ export function matchScript(value: string) {
   log.verbose(`Matched ${log.chalk.green(value)} to script ${log.chalk.green(scriptName)}.`);
 
   const scriptThunk = scripts.get(scriptName) as ScriptThunk;
-  return scriptConfigs.get(scriptThunk) as CreateScriptOptions;
+  return scriptConfigs.get(scriptThunk.name) as ScriptConfiguration;
 }
 
 
