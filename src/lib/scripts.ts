@@ -105,14 +105,6 @@ function resolveInstruction(value: Instruction): ScriptThunk | CommandThunk {
 }
 
 
-// createScript('build', {
-//   group: 'Build',
-//   run: [
-//
-//   ],
-// })
-
-
 /**
  * Provided a script options object, returns a function that, when invoked, will
  * execute the script. This function is then added to the scripts registry.
