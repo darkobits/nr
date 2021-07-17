@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.1-beta.2](https://github.com/darkobits/nr/compare/v0.3.1-beta.1...v0.3.1-beta.2) (2021-07-17)
+
+
+### 🐞 Bug Fixes
+
+* Use `defineProperty` to set function names. ([a1d0c48](https://github.com/darkobits/nr/commit/a1d0c4870f20636b4b9cc15a94f94526449e2565))
+
 ### [0.3.1-beta.1](https://github.com/darkobits/nr/compare/v0.3.1-beta.0...v0.3.1-beta.1) (2021-07-17)
 
 ### [0.3.1-beta.0](https://github.com/darkobits/nr/compare/v0.3.0...v0.3.1-beta.0) (2021-07-17)
