@@ -1,7 +1,9 @@
 import type execa from 'execa';
 import type { Arguments } from 'yargs-unparser';
 
+import type { IS_SCRIPT_THUNK, IS_COMMAND_THUNK } from 'etc/constants';
 import type { createCommand } from 'lib/commands';
+import type log from 'lib/log';
 import type { createScript } from 'lib/scripts';
 
 
@@ -12,10 +14,11 @@ import type { createScript } from 'lib/scripts';
  */
 export interface CreateCommandOptions {
   /**
-   * Name of the command. This value is what will be used in script definitions
-   * to execute the command.
+   * Name of the command. Only necessary if this command will be referenced
+   * using a string in the `commands` of a Script. Otherwise, the command may be
+   * referenced by providing the return value of `createCommand`.
    */
-  name: string;
+  name?: string;
 
   /**
    * Name of the executable to run. This may be any executable in $PATH.
@@ -31,6 +34,12 @@ export interface CreateCommandOptions {
    * be a primitive (string, number, boolean).
    */
   arguments?: Partial<Arguments>;
+
+  /**
+   * Function that will be passed a Chalk instance and should return a string.
+   * This string will be used to prefix all output from the command.
+   */
+  prefix?: (chalk: typeof log.chalk) => string;
 
   /**
    * Optional options to pass to Execa, which executes the command.
@@ -52,10 +61,23 @@ export interface CreateCommandOptions {
 /**
  * Function that will execute a command.
  */
-export type CommandThunk = () => execa.ExecaChildProcess;
+export interface CommandThunk {
+  (): Promise<void>;
+  [IS_COMMAND_THUNK]: boolean;
+  [key: string]: any;
+}
 
 
 // ----- Scripts ---------------------------------------------------------------
+
+/**
+ * An instruction indicates what a script should do. Scripts may run commands or
+ * other scripts. An `Instruction` may therefore be a `string` that exactly
+ * matches the `name` of a registered command or script, or the value returned
+ * by `createCommand` or `createScript`.
+ */
+export type Instruction = string | CommandThunk | ScriptThunk;
+
 
 /**
  * Object describing a script. Passed to `createScript`.
@@ -78,11 +100,21 @@ export interface CreateScriptOptions {
   description: string;
 
   /**
-   * Array of commands that the script will run. Each string must exactly match
-   * the name of a registered command. To run commands in parallel, use a nested
-   * array of strings.
+   * Optional group to use with the --scripts flag.
+   */
+  group?: string;
+
+  /**
+   * Array of Instructions that this script will run.
    *
-   * For example, if commands 'lint', 'babel', 'type-check', and 'cleanup' were
+   * An inner array may be used to indicate that a set of Instructions should be
+   * run in parallel. However, nesting beyond a depth of 2 is not allowed. If
+   * you need complex parallelization, define individual scripts and compose
+   * them.
+   *
+   * @example
+   *
+   * For example, if Commands 'lint', 'babel', 'type-check', and 'cleanup' were
    * registered, and we wanted to run the 'lint' command, then 'babel' and
    * 'type-check' in parallel, followed by the 'cleanup' command, we would
    * express that thusly:
@@ -93,21 +125,30 @@ export interface CreateScriptOptions {
    *   'cleanup'
    * ]
    *
-   * Note that if a script should run a single group of commands in parallel,
+   * Note: If a script should run a single group of Instructions in parallel,
    * a nested array is still required to indicate parallelization:
    *
    * commands: [
    *   ['lint', 'test', 'build']
    * ]
    */
-  commands: Array<string | Array<string>>;
+  commands: Array<Instruction | Array<Instruction>>;
+
+  /**
+   * Set to `true` to print a script's total run time.
+   */
+  timing?: boolean;
 }
 
 
 /**
  * Function that will execute a script.
  */
-export type ScriptThunk = () => Promise<void>;
+export interface ScriptThunk {
+  (): Promise<void>;
+  [IS_SCRIPT_THUNK]: boolean;
+  [key: string]: any;
+}
 
 
 // ----- Configuration ---------------------------------------------------------

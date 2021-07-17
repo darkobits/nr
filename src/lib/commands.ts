@@ -4,16 +4,26 @@ import kebabCaseKeys from 'kebabcase-keys';
 import ow from 'ow';
 import unParseArgs from 'yargs-unparser';
 
-import { CreateCommandOptions, CommandThunk } from 'etc/types';
+import { IS_COMMAND_THUNK } from 'etc/constants';
+import {
+  CommandThunk,
+  CreateCommandOptions
+} from 'etc/types';
 import log, { LogPipe } from 'lib/log';
 
 
 /**
  * Map of registered command names to their corresponding command thunks.
  */
-const commands = new Map<string, CommandThunk>();
+export const commands = new Map<string, CommandThunk>();
 
-const commandConfigs = new Map<string, CreateCommandOptions>();
+
+/**
+ * @private
+ *
+ * Map of registered command names to their corresponding configurations.
+ */
+const commandConfigs = new Map<CommandThunk, CreateCommandOptions>();
 
 
 /**
@@ -44,14 +54,12 @@ function parseArguments(args: CreateCommandOptions['arguments'], preserveArgumen
  */
 export function createCommand(opts: CreateCommandOptions) {
   try {
-    // Prevent overwriting of existing commands.
-    // if (commands.has(opts.name)) {
-    //   throw new Error('Command has already been registered.');
-    // }
-
     // Validate options.
     ow<CreateCommandOptions>(opts, ow.object.exactShape({
-      name: ow.string,
+      name: ow.any(
+        ow.undefined,
+        ow.string
+      ),
       command: ow.string,
       arguments: ow.any(
         ow.undefined,
@@ -74,6 +82,10 @@ export function createCommand(opts: CreateCommandOptions) {
           return true;
         })
       ),
+      prefix: ow.any(
+        ow.undefined,
+        ow.function
+      ),
       execaOptions: ow.any(
         ow.undefined,
         ow.object.nonEmpty
@@ -84,15 +96,14 @@ export function createCommand(opts: CreateCommandOptions) {
       )
     }));
 
-    const firstSegmentOfName = opts.name.split('.')[0];
+    // const firstSegmentOfName = opts.command;
+    const parsedArguments = parseArguments(opts.arguments, opts.preserveArguments);
 
-    commandConfigs.set(opts.name, opts);
-
-    commands.set(opts.name, () => {
-      const parsedArguments = parseArguments(opts.arguments, opts.preserveArguments);
+    const commandThunk: CommandThunk = Object.assign(async () => {
+      const runTime = log.createTimer();
 
       // Log the exact command being run at the verbose level.
-      log.verbose(log.prefix(firstSegmentOfName), log.chalk.gray(opts.command), log.chalk.gray(parsedArguments.join(' ')));
+      log.verbose(log.prefix(opts.command), 'exec:', log.chalk.gray(opts.command), log.chalk.gray(parsedArguments.join(' ')));
 
       const command = execa(opts.command, parsedArguments, {
         stdio: 'pipe',
@@ -100,31 +111,48 @@ export function createCommand(opts: CreateCommandOptions) {
           // This is needed to maintain colors in piped output.
           FORCE_COLOR: 'true'
         },
+        // Prefer locally-installed versions of executables. For example, this
+        // will search in the local NPM bin folder even if the user hasn't added
+        // it to their $PATH.
+        preferLocal: true,
         ...opts.execaOptions
       });
 
+      // If the user provided a custom prefix function, generate it now.
+      const prefix = opts.prefix ? opts.prefix(log.chalk) : '';
+
       if (command.stdout) {
         command.stdout.pipe(new LogPipe((...args: Array<any>) => {
-          log.info(log.prefix(firstSegmentOfName), ...args);
+          console.log(...[prefix, ...args].filter(Boolean));
         }));
       }
 
       if (command.stderr) {
         command.stderr.pipe(new LogPipe((...args: Array<any>) => {
-          log.error(log.prefix(firstSegmentOfName), ...args);
+          console.error(...[prefix, ...args].filter(Boolean));
         }));
       }
 
       void command.on('exit', code => {
-        if (code === 0) {
-          log.verbose(log.prefix(log.chalk.blue(firstSegmentOfName)), log.chalk.green('Done.'));
-        } else {
-          log.error(log.prefix(firstSegmentOfName), log.chalk.bold(log.chalk.red.bold(`Command failed with exit code: ${code}.`)));
+        if (code === 0 || opts.execaOptions?.reject === false) {
+          // If the command exited successfully or if we are ignoring failed
+          // commands, log completion time.
+          log.verbose(log.prefix(opts.command), log.chalk.gray(`Done in ${runTime}.`));
         }
       });
 
-      return command;
+      await command;
+    }, {
+      [IS_COMMAND_THUNK]: true
     });
+
+    if (opts.name) {
+      commands.set(opts.name, commandThunk);
+    }
+
+    commandConfigs.set(commandThunk, opts);
+
+    return commandThunk;
   } catch (err) {
     log.error(log.chalk.red.bold(`Unable to create command "${opts.name}":`));
 
@@ -133,6 +161,3 @@ export function createCommand(opts: CreateCommandOptions) {
     throw err;
   }
 }
-
-
-export { commands, commandConfigs };

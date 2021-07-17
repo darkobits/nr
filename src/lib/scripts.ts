@@ -1,28 +1,67 @@
-import type execa from 'execa';
+import { EOL } from 'os';
+
 import ow from 'ow';
 import pAll from 'p-all';
 import pSeries from 'p-series';
+import * as R from 'ramda';
 
-import { CreateScriptOptions, ScriptThunk } from 'etc/types';
+import {
+  IS_SCRIPT_THUNK,
+  IS_COMMAND_THUNK
+} from 'etc/constants';
+import {
+  CommandThunk,
+  CreateScriptOptions,
+  Instruction,
+  ScriptThunk
+} from 'etc/types';
 import { commands } from 'lib/commands';
 import log from 'lib/log';
 import { matchSegmentedName } from 'lib/utils';
 
 
 /**
- * @private
- *
  * Map of registered script names to their corresponding script thunks.
  */
-const scripts = new Map<string, ScriptThunk>();
+export const scripts = new Map<string, ScriptThunk>();
 
 
 /**
  * @private
  *
- * Map of registered script names to their provided configurations.
+ * Map of registered script thunks to their provided configurations.
  */
-const scriptConfigs = new Map<string, CreateScriptOptions>();
+const scriptConfigs = new Map<ScriptThunk, CreateScriptOptions>();
+
+
+/**
+ * @private
+ *
+ * Provided a CommandThunk, ScriptThunk, string, or array thereof, resolves each
+ * value to a CommandThunk, ScriptThunk or array thereof.
+ */
+function resolveInstruction(value: Instruction): ScriptThunk | CommandThunk {
+  if (typeof value === 'function') {
+    if (Reflect.has(value, IS_SCRIPT_THUNK) || Reflect.has(value, IS_COMMAND_THUNK)) {
+      return value;
+    }
+
+    throw new TypeError('Provided function is neither a ScriptThunk nor a CommandThunk.');
+  }
+
+  if (typeof value === 'string') {
+    const commandThunk = commands.get(value);
+
+    if (!commandThunk) {
+      throw new Error(`Unknown command: "${value}"`);
+    }
+
+    return commandThunk;
+  }
+
+  // N.B. This is just here for type coercion.
+  throw new TypeError('Invalid command.');
+}
 
 
 /**
@@ -35,70 +74,116 @@ export function createScript(opts: CreateScriptOptions) {
     ow<CreateScriptOptions>(opts, ow.object.exactShape({
       name: ow.string,
       description: ow.string,
+      group: ow.any(
+        ow.undefined,
+        ow.string
+      ),
       commands: ow.array.ofType(ow.any(
         ow.string,
-        ow.array.ofType(ow.string)
-      ))
+        ow.function,
+        ow.array.ofType(ow.any(
+          ow.string,
+          ow.function
+        ))
+      )),
+      timing: ow.any(
+        ow.undefined,
+        ow.boolean
+      )
     }));
 
-    // Prevent overwriting of existing scripts.
-    if (scripts.has(opts.name)) {
-      throw new Error(`Script "${opts.name}" has already been registered.`);
-    }
-
-    // Map each string in the command sequence to its corresponding command
-    // thunk, or throw an error if the command is not registered.
-    const validatedCommands = opts.commands.map(commandOrCommandArray => {
-      if (typeof commandOrCommandArray === 'string') {
-        const commandThunk = commands.get(commandOrCommandArray);
-
-        if (!commandThunk) {
-          throw new Error(`Unknown command: "${commandOrCommandArray}"`);
-        }
-
-        return commandThunk;
+    // Map each entry in the instruction sequence to its corresponding command
+    // thunk or script thunk. For nested arrays, map the array to a thunk that
+    // runs each entry in parallel.
+    const validatedInstructions = opts.commands.map(value => {
+      if (Array.isArray(value)) {
+        return async () => {
+          await pAll(value.map(resolveInstruction));
+        };
       }
 
-      return commandOrCommandArray.map(command => {
-        const commandThunk = commands.get(command);
-
-        if (!commandThunk) {
-          throw new Error(`Unknown command: "${command}"`);
-        }
-
-        return commandThunk;
-      });
+      return resolveInstruction(value);
     });
-
-    scriptConfigs.set(opts.name, opts);
 
     // NB: This function does not catch errors. Failed commands will log
     // appropriate error messages and then re-throw, propagating errors up to
     // this function's caller.
-    scripts.set(opts.name, async () => {
+    const scriptThunk: ScriptThunk = Object.assign(async () => {
+      // Instructions may be added to a script definition dynamically, meaning
+      // it is possible that a script has zero instructions under certain
+      // conditions. When this is the case, issue a warning and bail.
+      if (validatedInstructions.length === 0) {
+        log.warn(log.prefix(opts.name), 'Script contains no instructions.');
+        return;
+      }
+
+      log.verbose(log.prefix('script'), `Executing script: ${log.chalk.green(opts.name)}`);
+
       const time = log.createTimer();
 
       // Run each item in the command list in series. If an item is itself an
       // array, all commands in that step will be run in parallel.
-      await pSeries<execa.ExecaReturnValue | Array<execa.ExecaReturnValue>>(validatedCommands.map(commandOrCommandArray => {
-        // For arrays of commands, run them in parallel using p-all.
-        if (Array.isArray(commandOrCommandArray)) {
-          return async () => pAll(commandOrCommandArray);
-        }
+      await pSeries(validatedInstructions);
 
-        // For single commands, return the command as-is to be run in series.
-        return commandOrCommandArray;
-      }));
-
-      log.info(log.prefix(opts.name), log.chalk.gray(`Done in ${time}.`));
+      if (opts.timing) {
+        log.verbose(log.prefix('script'), log.chalk.gray(`Script ${log.chalk.green.dim(opts.name)} done in ${time}.`));
+      }
+    }, {
+      [IS_SCRIPT_THUNK]: true
     });
-  } catch (err) {
-    log.error(log.chalk.red.bold(`Unable to create script "${opts.name}": ${err.message.split()}.`));
 
-    // Re-throw errors related to creating scripts so that our caller can exit
-    // with a non-zero code.
-    throw err;
+    scripts.set(opts.name, scriptThunk);
+    scriptConfigs.set(scriptThunk, opts);
+
+    return scriptThunk;
+  } catch (err) {
+    throw new Error(`Unable to create script "${opts.name}": ${err.message}.`);
   }
+}
+
+
+/**
+ * Prints all available scripts and their descriptions.
+ */
+export function printAvailableScripts() {
+  const allConfigs = Array.from(scriptConfigs.values());
+
+  console.log(`${EOL}Available scripts:${EOL}`);
+
+  R.forEachObjIndexed((scriptConfigs, groupName) => {
+    console.log(log.chalk.underline(groupName));
+
+    R.forEach(scriptConfig => {
+      console.log(log.chalk.green(scriptConfig.name), `– ${log.chalk.gray(scriptConfig.description)}`);
+    }, scriptConfigs);
+
+    console.log('');
+  }, R.groupBy<CreateScriptOptions>(scriptConfig => scriptConfig.group ?? 'Other', allConfigs));
+
+}
+
+
+/**
+ * Provided a search query, matches the query to a registered script and returns
+ * its configuration.
+ */
+export function matchScript(value: string) {
+  const scriptNames = [...scripts.keys()];
+
+  if (scriptNames.length === 0) {
+    throw new Error('No scripts have been registered.');
+  }
+
+  const scriptName = matchSegmentedName(scriptNames, value);
+
+  if (!scriptName) {
+    throw new Error(`"${value}" did not match any scripts.`);
+  }
+
+  log.verbose(`Matched ${log.chalk.green(value)} to script ${log.chalk.green(scriptName)}.`);
+
+  const scriptThunk = scripts.get(scriptName) as ScriptThunk;
+  return scriptConfigs.get(scriptThunk) as CreateScriptOptions;
 }
 
 
@@ -106,20 +191,10 @@ export function createScript(opts: CreateScriptOptions) {
  * Provided a script name search query, matches the query to a registered script
  * and executes it. If no match could be found, throws an error.
  */
-export async function executeScript(name: string) {
-  const scriptNames = [...scripts.keys()];
-
-  if (scriptNames.length === 0) {
-    throw new Error('No scripts have been registered.');
+export async function executeScript(scriptName: string) {
+  if (!scripts.has(scriptName)) {
+    throw new Error(`Unknown script: "${scriptName}".`);
   }
-
-  const scriptName = matchSegmentedName(scriptNames, name);
-
-  if (!scriptName) {
-    throw new Error(`"${name}" did not match any scripts.`);
-  }
-
-  log.verbose(`Matched ${log.chalk.green(name)} to script ${log.chalk.green(scriptName)}.`);
 
   const preScriptName = `pre${scriptName}`;
 
@@ -141,6 +216,3 @@ export async function executeScript(name: string) {
 
   await scriptThunk();
 }
-
-
-export { scripts, scriptConfigs };

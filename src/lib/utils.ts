@@ -1,3 +1,6 @@
+import { EOL } from 'os';
+
+import type { ExecaError } from 'execa';
 import micromatch from 'micromatch';
 import ow from 'ow';
 
@@ -51,4 +54,33 @@ export function matchSegmentedName(haystack: Array<string>, needle: string): str
 
   // Otherwise, we only have 1 result; return it.
   return results[0];
+}
+
+
+/**
+ * Use duck-typing to determine if the provided value is an ExecaError.
+ */
+export function isExecaError(value: any): value is ExecaError {
+  return value?.command && value?.exitCode;
+}
+
+
+/**
+ * Provided an Error, returns its message, stack, and command (if applicable).
+ */
+export function parseError<E extends Error>(err: E) {
+  let command: string | undefined;
+
+  if (isExecaError(err)) {
+    command = err.command?.split(' ')[0];
+  }
+
+  const [message, ...stackLines] = err.message.split(EOL);
+  const stack = stackLines.join(EOL);
+
+  return {
+    message,
+    stack,
+    command
+  };
 }

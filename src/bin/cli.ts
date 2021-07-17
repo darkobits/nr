@@ -1,21 +1,12 @@
 #!/usr/bin/env node
 
-import path from 'path';
-
 import cli from '@darkobits/saffron';
 
-import type { CLIArguments } from 'etc/types';
-import {
-  createCommand,
-  commands
-} from 'lib/commands';
+import type { CLIArguments, CreateScriptOptions } from 'etc/types';
+import loadConfig from 'lib/configuration';
 import log from 'lib/log';
-import {
-  createScript,
-  executeScript,
-  scripts,
-  scriptConfigs
-} from 'lib/scripts';
+import { matchScript, executeScript, printAvailableScripts } from 'lib/scripts';
+import { parseError } from 'lib/utils';
 
 
 cli.command<CLIArguments, any>({
@@ -45,64 +36,50 @@ cli.command<CLIArguments, any>({
       description: 'Provide an explicit path to a configuration file.'
     });
   },
-  handler: async ({ argv, config, configPath, configIsEmpty }) => {
+  handler: async opts => {
+    let matchedScript: CreateScriptOptions | undefined;
+
     try {
-      const { config: configFlag, script, scripts: scriptsFlag } = argv;
+      const { argv } = opts;
 
       // If the user did not pass the --scripts option, ensure that they did
       // pass a positional argument indicating a script to run.
-      if (!scriptsFlag && !script) {
+      if (!argv.scripts && !argv.script) {
         throw new Error('No script name provided.');
       }
 
-      // If the --config option was used, load the file at the indicated path
-      // and update our variables.
-      if (configFlag) {
-        configPath = path.resolve(configFlag);
-        config = (await import(configPath)).default;
-      } else if (configIsEmpty) {
-        // Otherwise, if Cosmiconfig found an empty configuration file, throw.
-        throw new Error(`Configuration file at ${configPath} is empty.`);
-      } else if (!configPath) {
-        // Otherwise, if Cosmiconfig did not find a configuration file, throw.
-        throw new Error('Unable to find an nr.config.js file.');
-      }
-
-      // If the config file did not export a function, throw.
-      if (typeof config !== 'function') {
-        throw new TypeError(`Configuration file at ${configPath} does not export a function.`);
-      }
-
-      // Invoke the user's configuration factory.
-      await config({ createCommand, createScript });
-
-      // After calling the user's configuration factory, ensure that our command
-      // registry is not empty.
-      if (commands.size === 0) {
-        throw new Error('Configuration failed to register any commands.');
-      }
-
-      // Ensure that our scripts registry is not empty.
-      if (scripts.size === 0) {
-        throw new Error('Configuration failed to register any scripts.');
-      }
+      // Load the user's configuration file.
+      await loadConfig(opts);
 
       // Finally, if the --scripts option was used, print the names and
       // descriptions of each registered script, then return.
-      if (scriptsFlag) {
-        console.log('Available scripts:\n');
-        scriptConfigs.forEach((scriptConfig, scriptName) => {
-          console.log(log.chalk.green(scriptName), `:: ${log.chalk.gray(scriptConfig.description)}`);
-        });
-
+      if (argv.scripts) {
+        printAvailableScripts();
         return;
       }
 
       // Otherwise, match and execute the indicated script.
-      await executeScript(argv.script);
+      const runTime = log.createTimer();
+      matchedScript = matchScript(argv.script);
+      await executeScript(matchedScript.name);
+
+      // If the parent script is configured to log timing, do so.
+      if (matchedScript.timing) {
+        log.info(log.chalk.gray.dim(`Done in ${runTime}.`));
+      }
     } catch (err) {
-      log.error(err);
-      process.exit(1);
+      const { command, message, stack } = parseError(err);
+
+      log.error(log.chalk.red.bold(
+        command ? [
+          `Command "${command}"`,
+          matchedScript && `in script "${matchedScript.name}"`,
+          `failed with exit code ${err.exitCode}.`
+        ].filter(Boolean) : message
+      ));
+
+      log.verbose(log.chalk.gray(stack));
+      process.exit(err?.exitCode ?? 0);
     }
   }
 });
