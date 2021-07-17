@@ -65,7 +65,7 @@ cli.command<CLIArguments, any>({
 
       // If the parent script is configured to log timing, do so.
       if (matchedScript.timing) {
-        log.info(log.chalk.gray.dim(`Done in ${runTime}.`));
+        log.info(log.chalk.gray(`Done in ${runTime}.`));
       }
     } catch (err) {
       const { command, message, stack } = parseError(err);
@@ -75,7 +75,7 @@ cli.command<CLIArguments, any>({
           `Command "${command}"`,
           matchedScript && `in script "${matchedScript.name}"`,
           `failed with exit code ${err.exitCode}.`
-        ].filter(Boolean) : message
+        ].filter(Boolean).join(' ') : message
       ));
 
       log.verbose(log.chalk.gray(stack));

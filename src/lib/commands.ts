@@ -103,7 +103,7 @@ export function createCommand(opts: CreateCommandOptions) {
       const runTime = log.createTimer();
 
       // Log the exact command being run at the verbose level.
-      log.verbose(log.prefix(opts.command), 'exec:', log.chalk.gray(opts.command), log.chalk.gray(parsedArguments.join(' ')));
+      log.verbose(log.prefix('cmd'), 'exec:', log.chalk.gray(opts.command), log.chalk.gray(parsedArguments.join(' ')));
 
       const command = execa(opts.command, parsedArguments, {
         stdio: 'pipe',
