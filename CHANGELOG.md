@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.1-beta.0](https://github.com/darkobits/nr/compare/v0.3.0...v0.3.1-beta.0) (2021-07-17)
+
+
+### 🏗 Chores
+
+* **deps:** Update dependencies. ([c8204c6](https://github.com/darkobits/nr/commit/c8204c6f8e37c24abe7ae7bd90e291fb059f8c67))
+
+
+### 🛠 Refactoring
+
+* Refactor signatures of `createCommand`, `createScript`. ([fb270a2](https://github.com/darkobits/nr/commit/fb270a2eefa7d8bb4d51875db63608ffad59baec))
+
 ## [0.3.0](https://github.com/darkobits/nr/compare/v0.2.0...v0.3.0) (2021-07-17)
 
 
