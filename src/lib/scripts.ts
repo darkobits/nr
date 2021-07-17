@@ -37,8 +37,30 @@ const scriptConfigs = new Map<ScriptThunk, CreateScriptOptions>();
 /**
  * @private
  *
- * Provided a CommandThunk, ScriptThunk, string, or array thereof, resolves each
- * value to a CommandThunk, ScriptThunk or array thereof.
+ * Parses a string identifier for a script or command and returns an object
+ * describing it.
+ */
+function parseIdentifier(value: string) {
+  if (value.includes(':')) {
+    const [type, name] = value.split(':');
+
+    if (!['script', 'cmd'].includes(type)) {
+      throw new Error(`Invalid type: ${type}`);
+    }
+
+    return { type, name };
+  }
+
+  return { type: 'unknown', name: value };
+}
+
+
+/**
+ * @private
+ *
+ * Provided a CommandThunk, ScriptThunk, or string, returns a CommandThunk or a
+ * ScriptThunk. Strings may begin with 'script:' or 'cmd:' to indicate the type
+ * to be resolved. If no prefix is provided and
  */
 function resolveInstruction(value: Instruction): ScriptThunk | CommandThunk {
   if (typeof value === 'function') {
@@ -50,17 +72,34 @@ function resolveInstruction(value: Instruction): ScriptThunk | CommandThunk {
   }
 
   if (typeof value === 'string') {
-    const commandThunk = commands.get(value);
+    const { type, name } = parseIdentifier(value);
+    const scriptThunk = scripts.get(name);
+    const commandThunk = commands.get(name);
 
-    if (!commandThunk) {
-      throw new Error(`Unknown command: "${value}"`);
+    if (type === 'script' && scriptThunk) {
+      return scriptThunk;
     }
 
-    return commandThunk;
+    if (type === 'command' && commandThunk) {
+      return commandThunk;
+    }
+
+    if (scriptThunk) {
+      return scriptThunk;
+    }
+
+    if (commandThunk) {
+      return commandThunk;
+    }
+
+    if (type === 'unknown' && scriptThunk && commandThunk) {
+      throw new Error(`Instruction "${value}" could refer to a script or command. Disambiguate using either a "cmd:" or "script:" prefix.`);
+    }
+
+    throw new Error(`Unable to resolve "${value}" to a script or command.`);
   }
 
-  // N.B. This is just here for type coercion.
-  throw new TypeError('Invalid command.');
+  throw new TypeError(`Expected instruction to be of type "string" or "function", got "${typeof value}".`);
 }
 
 
@@ -117,7 +156,7 @@ export function createScript(opts: CreateScriptOptions) {
         return;
       }
 
-      log.verbose(log.prefix('script'), `Executing script: ${log.chalk.green(opts.name)}`);
+      log.verbose(log.prefix('script'), 'exec:', log.chalk.green(opts.name));
 
       const time = log.createTimer();
 
@@ -137,7 +176,7 @@ export function createScript(opts: CreateScriptOptions) {
 
     return scriptThunk;
   } catch (err) {
-    throw new Error(`Unable to create script "${opts.name}": ${err.message}.`);
+    throw new Error(`Unable to create script "${opts.name}": ${err.message}`);
   }
 }
 
