@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.3.0](https://github.com/darkobits/nr/compare/v0.2.0...v0.3.0) (2021-07-17)
+
+
+### ✨ Features
+
+* Improve resolution of string instructions. ([467cffd](https://github.com/darkobits/nr/commit/467cffd51684e15eaf8243db79609ac598b053af))
+
+
+### 🏗 Chores
+
+* **deps:** Update @darkobits/ts. ([9a55bc0](https://github.com/darkobits/nr/commit/9a55bc0d8d760c9b2de9c8dd58296b251016ffc7))
+* Improve logging. ([1c7cda9](https://github.com/darkobits/nr/commit/1c7cda9990e4ca407aaa65a599cbe37b76e009e8))
+
 ## [0.2.0](https://github.com/darkobits/nr/compare/v0.1.0...v0.2.0) (2021-07-17)
 
 
