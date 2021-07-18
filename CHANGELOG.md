@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.5.0](https://github.com/darkobits/nr/compare/v0.4.0...v0.5.0) (2021-07-18)
+
+
+### 📖 Documentation
+
+* Update README. ([941237c](https://github.com/darkobits/nr/commit/941237c3a0876b4bb8532fd65c23f552e4c59b18))
+
+
+### ✨ Features
+
+* Support ESM syntax in configuration files. ([e988743](https://github.com/darkobits/nr/commit/e9887434bb0f22ba22f543c4e13d57f4827a4362))
+
 ## [0.4.0](https://github.com/darkobits/nr/compare/v0.3.1-beta.2...v0.4.0) (2021-07-17)
 
 ### [0.3.1-beta.2](https://github.com/darkobits/nr/compare/v0.3.1-beta.1...v0.3.1-beta.2) (2021-07-17)
