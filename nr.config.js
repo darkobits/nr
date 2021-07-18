@@ -1,1 +1,3 @@
-module.exports = require('@darkobits/ts').nr();
+import { nr } from '@darkobits/ts';
+
+export default nr();
