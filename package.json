@@ -17,6 +17,7 @@
   "main": "dist/index.js",
   "scripts": {
     "prepare": "nr prepare",
+    "prepublishOnly": "nr prepare",
     "help": "nr --scripts"
   },
   "dependencies": {
