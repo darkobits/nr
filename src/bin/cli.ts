@@ -68,16 +68,8 @@ cli.command<CLIArguments, any>({
         log.info(log.chalk.gray(`Done in ${runTime}.`));
       }
     } catch (err) {
-      const { command, message, stack } = parseError(err);
-
-      log.error(log.chalk.red.bold(
-        command ? [
-          `Command "${command}"`,
-          scriptConfig && `in script "${scriptConfig.name}"`,
-          `failed with exit code ${err.exitCode}.`
-        ].filter(Boolean).join(' ') : message
-      ));
-
+      const { message, stack } = parseError(err);
+      log.error(log.chalk.red.bold(message));
       log.verbose(log.chalk.gray(stack));
       process.exit(err?.exitCode ?? 0);
     }

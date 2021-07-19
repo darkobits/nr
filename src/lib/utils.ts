@@ -67,6 +67,8 @@ export function isExecaError(value: any): value is ExecaError {
 
 /**
  * Provided an Error, returns its message, stack, and command (if applicable).
+ *
+ * TODO: If 'command' is not used any more, remove it.
  */
 export function parseError<E extends Error>(err: E) {
   let command: string | undefined;
