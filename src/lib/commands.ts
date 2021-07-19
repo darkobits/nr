@@ -88,23 +88,11 @@ export function createCommand(name: CommandName, args: CreateCommandArguments, o
     const [executableName] = args;
 
     // Validate options.
-    ow<CreateCommandOptions | undefined>(opts, ow.any(
-      ow.undefined,
-      ow.object.exactShape({
-        prefix: ow.any(
-          ow.undefined,
-          ow.function
-        ),
-        execaOptions: ow.any(
-          ow.undefined,
-          ow.object.nonEmpty
-        ),
-        preserveArguments: ow.any(
-          ow.undefined,
-          ow.boolean
-        )
-      })
-    ));
+    ow<Required<CreateCommandOptions>>(opts, ow.optional.object.exactShape({
+      prefix: ow.optional.function,
+      execaOptions: ow.optional.object,
+      preserveArguments: ow.optional.boolean
+    }));
 
     const commandThunk: CommandThunk = Object.assign(async () => {
       try {

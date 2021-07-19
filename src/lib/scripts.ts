@@ -115,9 +115,9 @@ export function createScript(name: string, opts: CreateScriptOptions) {
     ow(name, 'script name', ow.string);
 
     // Validate options.
-    ow<CreateScriptOptions>(opts, ow.object.exactShape({
+    ow<Required<CreateScriptOptions>>(opts, ow.object.exactShape({
       description: ow.string,
-      group: ow.any(ow.undefined, ow.string),
+      group: ow.optional.string,
       run: ow.array.ofType(ow.any(
         ow.string,
         ow.function,
@@ -126,7 +126,7 @@ export function createScript(name: string, opts: CreateScriptOptions) {
           ow.function
         ))
       )),
-      timing: ow.any(ow.undefined, ow.boolean)
+      timing: ow.optional.boolean
     }));
 
     // Map each entry in the instruction sequence to its corresponding command
