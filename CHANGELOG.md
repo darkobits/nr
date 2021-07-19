@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.5](https://github.com/darkobits/nr/compare/v0.5.4...v0.5.5) (2021-07-19)
+
+
+### 🐞 Bug Fixes
+
+* Run post scripts in correct order. ([23d2546](https://github.com/darkobits/nr/commit/23d25468fa10b6350c2ea77fc1c61ea054b7aa41))
+
+
+### 🏗 Chores
+
+* Improve command error messages. ([61c0468](https://github.com/darkobits/nr/commit/61c0468a4e91400c0a9de18e12751a1d774a9063))
+
 ### [0.5.4](https://github.com/darkobits/nr/compare/v0.5.3...v0.5.4) (2021-07-19)
 
 
