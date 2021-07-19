@@ -246,6 +246,8 @@ export async function executeScript(scriptName: string) {
 
   const scriptThunk = scripts.get(scriptName) as ScriptThunk;
 
+  await scriptThunk();
+
   const postScriptName = `post${scriptName}`;
 
   if (scripts.has(postScriptName)) {
@@ -253,6 +255,4 @@ export async function executeScript(scriptName: string) {
     const postScriptThunk = scripts.get(postScriptName) as ScriptThunk;
     await postScriptThunk();
   }
-
-  await scriptThunk();
 }
