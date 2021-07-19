@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.4](https://github.com/darkobits/nr/compare/v0.5.3...v0.5.4) (2021-07-19)
+
+
+### 🏗 Chores
+
+* **deps:** Update dependencies. ([cf9f223](https://github.com/darkobits/nr/commit/cf9f2238407d4101ba16ac82541865217c052fcf))
+
 ### [0.5.3](https://github.com/darkobits/nr/compare/v0.5.2...v0.5.3) (2021-07-19)
 
 
