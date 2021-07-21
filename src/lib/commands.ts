@@ -119,7 +119,7 @@ function resolveCommand(cmd: string) {
  */
 const executeCommand: CommandExecutor = (name, executableName, parsedArguments, opts) => {
   const cmd = execa(executableName, parsedArguments, merge(commonExecaOptions, opts?.execaOptions ?? {}));
-  const escapedCommand = getEscapedCommand(cmd.spawnfile, cmd.spawnargs);
+  const escapedCommand = getEscapedCommand(undefined, cmd.spawnargs);
   log.verbose(log.prefix(`cmd:${name}`), 'exec:', log.chalk.gray(escapedCommand));
   return cmd;
 };
@@ -135,7 +135,7 @@ const executeCommand: CommandExecutor = (name, executableName, parsedArguments, 
 const executeNodeCommand: CommandExecutor = (name, scriptPath, parsedArguments, opts) => {
   const resolvedScriptPath = resolveCommand(scriptPath);
   const cmd = execa.node(resolvedScriptPath, parsedArguments, merge(commonExecaOptions, opts?.execaOptions ?? {}));
-  const escapedCommand = getEscapedCommand(cmd.spawnfile, cmd.spawnargs);
+  const escapedCommand = getEscapedCommand(undefined, cmd.spawnargs);
   log.verbose(log.prefix(`cmd:${name}`), 'exec:', log.chalk.gray(escapedCommand));
   return cmd;
 };
