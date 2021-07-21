@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.6.5](https://github.com/darkobits/nr/compare/v0.6.4...v0.6.5) (2021-07-21)
+
+
+### 🐞 Bug Fixes
+
+* Invoke `getEscapedCommand` without first argument. ([95cb39d](https://github.com/darkobits/nr/commit/95cb39d26f5a523a31090613273fb802b8320c48))
+
 ### [0.6.4](https://github.com/darkobits/nr/compare/v0.6.3...v0.6.4) (2021-07-21)
 
 
