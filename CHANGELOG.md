@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.6.0](https://github.com/darkobits/nr/compare/v0.5.5...v0.6.0) (2021-07-21)
+
+
+### 🏗 Chores
+
+* **deps:** Update dependencies. ([fe801d4](https://github.com/darkobits/nr/commit/fe801d41dc6699e4eb31ada54b20d9891234690e))
+
+
+### ✨ Features
+
+* Add `createNodeCommand`. ([f1ebd2a](https://github.com/darkobits/nr/commit/f1ebd2af9d008fea24b4dcd4547732b14d44b3a7))
+
 ### [0.5.5](https://github.com/darkobits/nr/compare/v0.5.4...v0.5.5) (2021-07-19)
 
 
