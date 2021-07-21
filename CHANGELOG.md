@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.3](https://github.com/darkobits/nr/compare/v0.7.2...v0.7.3) (2021-07-21)
+
+
+### 🐞 Bug Fixes
+
+* Ensure processes exit with non-zero code on failure. ([43c91a0](https://github.com/darkobits/nr/commit/43c91a0500c8231a4e251f288a5288e84a1cd07c))
+
 ### [0.7.2](https://github.com/darkobits/nr/compare/v0.7.1...v0.7.2) (2021-07-21)
 
 
