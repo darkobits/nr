@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.6.4](https://github.com/darkobits/nr/compare/v0.6.3...v0.6.4) (2021-07-21)
+
+
+### 🏗 Chores
+
+* Use `getEscapedCommand` to log commands. ([3431688](https://github.com/darkobits/nr/commit/34316880a42a6e4a22be426e161b6a41269875ec))
+
 ### [0.6.3](https://github.com/darkobits/nr/compare/v0.6.2...v0.6.3) (2021-07-21)
 
 

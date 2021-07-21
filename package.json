@@ -1,6 +1,6 @@
 {
   "name": "@darkobits/nr",
-  "version": "0.6.3",
+  "version": "0.6.4",
   "license": "WTFPL",
   "description": "Replacement for 'npm run'.",
   "author": "darkobits",
