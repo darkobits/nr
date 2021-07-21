@@ -3,7 +3,7 @@ import path from 'path';
 import type { SaffronHandlerOptions } from '@darkobits/saffron';
 
 import type { CLIArguments } from 'etc/types';
-import { createCommand, commands } from 'lib/commands';
+import { createCommand, createNodeCommand, commands } from 'lib/commands';
 import { createScript, scripts } from 'lib/scripts';
 
 
@@ -31,7 +31,7 @@ export default async function loadConfig({ argv, config, configPath, configIsEmp
   }
 
   // Invoke the user's configuration factory.
-  await config({ createCommand, createScript });
+  await config({ createCommand, createNodeCommand, createScript });
 
   // After calling the user's configuration factory, ensure that our command
   // registry is not empty.
