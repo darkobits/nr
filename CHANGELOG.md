@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.2](https://github.com/darkobits/nr/compare/v0.7.1...v0.7.2) (2021-07-21)
+
+
+### 🐞 Bug Fixes
+
+* Revert "Publish as ESM". ([ac11447](https://github.com/darkobits/nr/commit/ac11447497a5ca95279a9c9aef612667a45691c1))
+
 ### [0.7.1](https://github.com/darkobits/nr/compare/v0.7.0...v0.7.1) (2021-07-21)
 
 
