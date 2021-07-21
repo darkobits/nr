@@ -1,2 +1,2 @@
-export { createCommand } from 'lib/commands';
+export { createCommand, createNodeCommand } from 'lib/commands';
 export { createScript } from 'lib/scripts';

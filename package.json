@@ -25,6 +25,7 @@
     "@darkobits/saffron": "^0.2.5",
     "@types/yargs-unparser": "^2.0.1",
     "deepmerge": "^4.2.2",
+    "errno": "^1.0.0",
     "esm": "^3.2.25",
     "execa": "^5.1.1",
     "kebabcase-keys": "^1.0.0",
@@ -33,11 +34,13 @@
     "p-all": "^3.0.0",
     "p-series": "^2.1.0",
     "ramda": "^0.27.1",
+    "which": "^2.0.2",
     "yargs-unparser": "^2.0.0"
   },
   "devDependencies": {
     "@darkobits/ts": "^0.6.0",
     "@types/micromatch": "^4.0.2",
-    "@types/ramda": "^0.27.44"
+    "@types/ramda": "^0.27.44",
+    "@types/which": "^2.0.1"
   }
 }
