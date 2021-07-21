@@ -72,7 +72,7 @@ export interface CreateCommandOptions {
  * Signature of a command executor. Returns an execa invocation using different
  * strategies.
  */
-export type CommandExecutor = (command: string, args: Array<string>, opts?: CreateCommandOptions) => execa.ExecaChildProcess;
+export type CommandExecutor = (name: string, command: string, args: Array<string>, opts?: CreateCommandOptions) => execa.ExecaChildProcess;
 
 
 /**

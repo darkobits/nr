@@ -115,7 +115,8 @@ function resolveCommand(cmd: string) {
  *
  * Executes a command directly using Execa.
  */
-const executeCommand: CommandExecutor = (executableName, parsedArguments, opts) => {
+const executeCommand: CommandExecutor = (name, executableName, parsedArguments, opts) => {
+  log.verbose(log.prefix(`cmd:${name}`), 'exec:', log.chalk.gray(executableName), log.chalk.gray(parsedArguments.join(' ')));
   return execa(executableName, parsedArguments, merge(commonExecaOptions, opts?.execaOptions ?? {}));
 };
 
@@ -127,8 +128,9 @@ const executeCommand: CommandExecutor = (executableName, parsedArguments, opts) 
  *
  * See: https://github.com/sindresorhus/execa#execanodescriptpath-arguments-options
  */
-const executeNodeCommand: CommandExecutor = (scriptPath, parsedArguments, opts) => {
+const executeNodeCommand: CommandExecutor = (name, scriptPath, parsedArguments, opts) => {
   const resolvedScriptPath = resolveCommand(scriptPath);
+  log.verbose(log.prefix(`cmd:${name}`), 'exec:', log.chalk.gray(resolvedScriptPath), log.chalk.gray(parsedArguments.join(' ')));
   return execa.node(resolvedScriptPath, parsedArguments, merge(commonExecaOptions, opts?.execaOptions ?? {}));
 };
 
@@ -163,11 +165,7 @@ function commandBuilder(commandExecutor: CommandExecutor) {
       const commandThunk: CommandThunk = Object.assign(async () => {
         try {
           const runTime = log.createTimer();
-
-          // Log the exact command being run at the verbose level.
-          log.verbose(log.prefix(`cmd:${name}`), 'exec:', log.chalk.gray(executableName), log.chalk.gray(parsedArguments.join(' ')));
-
-          const command = commandExecutor(executableName, parsedArguments, opts);
+          const command = commandExecutor(name, executableName, parsedArguments, opts);
 
           // If the user provided a custom prefix function, generate it now.
           const prefix = opts?.prefix ? opts.prefix(log.chalk) : '';
