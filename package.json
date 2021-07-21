@@ -3,7 +3,6 @@
   "version": "0.7.1",
   "description": "Replacement for 'npm run'.",
   "author": "darkobits",
-  "type": "module",
   "engines": {
     "node": ">=14"
   },
