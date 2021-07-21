@@ -4,6 +4,7 @@
   "license": "WTFPL",
   "description": "Replacement for 'npm run'.",
   "author": "darkobits",
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "https://github.com/darkobits/nr"
@@ -22,7 +23,7 @@
   },
   "dependencies": {
     "@darkobits/log": "^2.0.0-beta.15",
-    "@darkobits/saffron": "^0.2.5",
+    "@darkobits/saffron": "^0.3.2",
     "@types/yargs-unparser": "^2.0.1",
     "deepmerge": "^4.2.2",
     "errno": "^1.0.0",
@@ -38,7 +39,7 @@
     "yargs-unparser": "^2.0.0"
   },
   "devDependencies": {
-    "@darkobits/ts": "^0.6.0",
+    "@darkobits/ts": "^0.7.2",
     "@types/micromatch": "^4.0.2",
     "@types/ramda": "^0.27.44",
     "@types/which": "^2.0.1"

@@ -1,6 +1,6 @@
 import { EOL } from 'os';
 
-import ow from 'ow';
+// import { default as ow } from 'ow';
 import pAll from 'p-all';
 import pSeries from 'p-series';
 import * as R from 'ramda';
@@ -112,22 +112,22 @@ function resolveInstruction(value: Instruction): ScriptThunk | CommandThunk {
 export function createScript(name: string, opts: CreateScriptOptions) {
   try {
     // Validate name.
-    ow(name, 'script name', ow.string);
+    // ow(name, 'script name', ow.string);
 
     // Validate options.
-    ow<Required<CreateScriptOptions>>(opts, ow.object.exactShape({
-      description: ow.string,
-      group: ow.optional.string,
-      run: ow.array.ofType(ow.any(
-        ow.string,
-        ow.function,
-        ow.array.ofType(ow.any(
-          ow.string,
-          ow.function
-        ))
-      )),
-      timing: ow.optional.boolean
-    }));
+    // ow<Required<CreateScriptOptions>>(opts, ow.object.exactShape({
+    //   description: ow.string,
+    //   group: ow.optional.string,
+    //   run: ow.array.ofType(ow.any(
+    //     ow.string,
+    //     ow.function,
+    //     ow.array.ofType(ow.any(
+    //       ow.string,
+    //       ow.function
+    //     ))
+    //   )),
+    //   timing: ow.optional.boolean
+    // }));
 
     // Map each entry in the instruction sequence to its corresponding command
     // thunk or script thunk. For nested arrays, map the array to a thunk that

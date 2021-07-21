@@ -6,7 +6,7 @@ import execa from 'execa';
 import { getEscapedCommand } from 'execa/lib/command';
 // @ts-expect-error - This package does not have type definitions.
 import kebabCaseKeys from 'kebabcase-keys';
-import ow from 'ow';
+// import { default as ow } from 'ow';
 import which from 'which';
 import unParseArgs from 'yargs-unparser';
 
@@ -60,8 +60,8 @@ const commonExecaOptions: execa.Options = {
  * "un-parsed" arguments.
  */
 function parseArguments(args: CreateCommandArguments, preserveArguments?: boolean) {
-  ow(args, 'command and arguments', ow.array.maxLength(3));
-  ow(args[0], 'command', ow.string);
+  // ow(args, 'command and arguments', ow.array.maxLength(3));
+  // ow(args[0], 'command', ow.string);
 
   if (args.length === 1) {
     return [''];
@@ -73,18 +73,18 @@ function parseArguments(args: CreateCommandArguments, preserveArguments?: boolea
   if (args.length === 2) {
     if (Array.isArray(args[1])) {
       // Got [command, positionals] form.
-      ow(args[1], 'positional arguments', ow.array.ofType(ow.string));
+      // ow(args[1], 'positional arguments', ow.array.ofType(ow.string));
       positionals = args[1];
     } else {
       // Got [command, flags] form.
-      ow(args[1], 'flags', ow.object);
+      // ow(args[1], 'flags', ow.object);
       flags = args[1];
     }
   } else if (args.length === 3) {
     // Got [command, positionals, flags] form.
-    ow(args[1], 'positional arguments', ow.array.ofType(ow.string));
+    // ow(args[1], 'positional arguments', ow.array.ofType(ow.string));
     positionals = args[1];
-    ow(args[2], 'flags', ow.object);
+    // ow(args[2], 'flags', ow.object);
     flags = args[2];
   }
 
@@ -155,18 +155,18 @@ function commandBuilder(commandExecutor: CommandExecutor) {
   return (name: CommandName, args: CreateCommandArguments, opts?: CreateCommandOptions) => {
     try {
       // Validate name.
-      ow(name, 'name', ow.string);
+      // ow(name, 'name', ow.string);
 
       // Parse and validate command and arguments.
       const parsedArguments = parseArguments(args, opts?.preserveArguments);
       const [executableName] = args;
 
       // Validate options.
-      ow<Required<CreateCommandOptions>>(opts, ow.optional.object.exactShape({
-        prefix: ow.optional.function,
-        execaOptions: ow.optional.object,
-        preserveArguments: ow.optional.boolean
-      }));
+      // ow<Required<CreateCommandOptions>>(opts, ow.optional.object.exactShape({
+      //   prefix: ow.optional.function,
+      //   execaOptions: ow.optional.object,
+      //   preserveArguments: ow.optional.boolean
+      // }));
 
       const commandThunk: CommandThunk = Object.assign(async () => {
         try {
@@ -211,7 +211,9 @@ function commandBuilder(commandExecutor: CommandExecutor) {
 
       return commandThunk;
     } catch (err) {
-      throw new Error(`Unable to create command "${name}": ${err.message}`);
+      console.log(err);
+      err.message = `Unable to create command "${name}": ${err.message}`;
+      throw err;
     }
   };
 }
