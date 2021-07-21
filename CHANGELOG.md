@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.6.6-beta.0](https://github.com/darkobits/nr/compare/v0.6.5...v0.6.6-beta.0) (2021-07-21)
+
+
+### 🛠 Refactoring
+
+* Publish as ESM. ([888a834](https://github.com/darkobits/nr/commit/888a8343b624c2ab04e775d2cb367bd37a4ed673))
+
 ### [0.6.5](https://github.com/darkobits/nr/compare/v0.6.4...v0.6.5) (2021-07-21)
 
 
