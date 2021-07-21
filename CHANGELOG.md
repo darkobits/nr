@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.7.0](https://github.com/darkobits/nr/compare/v0.6.6-beta.0...v0.7.0) (2021-07-21)
+
+
+### ✨ Features
+
+* Pass `isCi` to configuration factories. ([34bfd75](https://github.com/darkobits/nr/commit/34bfd75877b0bcd6c575495ebe3fe6098364c8aa))
+
 ### [0.6.6-beta.0](https://github.com/darkobits/nr/compare/v0.6.5...v0.6.6-beta.0) (2021-07-21)
 
 
