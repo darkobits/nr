@@ -1,8 +1,10 @@
 import path from 'path';
 
+import isCI from 'is-ci';
+
 import type { SaffronHandlerOptions } from '@darkobits/saffron';
 
-import type { CLIArguments } from 'etc/types';
+import type { CLIArguments, ConfigurationFactory } from 'etc/types';
 import { createCommand, createNodeCommand, commands } from 'lib/commands';
 import { createScript, scripts } from 'lib/scripts';
 
@@ -11,7 +13,7 @@ import { createScript, scripts } from 'lib/scripts';
  * Responsible for interpreting command line arguments and Cosmiconfig results
  * to locate and parse the user's configuration file, then return the results.
  */
-export default async function loadConfig({ argv, config, configPath, configIsEmpty }: SaffronHandlerOptions<CLIArguments, any>) {
+export default async function loadConfig({ argv, config, configPath, configIsEmpty }: SaffronHandlerOptions<CLIArguments, ConfigurationFactory>) {
   // If the --config option was used, load the file at the indicated path
   // and update our variables.
   if (argv.config) {
@@ -31,7 +33,12 @@ export default async function loadConfig({ argv, config, configPath, configIsEmp
   }
 
   // Invoke the user's configuration factory.
-  await config({ createCommand, createNodeCommand, createScript });
+  await config({
+    createCommand,
+    createNodeCommand,
+    createScript,
+    isCI
+  });
 
   // After calling the user's configuration factory, ensure that our command
   // registry is not empty.

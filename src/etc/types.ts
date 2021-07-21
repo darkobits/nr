@@ -186,6 +186,13 @@ export interface ConfigurationFactoryArguments {
   createCommand: typeof createCommand;
   createNodeCommand: typeof createNodeCommand;
   createScript: typeof createScript;
+
+  /**
+   * True if a CI environment has been detected.
+   *
+   * See: https://github.com/watson/is-ci
+   */
+  isCI: boolean;
 }
 
 
