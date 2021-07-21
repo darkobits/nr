@@ -2,7 +2,7 @@ import type execa from 'execa';
 import type { Arguments } from 'yargs-unparser';
 
 import type { IS_SCRIPT_THUNK, IS_COMMAND_THUNK } from 'etc/constants';
-import type { createCommand } from 'lib/commands';
+import type { createCommand, createNodeCommand } from 'lib/commands';
 import type log from 'lib/log';
 import type { createScript } from 'lib/scripts';
 
@@ -184,6 +184,7 @@ export interface ScriptThunk {
  */
 export interface ConfigurationFactoryArguments {
   createCommand: typeof createCommand;
+  createNodeCommand: typeof createNodeCommand;
   createScript: typeof createScript;
 }
 
