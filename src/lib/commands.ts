@@ -2,6 +2,8 @@ import merge from 'deepmerge';
 // @ts-expect-error - This package does not have type definitions.
 import errno from 'errno';
 import execa from 'execa';
+// @ts-expect-error - This file does not have type definitions.
+import { getEscapedCommand } from 'execa/lib/command';
 // @ts-expect-error - This package does not have type definitions.
 import kebabCaseKeys from 'kebabcase-keys';
 import ow from 'ow';
@@ -116,8 +118,10 @@ function resolveCommand(cmd: string) {
  * Executes a command directly using Execa.
  */
 const executeCommand: CommandExecutor = (name, executableName, parsedArguments, opts) => {
-  log.verbose(log.prefix(`cmd:${name}`), 'exec:', log.chalk.gray(executableName), log.chalk.gray(parsedArguments.join(' ')));
-  return execa(executableName, parsedArguments, merge(commonExecaOptions, opts?.execaOptions ?? {}));
+  const cmd = execa(executableName, parsedArguments, merge(commonExecaOptions, opts?.execaOptions ?? {}));
+  const escapedCommand = getEscapedCommand(cmd.spawnfile, cmd.spawnargs);
+  log.verbose(log.prefix(`cmd:${name}`), 'exec:', log.chalk.gray(escapedCommand));
+  return cmd;
 };
 
 
@@ -130,8 +134,10 @@ const executeCommand: CommandExecutor = (name, executableName, parsedArguments, 
  */
 const executeNodeCommand: CommandExecutor = (name, scriptPath, parsedArguments, opts) => {
   const resolvedScriptPath = resolveCommand(scriptPath);
-  log.verbose(log.prefix(`cmd:${name}`), 'exec:', log.chalk.gray(resolvedScriptPath), log.chalk.gray(parsedArguments.join(' ')));
-  return execa.node(resolvedScriptPath, parsedArguments, merge(commonExecaOptions, opts?.execaOptions ?? {}));
+  const cmd = execa.node(resolvedScriptPath, parsedArguments, merge(commonExecaOptions, opts?.execaOptions ?? {}));
+  const escapedCommand = getEscapedCommand(cmd.spawnfile, cmd.spawnargs);
+  log.verbose(log.prefix(`cmd:${name}`), 'exec:', log.chalk.gray(escapedCommand));
+  return cmd;
 };
 
 
