@@ -2,7 +2,7 @@ import { EOL } from 'os';
 
 import type { ExecaError } from 'execa';
 import micromatch from 'micromatch';
-// import { default as ow } from 'ow';
+import ow from 'ow';
 
 
 /**
@@ -22,7 +22,7 @@ function isSingleSegment(input: string) {
  */
 export function matchSegmentedName(haystack: Array<string>, needle: string): string {
   // Validate haystack type.
-  // ow(haystack, 'script list', ow.array.ofType(ow.string));
+  ow(haystack, 'script list', ow.array.ofType(ow.string));
 
   // Append '*' to each dot-delimited segment of the query so that we achieve
   // the desired results when using micromatch. Throw if any segment is an

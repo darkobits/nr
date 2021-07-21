@@ -71,7 +71,7 @@ cli.command<CLIArguments, any>({
       const { message, stack } = parseError(err);
       log.error(log.chalk.red.bold(message));
       log.verbose(log.chalk.gray(stack));
-      process.exit(err?.exitCode ?? 0);
+      process.exit(err?.exitCode ?? 1);
     }
   }
 });
