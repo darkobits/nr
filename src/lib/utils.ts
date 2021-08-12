@@ -48,8 +48,11 @@ export function matchSegmentedName(haystack: Array<string>, needle: string): str
       return singleSegmentResults[0];
     }
 
+    const formattedResults = results.map(result => `"${result}"`);
+    formattedResults[formattedResults.length - 1] = `and ${formattedResults[formattedResults.length - 1]}`;
+
     // Otherwise, throw.
-    throw new Error(`Multiple scripts match "${needle}": ${results.join(', ')}`);
+    throw new Error(`Multiple scripts matched "${needle}": ${formattedResults.join(', ')}. Use more characters to disambiguate.`);
   }
 
   // Otherwise, we only have 1 result; return it.
