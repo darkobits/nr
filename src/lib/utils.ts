@@ -1,8 +1,9 @@
 import { EOL } from 'os';
 
-import type { ExecaError } from 'execa';
 import micromatch from 'micromatch';
 import ow from 'ow';
+
+import type { ExecaError } from 'execa';
 
 
 /**
@@ -64,7 +65,7 @@ export function matchSegmentedName(haystack: Array<string>, needle: string): str
  * Use duck-typing to determine if the provided value is an ExecaError.
  */
 export function isExecaError(value: any): value is ExecaError {
-  return value?.command && value?.exitCode;
+  return Boolean(value?.command && value?.exitCode);
 }
 
 

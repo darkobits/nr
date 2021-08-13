@@ -2,11 +2,11 @@ import path from 'path';
 
 import isCI from 'is-ci';
 
-import type { SaffronHandlerOptions } from '@darkobits/saffron';
-
-import type { CLIArguments, ConfigurationFactory } from 'etc/types';
 import { createCommand, createNodeCommand, commands } from 'lib/commands';
 import { createScript, scripts } from 'lib/scripts';
+
+import type { SaffronHandlerOptions } from '@darkobits/saffron';
+import type { CLIArguments, ConfigurationFactory } from 'etc/types';
 
 
 /**

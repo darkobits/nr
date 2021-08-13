@@ -2,11 +2,12 @@
 
 import cli from '@darkobits/saffron';
 
-import type { CLIArguments, ScriptConfiguration } from 'etc/types';
 import loadConfig from 'lib/configuration';
 import log from 'lib/log';
 import { matchScript, executeScript, printAvailableScripts } from 'lib/scripts';
 import { parseError } from 'lib/utils';
+
+import type { CLIArguments, ScriptConfiguration } from 'etc/types';
 
 
 cli.command<CLIArguments, any>({

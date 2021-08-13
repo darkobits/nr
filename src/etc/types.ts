@@ -1,10 +1,10 @@
-import type execa from 'execa';
-import type { Arguments } from 'yargs-unparser';
 
 import type { IS_SCRIPT_THUNK, IS_COMMAND_THUNK } from 'etc/constants';
+import type execa from 'execa';
 import type { createCommand, createNodeCommand } from 'lib/commands';
 import type log from 'lib/log';
 import type { createScript } from 'lib/scripts';
+import type { Arguments } from 'yargs-unparser';
 
 
 // ----- Commands --------------------------------------------------------------
