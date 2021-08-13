@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.4](https://github.com/darkobits/nr/compare/v0.7.3...v0.7.4) (2021-08-13)
+
+
+### 🛠 Refactoring
+
+* Update error message. ([4151ad7](https://github.com/darkobits/nr/commit/4151ad7c83a1506446a162c6ad875deb1216ba24))
+
+
+### 🏗 Chores
+
+* **deps:** Update dependencies. ([27482db](https://github.com/darkobits/nr/commit/27482dbf8ad91e583fce82c6525e8ce4f508564a))
+* **deps:** Update dependencies. ([5ddcb38](https://github.com/darkobits/nr/commit/5ddcb380d6244dc48f41101c856a42da2d393881))
+* **deps:** Update dependencies. ([0047c13](https://github.com/darkobits/nr/commit/0047c13ff85860d3b6dae6d31e5029c04296b95c))
+* Update ci.yml. ([5753188](https://github.com/darkobits/nr/commit/57531886ac77d0b9fcc283b2a179a12ba02cfa6c))
+
 ### [0.7.3](https://github.com/darkobits/nr/compare/v0.7.2...v0.7.3) (2021-07-21)
 
 
