@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.8.2](https://github.com/darkobits/nr/compare/v0.8.1...v0.8.2) (2022-02-08)
+
+
+### 🏗 Chores
+
+* Update dependencies. ([0ea8569](https://github.com/darkobits/nr/commit/0ea8569a1edde350048fe81170aeb81b3bd82eca))
+
+
+### 🐞 Bug Fixes
+
+* Pass `createBabelNodeCommand` to factories. ([d35d705](https://github.com/darkobits/nr/commit/d35d70576fcc04a769fa3b2078ebb07d97271fc1))
+
 ### [0.8.1](https://github.com/darkobits/nr/compare/v0.8.0...v0.8.1) (2022-02-08)
 
 
