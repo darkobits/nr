@@ -233,3 +233,18 @@ export function createCommand(name: CommandName, args: CreateCommandArguments, o
 export function createNodeCommand(name: CommandName, args: CreateCommandArguments, opts?: CreateCommandOptions) {
   return commandBuilder(executeNodeCommand)(name, args, opts);
 }
+
+
+/**
+ * Creates a CommandThunk that executes a command using `execa.node()` with
+ * Babel.
+ */
+export function createBabelNodeCommand(...params: Parameters<typeof createNodeCommand>) {
+  const [name, args, opts] = params;
+
+  return createNodeCommand(name, args, merge({
+    execaOptions: {
+      nodeOptions: ['--require', require.resolve('etc/babel-register')]
+    }
+  }, opts ?? {}));
+}
