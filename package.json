@@ -24,6 +24,7 @@
     "help": "nr --scripts"
   },
   "dependencies": {
+    "@babel/register": "^7.17.0",
     "@darkobits/log": "^2.0.0-beta.15",
     "@darkobits/saffron": "^0.4.3",
     "@types/is-ci": "^3.0.0",
