@@ -1,6 +1,6 @@
 {
   "name": "@darkobits/nr",
-  "version": "0.7.4",
+  "version": "0.8.0",
   "description": "Replacement for 'npm run'.",
   "author": "darkobits",
   "engines": {
