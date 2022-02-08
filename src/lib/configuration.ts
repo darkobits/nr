@@ -2,7 +2,12 @@ import path from 'path';
 
 import isCI from 'is-ci';
 
-import { createCommand, createNodeCommand, commands } from 'lib/commands';
+import {
+  createCommand,
+  createNodeCommand,
+  createBabelNodeCommand,
+  commands
+} from 'lib/commands';
 import { createScript, scripts } from 'lib/scripts';
 
 import type { SaffronHandlerOptions } from '@darkobits/saffron';
@@ -35,6 +40,7 @@ export default async function loadConfig({ argv, config, configPath, configIsEmp
   await config({
     createCommand,
     createNodeCommand,
+    createBabelNodeCommand,
     createScript,
     isCI
   });
