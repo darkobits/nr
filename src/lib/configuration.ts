@@ -14,8 +14,7 @@ import type { CLIArguments, ConfigurationFactory } from 'etc/types';
  * to locate and parse the user's configuration file, then return the results.
  */
 export default async function loadConfig({ argv, config, configPath, configIsEmpty }: SaffronHandlerOptions<CLIArguments, ConfigurationFactory>) {
-  // If the --config option was used, load the file at the indicated path
-  // and update our variables.
+  // If the --config option was used, load the file at the indicated path.
   if (argv.config) {
     configPath = path.resolve(argv.config);
     config = (await import(configPath)).default;
@@ -48,7 +47,7 @@ export default async function loadConfig({ argv, config, configPath, configIsEmp
 
   // Ensure that our scripts registry is not empty.
   if (scripts.size === 0) {
-    throw new Error('Configuration failed to register any scripts.');
+    throw new Error('Configuration did not register any scripts.');
   }
 
   return config;

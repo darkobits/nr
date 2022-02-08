@@ -68,7 +68,7 @@ cli.command<CLIArguments, any>({
       if (scriptConfig.timing) {
         log.info(log.chalk.gray(`Done in ${runTime}.`));
       }
-    } catch (err) {
+    } catch (err: any) {
       const { message, stack } = parseError(err);
       log.error(log.chalk.red.bold(message));
       log.verbose(log.chalk.gray(stack));

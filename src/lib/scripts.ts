@@ -62,7 +62,7 @@ function parseIdentifier(value: string) {
  *
  * Provided a CommandThunk, ScriptThunk, or string, returns a CommandThunk or a
  * ScriptThunk. Strings may begin with 'script:' or 'cmd:' to indicate the type
- * to be resolved. If no prefix is provided and
+ * to be resolved.
  */
 function resolveInstruction(value: Instruction): ScriptThunk | CommandThunk {
   if (typeof value === 'function') {
@@ -175,7 +175,7 @@ export function createScript(name: string, opts: CreateScriptOptions) {
     scriptConfigs.set(name, {...opts, name });
 
     return scriptThunk;
-  } catch (err) {
+  } catch (err: any) {
     throw new Error(`Unable to create script "${name}": ${err.message}`);
   }
 }

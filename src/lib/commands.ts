@@ -197,7 +197,7 @@ function commandBuilder(commandExecutor: CommandExecutor) {
           });
 
           await command;
-        } catch (err) {
+        } catch (err: any) {
           throw new Error(`Command "${name}" failed: ${err.message}`);
         }
       }, {
@@ -210,7 +210,7 @@ function commandBuilder(commandExecutor: CommandExecutor) {
       commandConfigs.set(commandThunk, [args, opts]);
 
       return commandThunk;
-    } catch (err) {
+    } catch (err: any) {
       console.log(err);
       err.message = `Unable to create command "${name}": ${err.message}`;
       throw err;
