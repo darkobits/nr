@@ -17,8 +17,8 @@ import {
 } from 'etc/types';
 import { commands } from 'lib/commands';
 import log from 'lib/log';
+import matchSegmentedName from 'lib/matcher';
 import ow from 'lib/ow';
-import { matchSegmentedName } from 'lib/utils';
 
 
 /**
