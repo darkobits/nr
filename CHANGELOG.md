@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.8.4](https://github.com/darkobits/nr/compare/v0.8.3...v0.8.4) (2022-02-09)
+
 ### [0.8.3](https://github.com/darkobits/nr/compare/v0.8.3-beta.4...v0.8.3) (2022-02-09)
 
 ### [0.8.3-beta.4](https://github.com/darkobits/nr/compare/v0.8.3-beta.3...v0.8.3-beta.4) (2022-02-09)
