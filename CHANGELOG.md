@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.8.3-beta.3](https://github.com/darkobits/nr/compare/v0.8.3-beta.2...v0.8.3-beta.3) (2022-02-09)
+
+
+### 🐞 Bug Fixes
+
+* Fix @babel/register resolve. ([2acf81b](https://github.com/darkobits/nr/commit/2acf81be2b51e98b59017c24730c1d427d77af76))
+
 ### [0.8.3-beta.2](https://github.com/darkobits/nr/compare/v0.8.3-beta.1...v0.8.3-beta.2) (2022-02-09)
 
 
