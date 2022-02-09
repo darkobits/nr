@@ -4,8 +4,9 @@
   "description": "Replacement for 'npm run'.",
   "author": "darkobits",
   "engines": {
-    "node": ">=14"
+    "node": ">=16"
   },
+  "type": "module",
   "license": "WTFPL",
   "repository": {
     "type": "git",
@@ -24,27 +25,26 @@
     "help": "nr --scripts"
   },
   "dependencies": {
-    "@babel/register": "^7.17.0",
     "@darkobits/log": "^2.0.0-beta.15",
-    "@darkobits/saffron": "^0.4.3",
+    "@darkobits/saffron": "^0.4.4",
     "@types/is-ci": "^3.0.0",
     "@types/yargs-unparser": "^2.0.1",
     "deepmerge": "^4.2.2",
     "errno": "^1.0.0",
     "esm": "^3.2.25",
-    "execa": "^5.1.1",
+    "execa": "^6.0.0",
     "is-ci": "^3.0.1",
     "kebabcase-keys": "^1.0.0",
     "micromatch": "^4.0.4",
     "ow": "^0.28.1",
-    "p-all": "^3.0.0",
-    "p-series": "^2.1.0",
+    "p-all": "^4.0.0",
+    "p-series": "^3.0.0",
     "ramda": "^0.28.0",
     "which": "^2.0.2",
     "yargs-unparser": "^2.0.0"
   },
   "devDependencies": {
-    "@darkobits/ts": "^0.8.14",
+    "@darkobits/ts": "^0.8.16",
     "@types/micromatch": "^4.0.2",
     "@types/ramda": "^0.27.64",
     "@types/which": "^2.0.1"

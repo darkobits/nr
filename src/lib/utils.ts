@@ -1,7 +1,8 @@
 import { EOL } from 'os';
 
 import micromatch from 'micromatch';
-import ow from 'ow';
+
+import ow from 'lib/ow';
 
 import type { ExecaError } from 'execa';
 
@@ -89,4 +90,20 @@ export function parseError<E extends Error>(err: E) {
     stack,
     command
   };
+}
+
+
+/**
+ * From: https://github.com/sindresorhus/execa/blob/main/lib/command.js
+ */
+export function getEscapedCommand(file: string | undefined, args: Array<string>) {
+  const normalizeArgs = (file: string | undefined, args: Array<string> = []) => (!Array.isArray(args)
+    ? [file]
+    : [file, ...args]);
+
+  const escapeArg = (arg: string | undefined) => (typeof arg !== 'string' || /^[\w.-]+$/.test(arg)
+    ? arg
+    : `"${arg.replace(/"/g, '\\"')}"`);
+
+  return normalizeArgs(file, args).map(arg => escapeArg(arg)).join(' ');
 }

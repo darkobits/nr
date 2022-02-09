@@ -46,7 +46,7 @@ cli.command<CLIArguments, any>({
       // If the user did not pass the --scripts option, ensure that they did
       // pass a positional argument indicating a script to run.
       if (!argv.scripts && !argv.script) {
-        throw new Error('No script name provided.');
+        throw new Error('No script provided. Run "nr --scripts" to show available scripts.');
       }
 
       // Load the user's configuration file.

@@ -1,12 +1,11 @@
+import path from 'path';
+
 import merge from 'deepmerge';
 // @ts-expect-error - This package does not have type definitions.
 import errno from 'errno';
-import execa from 'execa';
-// @ts-expect-error - This file does not have type definitions.
-import { getEscapedCommand } from 'execa/lib/command';
+import { execa, execaNode,  Options as ExecaOptions } from 'execa';
 // @ts-expect-error - This package does not have type definitions.
 import kebabCaseKeys from 'kebabcase-keys';
-import ow from 'ow';
 import which from 'which';
 import unParseArgs from 'yargs-unparser';
 
@@ -19,6 +18,8 @@ import {
   CreateCommandOptions
 } from 'etc/types';
 import log, { LogPipe } from 'lib/log';
+import ow from 'lib/ow';
+import { getEscapedCommand } from 'lib/utils';
 
 
 /**
@@ -40,7 +41,7 @@ const commandConfigs = new Map<CommandThunk, [CreateCommandArguments, CreateComm
  *
  * Common options provided to Execa.
  */
-const commonExecaOptions: execa.Options = {
+const commonExecaOptions: ExecaOptions = {
   // Prefer locally-installed versions of executables. For example, this
   // will search in the local NPM bin folder even if the user hasn't
   // added it to their $PATH.
@@ -128,13 +129,13 @@ const executeCommand: CommandExecutor = (name, executableName, parsedArguments, 
 /**
  * @private
  *
- * Executes a command using execa.node.
+ * Executes a command using `execaNode`.
  *
  * See: https://github.com/sindresorhus/execa#execanodescriptpath-arguments-options
  */
 const executeNodeCommand: CommandExecutor = (name, scriptPath, parsedArguments, opts) => {
   const resolvedScriptPath = resolveCommand(scriptPath);
-  const cmd = execa.node(resolvedScriptPath, parsedArguments, merge(commonExecaOptions, opts?.execaOptions ?? {}));
+  const cmd = execaNode(resolvedScriptPath, parsedArguments, merge(commonExecaOptions, opts?.execaOptions ?? {}));
   const escapedCommand = getEscapedCommand(undefined, cmd.spawnargs);
   log.verbose(log.prefix(`cmd:${name}`), 'exec:', log.chalk.gray(escapedCommand));
   return cmd;
@@ -244,7 +245,7 @@ export function createBabelNodeCommand(...params: Parameters<typeof createNodeCo
 
   return createNodeCommand(name, args, merge({
     execaOptions: {
-      nodeOptions: ['--require', require.resolve('etc/babel-register')]
+      nodeOptions: ['--require', path.resolve('../etc/babel-register')]
     }
   }, opts ?? {}));
 }

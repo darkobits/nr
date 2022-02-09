@@ -1,6 +1,5 @@
 import { EOL } from 'os';
 
-import ow from 'ow';
 import pAll from 'p-all';
 import pSeries from 'p-series';
 import * as R from 'ramda';
@@ -18,6 +17,7 @@ import {
 } from 'etc/types';
 import { commands } from 'lib/commands';
 import log from 'lib/log';
+import ow from 'lib/ow';
 import { matchSegmentedName } from 'lib/utils';
 
 
