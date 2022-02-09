@@ -1,5 +1,6 @@
 import path from 'path';
 
+import { dirname } from '@darkobits/fd-name';
 import merge from 'deepmerge';
 // @ts-expect-error - This package does not have type definitions.
 import errno from 'errno';
@@ -245,7 +246,7 @@ export function createBabelNodeCommand(...params: Parameters<typeof createNodeCo
 
   return createNodeCommand(name, args, merge({
     execaOptions: {
-      nodeOptions: ['--require', path.resolve('../etc/babel-register.cjs')]
+      nodeOptions: ['--require', path.resolve(dirname() as string, 'etc', 'babel-register.cjs')]
     }
   }, opts ?? {}));
 }
