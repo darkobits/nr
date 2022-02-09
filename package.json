@@ -1,6 +1,6 @@
 {
   "name": "@darkobits/nr",
-  "version": "0.8.3-beta.3",
+  "version": "0.8.3-beta.4",
   "description": "Replacement for 'npm run'.",
   "author": "darkobits",
   "engines": {
@@ -28,7 +28,7 @@
     "@babel/register": "^7.17.0",
     "@darkobits/fd-name": "^0.1.4",
     "@darkobits/log": "^2.0.0-beta.15",
-    "@darkobits/saffron": "^0.4.4",
+    "@darkobits/saffron": "^0.4.6",
     "@types/is-ci": "^3.0.0",
     "@types/yargs-unparser": "^2.0.1",
     "deepmerge": "^4.2.2",
