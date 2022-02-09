@@ -1,6 +1,7 @@
 import owImport, { type Ow } from 'ow';
 
-// @ts-expect-error
-const ow: Ow = owImport.default;
+const ow: Ow = Reflect.has(owImport, '__esModule')
+  ? Reflect.get(owImport, 'default')
+  : owImport;
 
 export default ow;
