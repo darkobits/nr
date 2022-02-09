@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.8.3-beta.2](https://github.com/darkobits/nr/compare/v0.8.3-beta.1...v0.8.3-beta.2) (2022-02-09)
+
+
+### 🐞 Bug Fixes
+
+* Fix path logic. ([bbd6b8b](https://github.com/darkobits/nr/commit/bbd6b8b8e7e49f84b5bbc14a10211b9329336cb4))
+
 ### [0.8.3-beta.1](https://github.com/darkobits/nr/compare/v0.8.3-beta.0...v0.8.3-beta.1) (2022-02-09)
 
 
