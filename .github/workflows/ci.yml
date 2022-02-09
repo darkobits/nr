@@ -4,7 +4,6 @@ on:
   - pull_request
 env:
   FORCE_COLOR: 3
-  LINK_BINS: false
 jobs:
   ci-cd:
     name: CI/CD
