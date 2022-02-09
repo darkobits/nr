@@ -1,13 +1,13 @@
 {
   "name": "@darkobits/nr",
   "version": "0.8.7",
-  "description": "Replacement for 'npm run'.",
+  "description": "Task runner for JavaScript projects.",
   "author": "darkobits",
+  "license": "WTFPL",
+  "type": "module",
   "engines": {
     "node": ">=16"
   },
-  "type": "module",
-  "license": "WTFPL",
   "repository": {
     "type": "git",
     "url": "https://github.com/darkobits/nr"
@@ -25,14 +25,12 @@
   },
   "dependencies": {
     "@babel/register": "^7.17.0",
-    "@darkobits/fd-name": "^0.1.4",
     "@darkobits/log": "^2.0.0-beta.15",
     "@darkobits/saffron": "^0.4.11",
     "@types/is-ci": "^3.0.0",
     "@types/yargs-unparser": "^2.0.1",
     "deepmerge": "^4.2.2",
     "errno": "^1.0.0",
-    "esm": "^3.2.25",
     "execa": "^6.0.0",
     "is-ci": "^3.0.1",
     "kebabcase-keys": "^1.0.0",
