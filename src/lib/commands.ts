@@ -246,7 +246,7 @@ export function createBabelNodeCommand(...params: Parameters<typeof createNodeCo
 
   return createNodeCommand(name, args, merge({
     execaOptions: {
-      nodeOptions: ['--require', path.resolve(dirname() as string, 'etc', 'babel-register.cjs')]
+      nodeOptions: ['--require', path.resolve(dirname() as string, '..', 'etc', 'babel-register',  'babel-register.js')]
     }
   }, opts ?? {}));
 }
