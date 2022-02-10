@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.8.8](https://github.com/darkobits/nr/compare/v0.8.7...v0.8.8) (2022-02-10)
+
+
+### 🛠 Refactoring
+
+* `createBabelNodeCommand` uses `babel-node`. ([f086ab3](https://github.com/darkobits/nr/commit/f086ab3613a451b867801673dd2eaa8a86e2d2c2))
+* Improve `ow` ESM import helper. ([73b2e57](https://github.com/darkobits/nr/commit/73b2e571685a9b3f4e6fdbe5640ec6bb2a8c1908))
+* Improve matcher logic. ([2333992](https://github.com/darkobits/nr/commit/23339922111e56ccae43bd848cb816dd65b74582))
+* Remove index. ([0c969e0](https://github.com/darkobits/nr/commit/0c969e099b160e59c6a0c6c2c085064cde3ad03e))
+
+
+### 🏗 Chores
+
+* Update ci.yml. ([3e07ec0](https://github.com/darkobits/nr/commit/3e07ec0510069ddfb66d8d1c8fd225000fcc674f))
+* Update dependencies. ([33300d1](https://github.com/darkobits/nr/commit/33300d17f933b23c9f2012f0d4c28aa952fd39b3))
+* Update usage instructions. ([48d7115](https://github.com/darkobits/nr/commit/48d71156b3bdd8dee0b9ad39ef11bb9e06bb1897))
+
 ### [0.8.7](https://github.com/darkobits/nr/compare/v0.8.6...v0.8.7) (2022-02-09)
 
 
