@@ -26,7 +26,7 @@
   "dependencies": {
     "@babel/register": "^7.17.0",
     "@darkobits/log": "^2.0.0-beta.15",
-    "@darkobits/saffron": "^0.4.12",
+    "@darkobits/saffron": "^0.4.13",
     "@types/is-ci": "^3.0.0",
     "@types/yargs-unparser": "^2.0.1",
     "deepmerge": "^4.2.2",
