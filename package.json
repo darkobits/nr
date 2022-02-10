@@ -26,7 +26,7 @@
   "dependencies": {
     "@babel/register": "^7.17.0",
     "@darkobits/log": "^2.0.0-beta.15",
-    "@darkobits/saffron": "^0.4.11",
+    "@darkobits/saffron": "^0.4.12",
     "@types/is-ci": "^3.0.0",
     "@types/yargs-unparser": "^2.0.1",
     "deepmerge": "^4.2.2",
@@ -44,7 +44,7 @@
     "yargs-unparser": "^2.0.0"
   },
   "devDependencies": {
-    "@darkobits/ts": "^0.8.19",
+    "@darkobits/ts": "^0.8.20",
     "@types/micromatch": "^4.0.2",
     "@types/node-emoji": "^1.8.1",
     "@types/ramda": "^0.27.64",
