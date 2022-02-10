@@ -99,21 +99,6 @@ function parseArguments(args: CreateCommandArguments, preserveArguments?: boolea
 /**
  * @private
  *
- * Uses `which` to attempt to resolve the absolute path to the provided command.
- * Throws an ENOENT system error if the command cannot be found.
- */
-function resolveCommand(cmd: string) {
-  try {
-    return which.sync(cmd);
-  } catch {
-    throw Object.assign(new Error(`ENOENT: no such file or directory: '${cmd}'`), errno.code.ENOENT);
-  }
-}
-
-
-/**
- * @private
- *
  * Executes a command directly using Execa.
  */
 const executeCommand: CommandExecutor = (name, executableName, parsedArguments, opts) => {
@@ -122,6 +107,19 @@ const executeCommand: CommandExecutor = (name, executableName, parsedArguments, 
   log.verbose(log.prefix(`cmd:${name}`), 'exec:', log.chalk.gray(escapedCommand));
   return cmd;
 };
+
+
+/**
+ * Uses `which` to attempt to resolve the absolute path to the provided command.
+ * Throws an ENOENT system error if the command cannot be found.
+ */
+export function resolveCommand(cmd: string) {
+  try {
+    return which.sync(cmd);
+  } catch {
+    throw Object.assign(new Error(`ENOENT: no such file or directory: '${cmd}'`), errno.code.ENOENT);
+  }
+}
 
 
 /**

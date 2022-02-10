@@ -11,8 +11,8 @@ import type { CLIArguments, ScriptConfiguration } from 'etc/types';
 
 
 cli.command<CLIArguments, any>({
-  command: '* [script]',
-  description: 'Run the indicated script.',
+  command: '* [script query]',
+  description: 'Run the script matched by the provided query.',
   config: {
     auto: false,
     fileName: 'nr'
@@ -22,7 +22,7 @@ cli.command<CLIArguments, any>({
 
     command.positional('script', {
       type: 'string',
-      description: 'Script name or partial script name to run.'
+      description: 'Script name or query.'
     });
 
     command.option('scripts', {
@@ -36,6 +36,8 @@ cli.command<CLIArguments, any>({
       required: false,
       description: 'Provide an explicit path to a configuration file.'
     });
+
+    command.epilogue(log.chalk.gray('For full usage instructions, see https://github.com/darkobits/nr'));
   },
   handler: async opts => {
     let scriptConfig: ScriptConfiguration | undefined;

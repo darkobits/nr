@@ -1,5 +1,6 @@
 import { EOL } from 'os';
 
+import emoji from 'node-emoji';
 import pAll from 'p-all';
 import pSeries from 'p-series';
 import * as R from 'ramda';
@@ -15,7 +16,7 @@ import {
   ScriptConfiguration,
   ScriptThunk
 } from 'etc/types';
-import { commands } from 'lib/commands';
+import { commands, resolveCommand } from 'lib/commands';
 import log from 'lib/log';
 import matchSegmentedName from 'lib/matcher';
 import ow from 'lib/ow';
@@ -185,7 +186,21 @@ export function createScript(name: string, opts: CreateScriptOptions) {
  * Prints all available scripts and their descriptions.
  */
 export function printAvailableScripts() {
+  let nrIsInPath = false;
   const allConfigs = Array.from(scriptConfigs.values());
+
+  try {
+    resolveCommand('nr');
+    nrIsInPath = true;
+  } catch {
+    // nr is not in PATH.
+  }
+
+  if (!nrIsInPath) {
+    console.log(log.chalk.gray(`${EOL}${emoji.get('sparkles')} ${log.chalk.white.bold('nr')} is in your PATH. You can run scripts using: ${log.chalk.white('nr <script name>')}`));
+  } else {
+    console.log(log.chalk.gray(`${EOL}${emoji.get('exclamation')} ${log.chalk.white.bold('nr')} is ${log.chalk.red('not')} in your PATH. You must run scripts using: ${log.chalk.white('npx nr <script name>')}`));
+  }
 
   console.log(`${EOL}Available scripts:${EOL}`);
 
