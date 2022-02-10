@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.8.9](https://github.com/darkobits/nr/compare/v0.8.8...v0.8.9) (2022-02-10)
+
+
+### 🐞 Bug Fixes
+
+* Update CLI argument names. ([5f0b664](https://github.com/darkobits/nr/commit/5f0b664b13467ec6c703d9e3d399409f6f206b73))
+
 ### [0.8.8](https://github.com/darkobits/nr/compare/v0.8.7...v0.8.8) (2022-02-10)
 
 
