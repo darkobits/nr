@@ -214,19 +214,19 @@ export interface CLIArguments extends Arguments {
    *
    * Name or partial name of the registered script to run.
    */
-  script: string;
+  query: string | undefined;
 
   /**
    * [Flag]
    *
    * Optional explicit path to the configuration file to use.
    */
-  config?: string;
+  config: string | undefined;
 
   /**
    * [Flag]
    *
    * If set, will list the names and descriptions of all registered scripts.
    */
-  scripts?: boolean;
+  scripts: boolean | undefined;
 }

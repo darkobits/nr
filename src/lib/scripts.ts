@@ -222,7 +222,7 @@ export function printAvailableScripts() {
  * Provided a search query, matches the query to a registered script and returns
  * its configuration.
  */
-export function matchScript(value: string) {
+export function matchScript(value: string | undefined) {
   const scriptNames = [...scripts.keys()];
 
   if (scriptNames.length === 0) {

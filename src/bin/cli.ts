@@ -11,7 +11,7 @@ import type { CLIArguments, ScriptConfiguration } from 'etc/types';
 
 
 cli.command<CLIArguments, any>({
-  command: '* [script query]',
+  command: '* [query]',
   description: 'Run the script matched by the provided query.',
   config: {
     auto: false,
@@ -20,7 +20,7 @@ cli.command<CLIArguments, any>({
   builder: ({ command }) => {
     command.example('$0 test', 'Runs the script named "test".');
 
-    command.positional('script', {
+    command.positional('query', {
       type: 'string',
       description: 'Script name or query.'
     });
@@ -47,8 +47,8 @@ cli.command<CLIArguments, any>({
 
       // If the user did not pass the --scripts option, ensure that they did
       // pass a positional argument indicating a script to run.
-      if (!argv.scripts && !argv.script) {
-        throw new Error('No script provided. Run "nr --scripts" to show available scripts.');
+      if (!argv.scripts && !argv.query) {
+        throw new Error('No query provided. Run "nr --scripts" to show available scripts.');
       }
 
       // Load the user's configuration file.
@@ -63,7 +63,7 @@ cli.command<CLIArguments, any>({
 
       // Otherwise, match and execute the indicated script.
       const runTime = log.createTimer();
-      scriptConfig = matchScript(argv.script);
+      scriptConfig = matchScript(argv.query);
       await executeScript(scriptConfig.name);
 
       // If the parent script is configured to log timing, do so.

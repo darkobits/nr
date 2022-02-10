@@ -18,9 +18,13 @@ function isSingleSegment(input: string) {
  * search set that most closely matches the query. If zero or multiple results
  * are found, throws an error.
  */
-export default function match(haystack: Array<string>, needle: string): string {
+export default function match(haystack: Array<string>, needle: string | undefined): string | undefined {
   // Validate haystack type.
   ow(haystack, 'script list', ow.array.ofType(ow.string));
+
+  if (!needle) {
+    return;
+  }
 
   // If the user provided an exact match, use it, even if the query may have
   // partially matched one or more scripts.
