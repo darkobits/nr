@@ -4,9 +4,9 @@ import match from './matcher';
 describe('matcher', () => {
   const scripts = [
     'build',
+    'build.watch',
     'test',
     'prepare',
-    'build.watch',
     'test.watch',
     'backend.build',
     'backend.deploy',
@@ -33,5 +33,9 @@ describe('matcher', () => {
     expect(() => {
       match(scripts, 'be.dep.prod');
     }).toThrow('Multiple scripts matched');
+  });
+
+  it('should match single-segment scripts if a single-segment query was used', () => {
+    expect(match(scripts, 'bu')).toBe('build');
   });
 });
