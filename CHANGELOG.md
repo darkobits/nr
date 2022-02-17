@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.8.14](https://github.com/darkobits/nr/compare/v0.8.13...v0.8.14) (2022-02-17)
+
+
+### 🏗 Chores
+
+* Update dependencies. ([9e4c69f](https://github.com/darkobits/nr/commit/9e4c69f442623613ecc3f03cc07922f9b3d1e2f9))
+* Update tests. ([41e1b10](https://github.com/darkobits/nr/commit/41e1b103d31bb763202f9cd1e0ad08f6432b0516))
+
+
+### 🐞 Bug Fixes
+
+* Do not resolve Node commands. ([165314d](https://github.com/darkobits/nr/commit/165314daeb26fca36b5ced83346b2cf858533f73))
+
 ### [0.8.13](https://github.com/darkobits/nr/compare/v0.8.12...v0.8.13) (2022-02-10)
 
 
