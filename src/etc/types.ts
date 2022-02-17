@@ -1,6 +1,6 @@
 
 import type { IS_SCRIPT_THUNK, IS_COMMAND_THUNK } from 'etc/constants';
-import type execa from 'execa';
+import type { ExecaChildProcess, Options } from 'execa';
 import type { createCommand, createNodeCommand, createBabelNodeCommand } from 'lib/commands';
 import type log from 'lib/log';
 import type { createScript } from 'lib/scripts';
@@ -57,7 +57,7 @@ export interface CreateCommandOptions {
    * See https://github.com/sindresorhus/execa#cwd for a list of available
    * options.
    */
-  execaOptions?: execa.Options;
+  execaOptions?: Options;
 
   /**
    * The vast majority of CLIs accept keys in kebab case. However some, like
@@ -72,7 +72,7 @@ export interface CreateCommandOptions {
  * Signature of a command executor. Returns an execa invocation using different
  * strategies.
  */
-export type CommandExecutor = (name: string, command: string, args: Array<string>, opts?: CreateCommandOptions) => execa.ExecaChildProcess;
+export type CommandExecutor = (name: string, command: string, args: Array<string>, opts?: CreateCommandOptions) => ExecaChildProcess;
 
 
 /**
