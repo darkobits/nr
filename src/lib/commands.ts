@@ -130,8 +130,11 @@ export function resolveCommand(cmd: string) {
  * See: https://github.com/sindresorhus/execa#execanodescriptpath-arguments-options
  */
 const executeNodeCommand: CommandExecutor = (name, scriptPath, parsedArguments, opts) => {
-  const resolvedScriptPath = resolveCommand(scriptPath);
-  const cmd = execaNode(resolvedScriptPath, parsedArguments, merge(commonExecaOptions, opts?.execaOptions ?? {}));
+  // NOTE: Disabled for now, as this breaks when running commands using a custom
+  // `cwd` in `execaOptions`. It should be sufficient to let execa resolve this
+  // for us anyway.
+  // const resolvedScriptPath = resolveCommand(scriptPath);
+  const cmd = execaNode(scriptPath, parsedArguments, merge(commonExecaOptions, opts?.execaOptions ?? {}));
   const escapedCommand = getEscapedCommand(undefined, cmd.spawnargs);
   log.verbose(log.prefix(`cmd:${name}`), 'exec:', log.chalk.gray(escapedCommand));
   return cmd;
