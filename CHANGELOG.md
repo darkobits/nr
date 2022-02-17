@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.8.17](https://github.com/darkobits/nr/compare/v0.8.16...v0.8.17) (2022-02-17)
+
+
+### 🐞 Bug Fixes
+
+* Use `npm-run-path` when resolving Node commands. ([96c6ff5](https://github.com/darkobits/nr/commit/96c6ff52d3b085e00a7cd9feaa0811bc124e536e))
+
 ### [0.8.16](https://github.com/darkobits/nr/compare/v0.8.15...v0.8.16) (2022-02-17)
 
 
