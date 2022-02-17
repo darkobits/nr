@@ -4,6 +4,7 @@ import errno from 'errno';
 import { execa, execaNode,  Options as ExecaOptions } from 'execa';
 // @ts-expect-error - This package does not have type definitions.
 import kebabCaseKeys from 'kebabcase-keys';
+import { npmRunPath } from 'npm-run-path';
 import which from 'which';
 import unParseArgs from 'yargs-unparser';
 
@@ -116,7 +117,7 @@ const executeCommand: CommandExecutor = (name, executableName, parsedArguments, 
 export function resolveCommand(cmd: string, cwd?: string) {
   if (cwd) {
     try {
-      return which.sync(cmd, { path: cwd });
+      return which.sync(cmd, { path: npmRunPath({ cwd }) });
     } catch {
       // Empty block.
     }
