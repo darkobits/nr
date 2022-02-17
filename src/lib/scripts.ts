@@ -196,7 +196,7 @@ export function printAvailableScripts() {
     // nr is not in PATH.
   }
 
-  if (!nrIsInPath) {
+  if (nrIsInPath) {
     console.log(log.chalk.gray(`${EOL}${emoji.get('sparkles')} ${log.chalk.white.bold('nr')} is in your PATH. You can run scripts using: ${log.chalk.white('nr <script name>')}`));
   } else {
     console.log(log.chalk.gray(`${EOL}${emoji.get('exclamation')} ${log.chalk.white.bold('nr')} is ${log.chalk.red('not')} in your PATH. You must run scripts using: ${log.chalk.white('npx nr <script name>')}`));

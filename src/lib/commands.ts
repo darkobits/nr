@@ -114,17 +114,9 @@ const executeCommand: CommandExecutor = (name, executableName, parsedArguments, 
  * Uses `which` to attempt to resolve the absolute path to the provided command.
  * Throws an ENOENT system error if the command cannot be found.
  */
-export function resolveCommand(cmd: string, cwd?: string) {
-  if (cwd) {
-    try {
-      return which.sync(cmd, { path: npmRunPath({ cwd }) });
-    } catch {
-      // Empty block.
-    }
-  }
-
+export function resolveCommand(cmd: string, cwd = process.cwd()) {
   try {
-    return which.sync(cmd);
+    return which.sync(cmd, { path: npmRunPath({ cwd }) });
   } catch {
     throw Object.assign(new Error(`ENOENT: no such file or directory: '${cmd}'`), errno.code.ENOENT);
   }
