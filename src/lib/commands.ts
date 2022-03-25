@@ -64,7 +64,7 @@ function parseArguments(args: CreateCommandArguments, preserveArguments?: boolea
   ow(args[0], 'command', ow.string);
 
   if (args.length === 1) {
-    return [''];
+    return [];
   }
 
   let positionals: CreateCommandArguments['1'] = [];
@@ -114,7 +114,7 @@ const executeCommand: CommandExecutor = (name, executableName, parsedArguments, 
  * Uses `which` to attempt to resolve the absolute path to the provided command.
  * Throws an ENOENT system error if the command cannot be found.
  */
-export function resolveCommand(cmd: string, cwd = process.cwd()) {
+export function resolveCommand(cmd: string, cwd: string | URL | undefined = process.cwd()) {
   try {
     return which.sync(cmd, { path: npmRunPath({ cwd }) });
   } catch {
