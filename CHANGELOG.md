@@ -1,3 +1,16 @@
+### [0.8.19](https://github.com/darkobits/nr/compare/v0.8.18...v0.8.19) (2022-03-25)
+
+
+### 🐞 Bug Fixes
+
+* Return empty array when no arguments are passed. ([e9b53c5](https://github.com/darkobits/nr/commit/e9b53c5aad8cad4053fefb3ecbafd337a57e9be3))
+
+
+### 🏗 Chores
+
+* **deps:** Update dependencies. ([a881dff](https://github.com/darkobits/nr/commit/a881dffa3e905a481d68c35107801a3755118c73))
+* Release from CI. ([9f88575](https://github.com/darkobits/nr/commit/9f88575e8486de7d2b4dbedc0413029177fed394))
+
 # Changelog
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
