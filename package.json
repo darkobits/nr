@@ -30,10 +30,10 @@
     "@types/yargs-unparser": "^2.0.1",
     "deepmerge": "^4.2.2",
     "errno": "^1.0.0",
-    "execa": "^6.0.0",
+    "execa": "^6.1.0",
     "is-ci": "^3.0.1",
     "kebabcase-keys": "^1.0.0",
-    "micromatch": "^4.0.4",
+    "micromatch": "^4.0.5",
     "node-emoji": "^1.11.0",
     "npm-run-path": "^5.1.0",
     "ow": "^0.28.1",
@@ -44,10 +44,10 @@
     "yargs-unparser": "^2.0.0"
   },
   "devDependencies": {
-    "@darkobits/ts": "^0.8.23",
+    "@darkobits/ts": "^0.9.0",
     "@types/micromatch": "^4.0.2",
     "@types/node-emoji": "^1.8.1",
-    "@types/ramda": "^0.27.64",
+    "@types/ramda": "^0.28.2",
     "@types/which": "^2.0.1"
   }
 }
