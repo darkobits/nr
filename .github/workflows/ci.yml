@@ -36,3 +36,9 @@ jobs:
 
       # - name: Upload Coverage Report
       #   run: bash <(curl -s https://codecov.io/bash)
+
+      - name: Release
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npx nr release
