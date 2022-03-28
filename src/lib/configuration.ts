@@ -5,10 +5,10 @@ import isCI from 'is-ci';
 import {
   createCommand,
   createNodeCommand,
-  createBabelNodeCommand,
-  commands
+  createBabelNodeCommand
 } from 'lib/commands';
 import { createScript, scripts } from 'lib/scripts';
+import { createTask } from 'lib/tasks';
 
 import type { SaffronHandlerOptions } from '@darkobits/saffron';
 import type { CLIArguments, ConfigurationFactory } from 'etc/types';
@@ -42,14 +42,9 @@ export default async function loadConfig({ argv, config, configPath, configIsEmp
     createNodeCommand,
     createBabelNodeCommand,
     createScript,
+    createTask,
     isCI
   });
-
-  // After calling the user's configuration factory, ensure that our command
-  // registry is not empty.
-  if (commands.size === 0) {
-    throw new Error('Configuration failed to register any commands.');
-  }
 
   // Ensure that our scripts registry is not empty.
   if (scripts.size === 0) {

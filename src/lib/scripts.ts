@@ -7,19 +7,21 @@ import * as R from 'ramda';
 
 import {
   IS_SCRIPT_THUNK,
-  IS_COMMAND_THUNK
+  IS_COMMAND_THUNK,
+  IS_TASK_THUNK
 } from 'etc/constants';
 import {
-  CommandThunk,
   CreateScriptOptions,
   Instruction,
   ScriptConfiguration,
-  ScriptThunk
+  ScriptThunk,
+  Thunk
 } from 'etc/types';
 import { commands, resolveCommand } from 'lib/commands';
 import log from 'lib/log';
 import matchSegmentedName from 'lib/matcher';
 import ow from 'lib/ow';
+import { tasks } from 'lib/tasks';
 
 
 /**
@@ -47,7 +49,7 @@ function parseIdentifier(value: string) {
   if (value.includes(':')) {
     const [type, name] = value.split(':');
 
-    if (!['script', 'cmd'].includes(type)) {
+    if (!['script', 'cmd', 'task'].includes(type)) {
       throw new Error(`Invalid type: ${type}`);
     }
 
@@ -61,13 +63,17 @@ function parseIdentifier(value: string) {
 /**
  * @private
  *
- * Provided a CommandThunk, ScriptThunk, or string, returns a CommandThunk or a
- * ScriptThunk. Strings may begin with 'script:' or 'cmd:' to indicate the type
- * to be resolved.
+ * Provided a CommandThunk, ScriptThunk, TaskThunk, returns the value as-is. If
+ * provided a string, attempts to resolve it to one of the above. Strings may
+ * begin with 'cmd:', 'script:' or 'task:' to indicate the type to be resolved.
  */
-function resolveInstruction(value: Instruction): ScriptThunk | CommandThunk {
+function resolveInstruction(value: Instruction): Thunk {
   if (typeof value === 'function') {
-    if (Reflect.has(value, IS_SCRIPT_THUNK) || Reflect.has(value, IS_COMMAND_THUNK)) {
+    if (
+      Reflect.has(value, IS_SCRIPT_THUNK) ||
+      Reflect.has(value, IS_COMMAND_THUNK) ||
+      Reflect.has(value, IS_TASK_THUNK)
+    ) {
       return value;
     }
 
@@ -78,6 +84,7 @@ function resolveInstruction(value: Instruction): ScriptThunk | CommandThunk {
     const { type, name } = parseIdentifier(value);
     const scriptThunk = scripts.get(name);
     const commandThunk = commands.get(name);
+    const taskThunk = tasks.get(name);
 
     if (type === 'script' && scriptThunk) {
       return scriptThunk;
@@ -85,6 +92,10 @@ function resolveInstruction(value: Instruction): ScriptThunk | CommandThunk {
 
     if (type === 'command' && commandThunk) {
       return commandThunk;
+    }
+
+    if (type === 'task' && taskThunk) {
+      return taskThunk;
     }
 
     if (scriptThunk) {
@@ -95,11 +106,15 @@ function resolveInstruction(value: Instruction): ScriptThunk | CommandThunk {
       return commandThunk;
     }
 
-    if (type === 'unknown' && scriptThunk && commandThunk) {
-      throw new Error(`Instruction "${value}" could refer to a script or command. Disambiguate using either a "cmd:" or "script:" prefix.`);
+    if (taskThunk) {
+      return taskThunk;
     }
 
-    throw new Error(`Unable to resolve "${value}" to a script or command.`);
+    if (type === 'unknown' && scriptThunk && commandThunk && taskThunk) {
+      throw new Error(`Instruction "${value}" is ambiguous. Disambiguate using a "cmd:", "script:", or "task:" prefix.`);
+    }
+
+    throw new Error(`Unable to resolve "${value}" to a script, command, or task.`);
   }
 
   throw new TypeError(`Expected instruction to be of type "string" or "function", got "${typeof value}".`);

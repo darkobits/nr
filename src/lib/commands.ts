@@ -70,6 +70,7 @@ function parseArguments(args: CreateCommandArguments, preserveArguments?: boolea
   let positionals: CreateCommandArguments['1'] = [];
   let flags: CreateCommandArguments['2'] = {};
 
+
   if (args.length === 2) {
     if (Array.isArray(args[1])) {
       // Got [command, positionals] form.

@@ -1,9 +1,10 @@
 
-import type { IS_SCRIPT_THUNK, IS_COMMAND_THUNK } from 'etc/constants';
+import type { IS_SCRIPT_THUNK, IS_COMMAND_THUNK, IS_TASK_THUNK } from 'etc/constants';
 import type { ExecaChildProcess, Options } from 'execa';
 import type { createCommand, createNodeCommand, createBabelNodeCommand } from 'lib/commands';
 import type log from 'lib/log';
 import type { createScript } from 'lib/scripts';
+import type { createTask } from 'lib/tasks';
 import type { Arguments } from 'yargs-unparser';
 
 
@@ -81,6 +82,24 @@ export type CommandExecutor = (name: string, command: string, args: Array<string
 export interface CommandThunk {
   (): Promise<void>;
   [IS_COMMAND_THUNK]: boolean;
+  [key: string]: any;
+}
+
+
+// ----- Tasks -----------------------------------------------------------------
+
+/**
+ * Signature of generic user-provided task functions
+ */
+export type TaskFn = (...args: Array<any>) => Promise<any> | any;
+
+
+/**
+ * Function that will execute a task (a user-provided function).
+ */
+export interface TaskThunk {
+  (): Promise<void>;
+  [IS_TASK_THUNK]: boolean;
   [key: string]: any;
 }
 
@@ -187,6 +206,7 @@ export interface ConfigurationFactoryArguments {
   createNodeCommand: typeof createNodeCommand;
   createBabelNodeCommand: typeof createBabelNodeCommand;
   createScript: typeof createScript;
+  createTask: typeof createTask;
 
   /**
    * True if a CI environment has been detected.
@@ -230,3 +250,8 @@ export interface CLIArguments extends Arguments {
    */
   scripts: boolean | undefined;
 }
+
+
+// ----- Miscellaneous ---------------------------------------------------------
+
+export type Thunk = ScriptThunk | CommandThunk | TaskThunk;
