@@ -1,3 +1,15 @@
+## [0.9.0](https://github.com/darkobits/nr/compare/v0.8.19...v0.9.0) (2022-03-28)
+
+
+### 🏗 Chores
+
+* **deps:** Update dependencies. ([a0a4676](https://github.com/darkobits/nr/commit/a0a46768540db9fcdbba49ed54e3ec8311ae8398))
+
+
+### ✨ Features
+
+* Add support for task functions. ([0f37edf](https://github.com/darkobits/nr/commit/0f37edfc812f38c6429bb8dff92a54ac4d0c7bd3))
+
 ### [0.8.19](https://github.com/darkobits/nr/compare/v0.8.18...v0.8.19) (2022-03-25)
 
 
