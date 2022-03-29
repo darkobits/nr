@@ -1,3 +1,10 @@
+### [0.11.1](https://github.com/darkobits/nr/compare/v0.11.0...v0.11.1) (2022-03-29)
+
+
+### 🏗 Chores
+
+* Export configuration type from root. ([c84f1cc](https://github.com/darkobits/nr/commit/c84f1cc71e32973565c812a14d9ccc84d1eb6736))
+
 # Changelog
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
