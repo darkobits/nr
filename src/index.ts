@@ -7,3 +7,6 @@ import type { ConfigurationFactory } from 'etc/types';
 export default (userConfigFactory: ConfigurationFactory): ConfigurationFactory => {
   return async context => userConfigFactory(context);
 };
+
+
+export { type ConfigurationFactory } from 'etc/types';
