@@ -1,3 +1,15 @@
+### [0.11.3](https://github.com/darkobits/nr/compare/v0.11.2...v0.11.3) (2022-03-29)
+
+
+### 🏗 Chores
+
+* Export additional types. ([9305511](https://github.com/darkobits/nr/commit/93055117bae6d9aee631b08c1601ac3c9adfeeb7))
+
+
+### 📖 Documentation
+
+* Update README. ([0ea8317](https://github.com/darkobits/nr/commit/0ea8317b0a35c041a6be9faf941c88b710b21797))
+
 ### [0.11.2](https://github.com/darkobits/nr/compare/v0.11.1...v0.11.2) (2022-03-29)
 
 
