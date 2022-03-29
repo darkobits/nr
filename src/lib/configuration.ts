@@ -8,7 +8,7 @@ import {
   createBabelNodeCommand
 } from 'lib/commands';
 import { createScript, scripts } from 'lib/scripts';
-import { createTask } from 'lib/tasks';
+import { createTask, tasks } from 'lib/tasks';
 
 import type { SaffronHandlerOptions } from '@darkobits/saffron';
 import type { CLIArguments, ConfigurationFactory } from 'etc/types';
@@ -33,10 +33,10 @@ export default async function loadConfig({ argv, config, configPath, configIsEmp
 
   // If the config file did not export a function, throw.
   if (typeof config !== 'function') {
-    throw new TypeError(`Configuration file at ${configPath} does not export a function.`);
+    throw new TypeError(`Configuration file at ${configPath} does not have a default export of type "function".`);
   }
 
-  // Invoke the user's configuration factory.
+  // Invoke the user's configuration function.
   await config({
     createCommand,
     createNodeCommand,
@@ -46,9 +46,16 @@ export default async function loadConfig({ argv, config, configPath, configIsEmp
     isCI
   });
 
-  // Ensure that our scripts registry is not empty.
+  // Ensure that after calling the user's configuration function, our scripts
+  // registry is not empty.
   if (scripts.size === 0) {
     throw new Error('Configuration did not register any scripts.');
+  }
+
+  // Ensure that after calling the user's configuration function, our tasks and
+  // commands registries are not empty.
+  if (scripts.size === 0 && tasks.size === 0) {
+    throw new Error('Configuration did not register any commands or tasks.');
   }
 
   return config;
