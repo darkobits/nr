@@ -1,3 +1,15 @@
+## [0.10.0](https://github.com/darkobits/nr/compare/v0.9.0...v0.10.0) (2022-03-29)
+
+
+### 🏗 Chores
+
+* **deps:** Update dependencies. ([674d3d8](https://github.com/darkobits/nr/commit/674d3d87bc9ceb9fc571259818d5bb617e4e55da))
+
+
+### ✨ Features
+
+* Support typed configuration files. ([7101933](https://github.com/darkobits/nr/commit/7101933ff33c7a80893f11312198a235249c377a))
+
 ## [0.9.0](https://github.com/darkobits/nr/compare/v0.8.19...v0.9.0) (2022-03-28)
 
 
