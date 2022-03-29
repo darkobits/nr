@@ -125,7 +125,7 @@ function resolveInstruction(value: Instruction): Thunk {
  * Provided a script options object, returns a function that, when invoked, will
  * execute the script. This function is then added to the scripts registry.
  */
-export function createScript(name: string, opts: CreateScriptOptions) {
+export function script(name: string, opts: CreateScriptOptions) {
   try {
     // Validate name.
     ow(name, 'script name', ow.string);

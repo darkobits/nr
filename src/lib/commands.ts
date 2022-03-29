@@ -141,6 +141,14 @@ const executeNodeCommand: CommandExecutor = (name, scriptPath, parsedArguments, 
 };
 
 
+interface CommandBuilderOptions {
+  executor: CommandExecutor;
+  name: CommandName;
+  args: CreateCommandArguments;
+  opts: CreateCommandOptions | undefined;
+}
+
+
 /**
  * @private
  *
@@ -151,101 +159,112 @@ const executeNodeCommand: CommandExecutor = (name, scriptPath, parsedArguments, 
  * When invoked, the CommandThunk will execute the command using the provided
  * CommandExecutor strategy.
  */
-function commandBuilder(commandExecutor: CommandExecutor) {
-  return (name: CommandName, args: CreateCommandArguments, opts?: CreateCommandOptions) => {
-    try {
-      // Validate name.
-      ow(name, 'name', ow.string);
+function commandBuilder(builderOptions: CommandBuilderOptions): CommandThunk {
+  const { executor, name, args, opts } = builderOptions;
 
-      // Parse and validate command and arguments.
-      const parsedArguments = parseArguments(args, opts?.preserveArguments);
-      const [executableName] = args;
+  try {
+    // Validate name.
+    ow(name, 'name', ow.string);
 
-      // Validate options.
-      ow<Required<CreateCommandOptions>>(opts, ow.optional.object.exactShape({
-        prefix: ow.optional.function,
-        execaOptions: ow.optional.object,
-        preserveArguments: ow.optional.boolean
-      }));
+    // Parse and validate command and arguments.
+    const parsedArguments = parseArguments(args, opts?.preserveArguments);
+    const [executableName] = args;
 
-      const commandThunk: CommandThunk = Object.assign(async () => {
-        try {
-          const runTime = log.createTimer();
-          const command = commandExecutor(name, executableName, parsedArguments, opts);
+    // Validate options.
+    ow<Required<CreateCommandOptions>>(opts, ow.optional.object.exactShape({
+      prefix: ow.optional.function,
+      execaOptions: ow.optional.object,
+      preserveArguments: ow.optional.boolean
+    }));
 
-          // If the user provided a custom prefix function, generate it now.
-          const prefix = opts?.prefix ? opts.prefix(log.chalk) : '';
+    const commandThunk: CommandThunk = Object.assign(async () => {
+      try {
+        const runTime = log.createTimer();
+        const command = executor(name, executableName, parsedArguments, opts);
 
-          if (command.stdout) {
-            command.stdout.pipe(new LogPipe((...args: Array<any>) => {
-              console.log(...[prefix, ...args].filter(Boolean));
-            }));
-          }
+        // If the user provided a custom prefix function, generate it now.
+        const prefix = opts?.prefix ? opts.prefix(log.chalk) : '';
 
-          if (command.stderr) {
-            command.stderr.pipe(new LogPipe((...args: Array<any>) => {
-              console.error(...[prefix, ...args].filter(Boolean));
-            }));
-          }
-
-          void command.on('exit', code => {
-            if (code === 0 || opts?.execaOptions?.reject === false) {
-              // If the command exited successfully or if we are ignoring failed
-              // commands, log completion time.
-              log.verbose(log.prefix(`cmd:${name}`), log.chalk.gray(`Done in ${runTime}.`));
-            }
-          });
-
-          await command;
-        } catch (err: any) {
-          throw new Error(`Command "${name}" failed: ${err.message}`);
+        if (command.stdout) {
+          command.stdout.pipe(new LogPipe((...args: Array<any>) => {
+            console.log(...[prefix, ...args].filter(Boolean));
+          }));
         }
-      }, {
-        [IS_COMMAND_THUNK]: true
-      });
 
-      Reflect.defineProperty(commandThunk, 'name', { value: name });
+        if (command.stderr) {
+          command.stderr.pipe(new LogPipe((...args: Array<any>) => {
+            console.error(...[prefix, ...args].filter(Boolean));
+          }));
+        }
 
-      commands.set(name, commandThunk);
-      commandConfigs.set(commandThunk, [args, opts]);
+        void command.on('exit', code => {
+          if (code === 0 || opts?.execaOptions?.reject === false) {
+            // If the command exited successfully or if we are ignoring failed
+            // commands, log completion time.
+            log.verbose(log.prefix(`cmd:${name}`), log.chalk.gray(`Done in ${runTime}.`));
+          }
+        });
 
-      return commandThunk;
-    } catch (err: any) {
-      console.log(err);
-      err.message = `Unable to create command "${name}": ${err.message}`;
-      throw err;
-    }
-  };
+        await command;
+      } catch (err: any) {
+        throw new Error(`Command "${name}" failed: ${err.message}`);
+      }
+    }, {
+      [IS_COMMAND_THUNK]: true
+    });
+
+    Reflect.defineProperty(commandThunk, 'name', { value: name });
+
+    commands.set(name, commandThunk);
+    commandConfigs.set(commandThunk, [args, opts]);
+
+    return commandThunk;
+  } catch (err: any) {
+    console.log(err);
+    err.message = `Unable to create command "${name}": ${err.message}`;
+    throw err;
+  }
+
 }
 
 
 /**
  * Creates a CommandThunk that executes a command directly using `execa`.
  */
-export function createCommand(name: CommandName, args: CreateCommandArguments, opts?: CreateCommandOptions) {
-  return commandBuilder(executeCommand)(name, args, opts);
+export function command(name: CommandName, args: CreateCommandArguments, opts?: CreateCommandOptions) {
+  return commandBuilder({
+    executor: executeCommand,
+    name,
+    args,
+    opts
+  });
 }
 
 
 /**
  * Creates a CommandThunk that executes a command using `execa.node()`.
  */
-export function createNodeCommand(name: CommandName, args: CreateCommandArguments, opts?: CreateCommandOptions) {
-  return commandBuilder(executeNodeCommand)(name, args, opts);
-}
+command.node = (name: CommandName, args: CreateCommandArguments, opts?: CreateCommandOptions) => {
+  return commandBuilder({
+    executor: executeNodeCommand,
+    name,
+    args,
+    opts
+  });
+};
 
 
 /**
  * Creates a CommandThunk that executes a command using `execa.node()` with
  * Babel.
  */
-export function createBabelNodeCommand(...params: Parameters<typeof createNodeCommand>) {
+command.babel = (...params: Parameters<typeof command.node>) => {
   const [name, args, opts] = params;
 
-  return createNodeCommand(name, args, merge({
+  return command.node(name, args, merge({
     execaOptions: {
       nodePath: 'babel-node',
       nodeOptions: ['--extensions', '.ts,.tsx,.js,.jsx,.json']
     }
   }, opts ?? {}));
-}
+};

@@ -2,13 +2,9 @@ import path from 'path';
 
 import isCI from 'is-ci';
 
-import {
-  createCommand,
-  createNodeCommand,
-  createBabelNodeCommand
-} from 'lib/commands';
-import { createScript, scripts } from 'lib/scripts';
-import { createTask, tasks } from 'lib/tasks';
+import { command } from 'lib/commands';
+import { script, scripts } from 'lib/scripts';
+import { task, tasks } from 'lib/tasks';
 
 import type { SaffronHandlerOptions } from '@darkobits/saffron';
 import type { CLIArguments, ConfigurationFactory } from 'etc/types';
@@ -38,11 +34,9 @@ export default async function loadConfig({ argv, config, configPath, configIsEmp
 
   // Invoke the user's configuration function.
   await config({
-    createCommand,
-    createNodeCommand,
-    createBabelNodeCommand,
-    createScript,
-    createTask,
+    command,
+    script,
+    task,
     isCI
   });
 

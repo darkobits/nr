@@ -1,10 +1,10 @@
 
 import type { IS_SCRIPT_THUNK, IS_COMMAND_THUNK, IS_TASK_THUNK } from 'etc/constants';
 import type { ExecaChildProcess, Options } from 'execa';
-import type { createCommand, createNodeCommand, createBabelNodeCommand } from 'lib/commands';
+import type { command } from 'lib/commands';
 import type log from 'lib/log';
-import type { createScript } from 'lib/scripts';
-import type { createTask } from 'lib/tasks';
+import type { script } from 'lib/scripts';
+import type { task } from 'lib/tasks';
 import type { Arguments } from 'yargs-unparser';
 
 
@@ -13,13 +13,13 @@ import type { Arguments } from 'yargs-unparser';
 /**
  * Name of the command. Only necessary if this command will be referenced
  * using a string in the `commands` of a Script. Otherwise, the command may be
- * referenced by providing the return value of `createCommand`.
+ * referenced by providing the return value of `command`.
  */
 export type CommandName = string;
 
 
 /**
- * Shape of the second argument passed to `createCommand`. The first item in
+ * Shape of the second argument passed to `command`. The first item in
  * this array should be the command to execute.
  *
  * If passing only positional arguments, these may be provided as an array of
@@ -43,7 +43,7 @@ export type CreateCommandArguments =
 
 
 /**
- * Object describing a command. Passed to `createCommand`.
+ * Object describing a command. Passed to `command`.
  */
 export interface CreateCommandOptions {
   /**
@@ -110,13 +110,13 @@ export interface TaskThunk {
  * An instruction indicates what a script should do. Scripts may run commands or
  * other scripts. An `Instruction` may therefore be a `string` that exactly
  * matches the `name` of a registered command or script, or the value returned
- * by `createCommand` or `createScript`.
+ * by `command` or `script`.
  */
 export type Instruction = string | CommandThunk | ScriptThunk;
 
 
 /**
- * Object describing a script. Passed to `createScript`.
+ * Object describing a script. Passed to `script`.
  */
 export interface CreateScriptOptions {
   /**
@@ -179,7 +179,7 @@ export interface CreateScriptOptions {
 
 /**
  * A script's configuration consists of all the options provided to
- * `createScript` in addition to its `name`.
+ * `script` in addition to its `name`.
  */
 export interface ScriptConfiguration extends CreateScriptOptions {
   name: string;
@@ -202,11 +202,9 @@ export interface ScriptThunk {
  * Object passed to configuration factories.
  */
 export interface ConfigurationFactoryArguments {
-  createCommand: typeof createCommand;
-  createNodeCommand: typeof createNodeCommand;
-  createBabelNodeCommand: typeof createBabelNodeCommand;
-  createScript: typeof createScript;
-  createTask: typeof createTask;
+  command: typeof command;
+  script: typeof script;
+  task: typeof task;
 
   /**
    * True if a CI environment has been detected.

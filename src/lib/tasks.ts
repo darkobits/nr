@@ -13,7 +13,7 @@ export const tasks = new Map<string, TaskThunk>();
  * Provided a name and a task function, registers the task and returns a thunk
  * that, when called, will invoke the task function.
  */
-export function createTask(name: string, taskFn: TaskFn) {
+export function task(name: string, taskFn: TaskFn) {
   try {
     const taskThunk = Object.assign(async (...args: Array<any>) => {
       log.verbose(log.prefix('task'), 'exec:', log.chalk.green(name));
