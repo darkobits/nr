@@ -1,3 +1,10 @@
+### [0.11.4](https://github.com/darkobits/nr/compare/v0.11.3...v0.11.4) (2022-03-29)
+
+
+### 🏗 Chores
+
+* Update dependencies. ([f232c9d](https://github.com/darkobits/nr/commit/f232c9d33edcb79522d6757213072bb47212fd4f))
+
 ### [0.11.3](https://github.com/darkobits/nr/compare/v0.11.2...v0.11.3) (2022-03-29)
 
 
