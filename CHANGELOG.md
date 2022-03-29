@@ -1,3 +1,14 @@
+# Changelog
+
+All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+## [0.11.0](https://github.com/darkobits/nr/compare/v0.10.1...v0.11.0) (2022-03-29)
+
+
+### 🛠 Refactoring
+
+* Make API more terse. ([6ea1085](https://github.com/darkobits/nr/commit/6ea1085162d1274410cfb1161a95ea35a83e125c))
+
 ### [0.10.1](https://github.com/darkobits/nr/compare/v0.10.0...v0.10.1) (2022-03-29)
 
 
