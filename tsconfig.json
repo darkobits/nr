@@ -1,9 +1,8 @@
 {
   "extends": "@darkobits/ts",
+  "include": ["src"],
   "compilerOptions": {
     "baseUrl": "src",
-    "outDir": "dist",
-    "module": "commonjs"
+    "outDir": "dist"
   },
-  "include": ["src"]
 }
