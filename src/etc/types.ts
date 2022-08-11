@@ -107,12 +107,12 @@ export interface TaskThunk {
 // ----- Scripts ---------------------------------------------------------------
 
 /**
- * An instruction indicates what a script should do. Scripts may run commands or
- * other scripts. An `Instruction` may therefore be a `string` that exactly
- * matches the `name` of a registered command or script, or the value returned
- * by `command` or `script`.
+ * An instruction indicates what a script should do. Scripts may run commands,
+ * tasks, or other scripts. An `Instruction` may therefore be a `string` that
+ * exactly matches the `name` of a registered command, task, or script -- or
+ * the value returned by `command`, `task`, or `script`.
  */
-export type Instruction = string | CommandThunk | ScriptThunk;
+export type Instruction = string | Thunk;
 
 
 /**
