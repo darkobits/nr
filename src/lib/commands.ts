@@ -210,7 +210,7 @@ function commandBuilder(builderOptions: CommandBuilderOptions): CommandThunk {
         throw new Error(`Command "${name}" failed: ${err.message}`);
       }
     }, {
-      [IS_COMMAND_THUNK]: true
+      [IS_COMMAND_THUNK]: true as const
     });
 
     Reflect.defineProperty(commandThunk, 'name', { value: name });

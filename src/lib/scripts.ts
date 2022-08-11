@@ -182,7 +182,7 @@ export function script(name: string, opts: CreateScriptOptions) {
         log.verbose(log.prefix('script'), log.chalk.gray(`Script ${log.chalk.green.dim(name)} done in ${runTime}.`));
       }
     }, {
-      [IS_SCRIPT_THUNK]: true
+      [IS_SCRIPT_THUNK]: true as const
     });
 
     Reflect.defineProperty(scriptThunk, 'name', { value: name });

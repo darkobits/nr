@@ -81,7 +81,7 @@ export type CommandExecutor = (name: string, command: string, args: Array<string
  */
 export interface CommandThunk {
   (): Promise<void>;
-  [IS_COMMAND_THUNK]: boolean;
+  [IS_COMMAND_THUNK]: true;
   [key: string]: any;
 }
 
@@ -99,7 +99,7 @@ export type TaskFn = (...args: Array<any>) => Promise<any> | any;
  */
 export interface TaskThunk {
   (): Promise<void>;
-  [IS_TASK_THUNK]: boolean;
+  [IS_TASK_THUNK]: true;
   [key: string]: any;
 }
 
@@ -191,7 +191,7 @@ export interface ScriptConfiguration extends CreateScriptOptions {
  */
 export interface ScriptThunk {
   (): Promise<void>;
-  [IS_SCRIPT_THUNK]: boolean;
+  [IS_SCRIPT_THUNK]: true;
   [key: string]: any;
 }
 

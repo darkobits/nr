@@ -24,7 +24,7 @@ export function task(name: string, taskFn: TaskFn) {
         throw new Error(`Task "${name}" failed: ${err.message}`);
       }
     }, {
-      [IS_TASK_THUNK]: true
+      [IS_TASK_THUNK]: true as const
     });
 
     tasks.set(name, taskThunk);
