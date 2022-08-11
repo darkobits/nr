@@ -32,7 +32,7 @@ jobs:
         run: npx nr build
 
       - name: Run Unit Tests
-        run: npx nr test.passWithNoTests
+        run: npx nr test
 
       # - name: Upload Coverage Report
       #   run: bash <(curl -s https://codecov.io/bash)
