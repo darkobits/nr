@@ -1,3 +1,10 @@
+### [0.11.6](https://github.com/darkobits/nr/compare/v0.11.5...v0.11.6) (2022-08-11)
+
+
+### 🐞 Bug Fixes
+
+* Narrow types to `true` for Symbol checks. ([c601d53](https://github.com/darkobits/nr/commit/c601d530ea8539c7df8862ef0dda3989d3bfdad5))
+
 ### [0.11.5](https://github.com/darkobits/nr/compare/v0.11.4...v0.11.5) (2022-08-11)
 
 
