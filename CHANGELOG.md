@@ -1,3 +1,10 @@
+### [0.11.7](https://github.com/darkobits/nr/compare/v0.11.6...v0.11.7) (2022-08-11)
+
+
+### 🐞 Bug Fixes
+
+* **types:** Include task thunks in instructions. ([965da0a](https://github.com/darkobits/nr/commit/965da0a74cb2d1353292421445acb20436d241c3))
+
 ### [0.11.6](https://github.com/darkobits/nr/compare/v0.11.5...v0.11.6) (2022-08-11)
 
 
