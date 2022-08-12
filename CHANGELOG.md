@@ -1,3 +1,19 @@
+# Changelog
+
+All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+## [0.12.0](https://github.com/darkobits/nr/compare/v0.11.8...v0.12.0) (2022-08-12)
+
+
+### 🏗 Chores
+
+* Export all types. ([8f85e31](https://github.com/darkobits/nr/commit/8f85e31282785fc49922c4adddbcf35f6faeffb1))
+
+
+### 🛠 Refactoring
+
+* Require prefixes on string identifiers for instructions. ([067e430](https://github.com/darkobits/nr/commit/067e4303f8a2ea8e56f304d9ef8998c081bffec5))
+
 ### [0.11.8](https://github.com/darkobits/nr/compare/v0.11.7...v0.11.8) (2022-08-11)
 
 
