@@ -10,7 +10,6 @@ import unParseArgs from 'yargs-unparser';
 
 import { IS_COMMAND_THUNK } from 'etc/constants';
 import {
-  CommandName,
   CommandExecutor,
   CommandThunk,
   CreateCommandArguments,
@@ -25,6 +24,19 @@ import { getEscapedCommand } from 'lib/utils';
  * Map of registered command names to their corresponding command thunks.
  */
 export const commands = new Map<string, CommandThunk>();
+
+
+/**
+ * Uses `which` to attempt to resolve the absolute path to the provided command.
+ * Throws an ENOENT system error if the command cannot be found.
+ */
+export function resolveCommand(cmd: string, cwd: string | URL | undefined = process.cwd()) {
+  try {
+    return which.sync(cmd, { path: npmRunPath({ cwd }) });
+  } catch {
+    throw Object.assign(new Error(`ENOENT: no such file or directory: '${cmd}'`), errno.code.ENOENT);
+  }
+}
 
 
 /**
@@ -112,19 +124,6 @@ const executeCommand: CommandExecutor = (name, executableName, parsedArguments, 
 
 
 /**
- * Uses `which` to attempt to resolve the absolute path to the provided command.
- * Throws an ENOENT system error if the command cannot be found.
- */
-export function resolveCommand(cmd: string, cwd: string | URL | undefined = process.cwd()) {
-  try {
-    return which.sync(cmd, { path: npmRunPath({ cwd }) });
-  } catch {
-    throw Object.assign(new Error(`ENOENT: no such file or directory: '${cmd}'`), errno.code.ENOENT);
-  }
-}
-
-
-/**
  * @private
  *
  * Executes a command using `execaNode`.
@@ -143,7 +142,7 @@ const executeNodeCommand: CommandExecutor = (name, scriptPath, parsedArguments, 
 
 interface CommandBuilderOptions {
   executor: CommandExecutor;
-  name: CommandName;
+  name: string;
   args: CreateCommandArguments;
   opts: CreateCommandOptions | undefined;
 }
@@ -229,9 +228,9 @@ function commandBuilder(builderOptions: CommandBuilderOptions): CommandThunk {
 
 
 /**
- * Creates a CommandThunk that executes a command directly using `execa`.
+ * Creates a `CommandThunk` that executes a command directly using `execa`.
  */
-export function command(name: CommandName, args: CreateCommandArguments, opts?: CreateCommandOptions) {
+export function command(name: string, args: CreateCommandArguments, opts?: CreateCommandOptions) {
   return commandBuilder({
     executor: executeCommand,
     name,
@@ -242,9 +241,9 @@ export function command(name: CommandName, args: CreateCommandArguments, opts?: 
 
 
 /**
- * Creates a CommandThunk that executes a command using `execa.node()`.
+ * Creates a `CommandThunk` that executes a command using `execa.node()`.
  */
-command.node = (name: CommandName, args: CreateCommandArguments, opts?: CreateCommandOptions) => {
+command.node = (name: string, args: CreateCommandArguments, opts?: CreateCommandOptions) => {
   return commandBuilder({
     executor: executeNodeCommand,
     name,
@@ -255,8 +254,8 @@ command.node = (name: CommandName, args: CreateCommandArguments, opts?: CreateCo
 
 
 /**
- * Creates a CommandThunk that executes a command using `execa.node()` with
- * Babel.
+ * Creates a `CommandThunk` that executes a command using `execa.node()` with
+ * `babel-node` as the executable.
  */
 command.babel = (...params: Parameters<typeof command.node>) => {
   const [name, args, opts] = params;

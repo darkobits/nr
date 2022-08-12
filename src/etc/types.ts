@@ -11,25 +11,18 @@ import type { Arguments } from 'yargs-unparser';
 // ----- Commands --------------------------------------------------------------
 
 /**
- * Name of the command. Only necessary if this command will be referenced
- * using a string in the `commands` of a Script. Otherwise, the command may be
- * referenced by providing the return value of `command`.
- */
-export type CommandName = string;
-
-
-/**
- * Shape of the second argument passed to `command`. The first item in
- * this array should be the command to execute.
+ * Shape of the array passed as the second argument to `command`.
+ *
+ * The first member should be the command to execute.
  *
  * If passing only positional arguments, these may be provided as an array of
- * strings in the second position.
+ * strings as the second member of the array.
  *
- * If passing only flags, this may be provided as an object in the second
- * position.
+ * If passing only flags, these may be provided as an object as the second
+ * member of the array.
  *
  * If passing both positional arguments and flags, positionals should be
- * provided in the second position and flags in the third position.
+ * provided as the second member and flags as the third.
  */
 export type CreateCommandArguments =
   // Command only.
@@ -43,7 +36,7 @@ export type CreateCommandArguments =
 
 
 /**
- * Object describing a command. Passed to `command`.
+ * Additional options that may be provided to `command`
  */
 export interface CreateCommandOptions {
   /**
@@ -53,7 +46,7 @@ export interface CreateCommandOptions {
   prefix?: (chalk: typeof log.chalk) => string;
 
   /**
-   * Optional options to pass to Execa, which executes the command.
+   * Optional options to pass to execa, which executes the command.
    *
    * See https://github.com/sindresorhus/execa#cwd for a list of available
    * options.
@@ -77,7 +70,7 @@ export type CommandExecutor = (name: string, command: string, args: Array<string
 
 
 /**
- * Function that will execute a command.
+ * Return type of `command`.
  */
 export interface CommandThunk {
   (): Promise<void>;
@@ -89,13 +82,13 @@ export interface CommandThunk {
 // ----- Tasks -----------------------------------------------------------------
 
 /**
- * Signature of generic user-provided task functions
+ * Signature of generic user-provided task functions.
  */
 export type TaskFn = (...args: Array<any>) => Promise<any> | any;
 
 
 /**
- * Function that will execute a task (a user-provided function).
+ * Return type of `task`.
  */
 export interface TaskThunk {
   (): Promise<void>;
@@ -106,29 +99,35 @@ export interface TaskThunk {
 
 // ----- Scripts ---------------------------------------------------------------
 
+export type Thunk = ScriptThunk | CommandThunk | TaskThunk;
+
+
 /**
- * An instruction indicates what a script should do. Scripts may run commands,
- * tasks, or other scripts. An `Instruction` may therefore be a `string` that
- * exactly matches the `name` of a registered command, task, or script -- or
- * the value returned by `command`, `task`, or `script`.
+ * An `Instruction` indicates what a script should do. Scripts may run commands,
+ * tasks, or other scripts. An `Instruction` may therefore be:
+ *
+ * - a `string` in the form `cmd:command-name` to execute a command
+ * - a `string` in the form `task:task-name` to execute a task
+ * - a `string` in the form `script:script-name` to execute a script
+ * - the value returned by `command`, `task`, or `script`
  */
 export type Instruction = string | Thunk;
 
 
 /**
- * Object describing a script. Passed to `script`.
+ * An `Instruction` in `string` form will be converted into an object of the
+ * following shape.
+ */
+export interface ParsedInstruction {
+  type: 'cmd' | 'task' | 'script';
+  name: string;
+}
+
+
+/**
+ * Configuration options passed as the second argument to `script`.
  */
 export interface CreateScriptOptions {
-  /**
-   * Name of the script. A script's name may contain 'segments' delimited by a
-   * single dot. When using the CLI to execute a script, the user may provide a
-   * shorthand for the full script name that will be matched against each
-   * segment in the name.
-   *
-   * For example, a script named `build.watch` could be run using `nr b.w`.
-   */
-  // name: string;
-
   /**
    * Description of what the script does. This will be printed if the --scripts
    * flag is passed, which lists all available scripts and their descriptions.
@@ -171,7 +170,7 @@ export interface CreateScriptOptions {
   run: Array<Instruction | Array<Instruction>>;
 
   /**
-   * Set to `true` to print a script's total run time.
+   * Set to `true` to print a script's total run time once it has finished.
    */
   timing?: boolean;
 }
@@ -187,7 +186,7 @@ export interface ScriptConfiguration extends CreateScriptOptions {
 
 
 /**
- * Function that will execute a script.
+ * Return type of `script`.
  */
 export interface ScriptThunk {
   (): Promise<void>;
@@ -199,12 +198,26 @@ export interface ScriptThunk {
 // ----- Configuration ---------------------------------------------------------
 
 /**
- * Object passed to configuration factories.
+ * Context passed to user configuration functions.
  */
-export interface ConfigurationFactoryArguments {
+export interface ConfigurationFactoryContext {
+  /**
+   * Provided a name and a command configuration, registers the command and
+   * returns a `CommandThunk`.
+   */
   command: typeof command;
-  script: typeof script;
+
+  /**
+   * Provided a name and a task function, registers the task and returns a
+   * `TaskThunk`.
+   */
   task: typeof task;
+
+  /**
+   * Provided a name and a script configuration, registers the script and
+   * returns a `ScriptThunk`.
+   */
+  script: typeof script;
 
   /**
    * True if a CI environment has been detected.
@@ -218,7 +231,7 @@ export interface ConfigurationFactoryArguments {
 /**
  * Signature of configuration factory functions.
  */
-export type ConfigurationFactory = (o: ConfigurationFactoryArguments) => void | Promise<void>;
+export type ConfigurationFactory = (ctx: ConfigurationFactoryContext) => void | Promise<void>;
 
 
 // ----- CLI -------------------------------------------------------------------
@@ -251,5 +264,3 @@ export interface CLIArguments extends Arguments {
 
 
 // ----- Miscellaneous ---------------------------------------------------------
-
-export type Thunk = ScriptThunk | CommandThunk | TaskThunk;

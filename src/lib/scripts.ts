@@ -6,13 +6,14 @@ import pSeries from 'p-series';
 import * as R from 'ramda';
 
 import {
-  IS_SCRIPT_THUNK,
   IS_COMMAND_THUNK,
-  IS_TASK_THUNK
+  IS_TASK_THUNK,
+  IS_SCRIPT_THUNK
 } from 'etc/constants';
 import {
   CreateScriptOptions,
   Instruction,
+  ParsedInstruction,
   ScriptConfiguration,
   ScriptThunk,
   Thunk
@@ -45,29 +46,32 @@ const scriptConfigs = new Map<string, ScriptConfiguration>();
  * Parses a string identifier for a script or command and returns an object
  * describing it.
  */
-function parseIdentifier(value: string) {
-  if (value.includes(':')) {
-    const [type, name] = value.split(':');
-
-    if (!['script', 'cmd', 'task'].includes(type)) {
-      throw new Error(`Invalid type: ${type}`);
-    }
-
-    return { type, name };
+function parseInstruction(value: string) {
+  if (!value.includes(':')) {
+    throw new Error(`Invalid instruction identifier: "${value}"`);
   }
 
-  return { type: 'unknown', name: value };
+  const [type, name] = value.split(':');
+
+  if (!['script', 'cmd', 'task'].includes(type)) {
+    throw new Error(`Invalid instruction type: ${type}`);
+  }
+
+  return { type, name } as ParsedInstruction;
 }
 
 
 /**
  * @private
  *
- * Provided a CommandThunk, ScriptThunk, TaskThunk, returns the value as-is. If
- * provided a string, attempts to resolve it to one of the above. Strings may
- * begin with 'cmd:', 'script:' or 'task:' to indicate the type to be resolved.
+ * If provided a CommandThunk, TaskThunk, or ScriptThunk, returns the value
+ * as-is. If provided a string, attempts to resolve it to one of the above.
+ * Strings may begin with 'cmd:', 'task:', or 'script:' to indicate the type to
+ * be resolved.
  */
 function resolveInstruction(value: Instruction): Thunk {
+  // If the user provided a thunk directly in a script, we don't need to look it
+  // up in the registry.
   if (typeof value === 'function') {
     if (
       Reflect.has(value, IS_SCRIPT_THUNK) ||
@@ -77,44 +81,31 @@ function resolveInstruction(value: Instruction): Thunk {
       return value;
     }
 
-    throw new TypeError('Provided function is neither a ScriptThunk nor a CommandThunk.');
+    throw new TypeError('Provided function is not a CommandThunk, TaskThunk, or ScriptThunk.');
   }
 
+  // If the user provided a string, parse it and look-up the indicated command,
+  // task, or script.
   if (typeof value === 'string') {
-    const { type, name } = parseIdentifier(value);
-    const scriptThunk = scripts.get(name);
-    const commandThunk = commands.get(name);
-    const taskThunk = tasks.get(name);
+    const { type, name } = parseInstruction(value);
 
-    if (type === 'script' && scriptThunk) {
-      return scriptThunk;
-    }
-
-    if (type === 'command' && commandThunk) {
+    if (type === 'cmd') {
+      const commandThunk = commands.get(name);
+      if (!commandThunk) throw new Error(`Unknown command: "${name}"`);
       return commandThunk;
     }
 
-    if (type === 'task' && taskThunk) {
+    if (type === 'task') {
+      const taskThunk = tasks.get(name);
+      if (!taskThunk) throw new Error(`Unknown task: "${name}"`);
       return taskThunk;
     }
 
-    if (scriptThunk) {
+    if (type === 'script') {
+      const scriptThunk = scripts.get(name);
+      if (!scriptThunk) throw new Error(`Unknown script: "${name}"`);
       return scriptThunk;
     }
-
-    if (commandThunk) {
-      return commandThunk;
-    }
-
-    if (taskThunk) {
-      return taskThunk;
-    }
-
-    if (type === 'unknown' && scriptThunk && commandThunk && taskThunk) {
-      throw new Error(`Instruction "${value}" is ambiguous. Disambiguate using a "cmd:", "script:", or "task:" prefix.`);
-    }
-
-    throw new Error(`Unable to resolve "${value}" to a script, command, or task.`);
   }
 
   throw new TypeError(`Expected instruction to be of type "string" or "function", got "${typeof value}".`);
