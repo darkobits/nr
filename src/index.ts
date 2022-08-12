@@ -9,7 +9,4 @@ export default (userConfigFactory: ConfigurationFactory): ConfigurationFactory =
 };
 
 
-export {
-  type ConfigurationFactory,
-  type ConfigurationFactoryArguments as Context
-} from 'etc/types';
+export * from 'etc/types';
