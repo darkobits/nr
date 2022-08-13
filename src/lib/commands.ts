@@ -1,3 +1,4 @@
+import callsites from 'callsites';
 import merge from 'deepmerge';
 // @ts-expect-error - This package does not have type definitions.
 import errno from 'errno';
@@ -9,21 +10,26 @@ import which from 'which';
 import unParseArgs from 'yargs-unparser';
 
 import { IS_COMMAND_THUNK } from 'etc/constants';
+import log, { LogPipe } from 'lib/log';
+import ow from 'lib/ow';
 import {
+  getEscapedCommand,
+  getPackageNameFromCallsite
+} from 'lib/utils';
+
+import type {
+  CommandDescriptor,
   CommandExecutor,
   CommandThunk,
   CreateCommandArguments,
   CreateCommandOptions
 } from 'etc/types';
-import log, { LogPipe } from 'lib/log';
-import ow from 'lib/ow';
-import { getEscapedCommand } from 'lib/utils';
 
 
 /**
  * Map of registered command names to their corresponding command thunks.
  */
-export const commands = new Map<string, CommandThunk>();
+export const commands = new Map<string, CommandDescriptor>();
 
 
 /**
@@ -37,14 +43,6 @@ export function resolveCommand(cmd: string, cwd: string | URL | undefined = proc
     throw Object.assign(new Error(`ENOENT: no such file or directory: '${cmd}'`), errno.code.ENOENT);
   }
 }
-
-
-/**
- * @private
- *
- * Map of registered command names to their corresponding configurations.
- */
-const commandConfigs = new Map<CommandThunk, [CreateCommandArguments, CreateCommandOptions | undefined]>();
 
 
 /**
@@ -163,7 +161,7 @@ function commandBuilder(builderOptions: CommandBuilderOptions): CommandThunk {
 
   try {
     // Validate name.
-    ow(name, 'name', ow.string);
+    ow(name, 'command name', ow.string);
 
     // Parse and validate command and arguments.
     const parsedArguments = parseArguments(args, opts?.preserveArguments);
@@ -176,7 +174,10 @@ function commandBuilder(builderOptions: CommandBuilderOptions): CommandThunk {
       preserveArguments: ow.optional.boolean
     }));
 
-    const commandThunk: CommandThunk = Object.assign(async () => {
+    // Get the name of the package that defined this command.
+    const sourcePackage = getPackageNameFromCallsite(callsites()[1]);
+
+    const commandThunk = async () => {
       try {
         const runTime = log.createTimer();
         const command = executor(name, executableName, parsedArguments, opts);
@@ -208,16 +209,22 @@ function commandBuilder(builderOptions: CommandBuilderOptions): CommandThunk {
       } catch (err: any) {
         throw new Error(`Command "${name}" failed: ${err.message}`);
       }
-    }, {
-      [IS_COMMAND_THUNK]: true as const
+    };
+
+    Object.defineProperties(commandThunk, {
+      name: { value: name },
+      [IS_COMMAND_THUNK]: { value: true as const }
     });
 
-    Reflect.defineProperty(commandThunk, 'name', { value: name });
+    commands.set(name.toLowerCase(), {
+      name,
+      sourcePackage,
+      arguments: args,
+      options: opts,
+      thunk: commandThunk as CommandThunk
+    });
 
-    commands.set(name, commandThunk);
-    commandConfigs.set(commandThunk, [args, opts]);
-
-    return commandThunk;
+    return commandThunk as CommandThunk;
   } catch (err: any) {
     console.log(err);
     err.message = `Unable to create command "${name}": ${err.message}`;

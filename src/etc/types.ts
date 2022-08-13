@@ -75,7 +75,18 @@ export type CommandExecutor = (name: string, command: string, args: Array<string
 export interface CommandThunk {
   (): Promise<void>;
   [IS_COMMAND_THUNK]: true;
-  [key: string]: any;
+}
+
+
+/**
+ * Descriptor for a command that will be stored in the registry.
+ */
+export interface CommandDescriptor {
+  name: string;
+  sourcePackage: string;
+  arguments: CreateCommandArguments;
+  options: CreateCommandOptions;
+  thunk: CommandThunk;
 }
 
 
@@ -93,7 +104,16 @@ export type TaskFn = (...args: Array<any>) => Promise<any> | any;
 export interface TaskThunk {
   (): Promise<void>;
   [IS_TASK_THUNK]: true;
-  [key: string]: any;
+}
+
+
+/**
+ * Descriptor for a Task that will be stored in the registry.
+ */
+export interface TaskDescriptor {
+  name: string;
+  sourcePackage: string;
+  thunk: TaskThunk;
 }
 
 
@@ -178,21 +198,22 @@ export interface CreateScriptOptions {
 
 
 /**
- * A script's configuration consists of all the options provided to
- * `script` in addition to its `name`.
- */
-export interface ScriptConfiguration extends CreateScriptOptions {
-  name: string;
-}
-
-
-/**
  * Return type of `script`.
  */
 export interface ScriptThunk {
   (): Promise<void>;
   [IS_SCRIPT_THUNK]: true;
-  [key: string]: any;
+}
+
+
+/**
+ * Descriptor for a script that will be stored in the registry.
+ */
+export interface ScriptDescriptor {
+  name: string;
+  sourcePackage: string;
+  options: CreateScriptOptions;
+  thunk: ScriptThunk;
 }
 
 

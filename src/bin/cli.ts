@@ -7,7 +7,7 @@ import log from 'lib/log';
 import { matchScript, executeScript, printAvailableScripts } from 'lib/scripts';
 import { parseError } from 'lib/utils';
 
-import type { CLIArguments, ScriptConfiguration } from 'etc/types';
+import type { CLIArguments, ScriptDescriptor } from 'etc/types';
 
 
 cli.command<CLIArguments, any>({
@@ -40,7 +40,7 @@ cli.command<CLIArguments, any>({
     command.epilogue(log.chalk.gray('For full usage instructions, see https://github.com/darkobits/nr'));
   },
   handler: async opts => {
-    let scriptConfig: ScriptConfiguration | undefined;
+    let scriptDescriptor: ScriptDescriptor | undefined;
 
     try {
       const { argv } = opts;
@@ -63,11 +63,11 @@ cli.command<CLIArguments, any>({
 
       // Otherwise, match and execute the indicated script.
       const runTime = log.createTimer();
-      scriptConfig = matchScript(argv.query);
-      await executeScript(scriptConfig.name);
+      scriptDescriptor = matchScript(argv.query);
+      await executeScript(scriptDescriptor.name);
 
       // If the parent script is configured to log timing, do so.
-      if (scriptConfig.timing) {
+      if (scriptDescriptor.options.timing) {
         log.info(log.chalk.gray(`Done in ${runTime}.`));
       }
     } catch (err: any) {

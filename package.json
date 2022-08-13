@@ -33,6 +33,7 @@
     "@darkobits/saffron": "^0.4.22",
     "@types/is-ci": "^3.0.0",
     "@types/yargs-unparser": "^2.0.1",
+    "callsites": "^4.0.0",
     "deepmerge": "^4.2.2",
     "errno": "^1.0.0",
     "execa": "^6.1.0",
@@ -45,6 +46,7 @@
     "p-all": "^4.0.0",
     "p-series": "^3.0.0",
     "ramda": "^0.28.0",
+    "read-pkg-up": "^9.1.0",
     "which": "^2.0.2",
     "yargs-unparser": "^2.0.0"
   },

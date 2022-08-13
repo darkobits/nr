@@ -1,5 +1,8 @@
-import { EOL } from 'os';
+import { EOL } from 'node:os';
 
+import { readPackageUpSync } from 'read-pkg-up';
+
+import type { CallSite } from 'callsites';
 import type { ExecaError } from 'execa';
 
 
@@ -47,4 +50,28 @@ export function getEscapedCommand(file: string | undefined, args: Array<string>)
     : `"${arg.replace(/"/g, '\\"')}"`);
 
   return normalizeArgs(file, args).map(arg => escapeArg(arg)).join(' ');
+}
+
+
+/**
+ * Provided a CallSite object, returns the package name from which it
+ * originated.
+ */
+export function getPackageNameFromCallsite(callSite: CallSite | undefined, fallback = 'unknown') {
+  if (!callSite) return fallback;
+
+  const fileName = callSite.getFileName();
+  if (!fileName) return fallback;
+
+  const localPackage = readPackageUpSync();
+
+  const sourcePackage = readPackageUpSync({ cwd: fileName });
+  if (!sourcePackage) return fallback;
+
+  if (localPackage && localPackage.packageJson.name === sourcePackage.packageJson.name) {
+    return 'local';
+  }
+
+  return sourcePackage.packageJson.name;
+  // return fileName;
 }

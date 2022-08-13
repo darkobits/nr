@@ -1,12 +1,21 @@
+import callsites from 'callsites';
+
 import { IS_TASK_THUNK } from 'etc/constants';
-import { TaskThunk, TaskFn } from 'etc/types';
 import log from 'lib/log';
+import ow from 'lib/ow';
+import { getPackageNameFromCallsite } from 'lib/utils';
+
+import type {
+  TaskDescriptor,
+  TaskFn,
+  TaskThunk
+} from 'etc/types';
 
 
 /**
  * Map of registered task names to their corresponding task thunks.
  */
-export const tasks = new Map<string, TaskThunk>();
+export const tasks = new Map<string, TaskDescriptor>();
 
 
 /**
@@ -15,21 +24,35 @@ export const tasks = new Map<string, TaskThunk>();
  */
 export function task(name: string, taskFn: TaskFn) {
   try {
-    const taskThunk = Object.assign(async (...args: Array<any>) => {
+    // Validate parameters.
+    ow(name, 'task name', ow.string);
+    ow(taskFn, 'task function', ow.function);
+
+    // Get the name of the package that defined this task.
+    const sourcePackage = getPackageNameFromCallsite(callsites()[1]);
+
+    const taskThunk = async () => {
       log.verbose(log.prefix('task'), 'exec:', log.chalk.green(name));
 
       try {
-        await taskFn(...args);
+        await taskFn();
       } catch (err: any) {
         throw new Error(`Task "${name}" failed: ${err.message}`);
       }
-    }, {
-      [IS_TASK_THUNK]: true as const
+    };
+
+    Object.defineProperties(taskThunk, {
+      name: { value: name },
+      [IS_TASK_THUNK]: { value: true as const }
     });
 
-    tasks.set(name, taskThunk);
+    tasks.set(name.toLowerCase(), {
+      name,
+      sourcePackage,
+      thunk: taskThunk as TaskThunk
+    });
 
-    return taskThunk;
+    return taskThunk as TaskThunk;
   } catch (err: any) {
     console.log(err);
     err.message = `Unable to create task "${name}": ${err.message}`;

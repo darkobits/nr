@@ -1,5 +1,6 @@
-import { EOL } from 'os';
+import { EOL } from 'node:os';
 
+import callsites from 'callsites';
 import emoji from 'node-emoji';
 import pAll from 'p-all';
 import pSeries from 'p-series';
@@ -14,7 +15,7 @@ import {
   CreateScriptOptions,
   Instruction,
   ParsedInstruction,
-  ScriptConfiguration,
+  ScriptDescriptor,
   ScriptThunk,
   Thunk
 } from 'etc/types';
@@ -23,21 +24,13 @@ import log from 'lib/log';
 import matchSegmentedName from 'lib/matcher';
 import ow from 'lib/ow';
 import { tasks } from 'lib/tasks';
+import { getPackageNameFromCallsite } from 'lib/utils';
 
 
 /**
  * Map of registered script names to their corresponding script thunks.
  */
-export const scripts = new Map<string, ScriptThunk>();
-
-
-/**
- * @private
- *
- * Map of registered script thunks to their provided configurations.
- * Configurations stored here also contain the script's `name`.
- */
-const scriptConfigs = new Map<string, ScriptConfiguration>();
+export const scripts = new Map<string, ScriptDescriptor>();
 
 
 /**
@@ -90,25 +83,138 @@ function resolveInstruction(value: Instruction): Thunk {
     const { type, name } = parseInstruction(value);
 
     if (type === 'cmd') {
-      const commandThunk = commands.get(name);
-      if (!commandThunk) throw new Error(`Unknown command: "${name}"`);
-      return commandThunk;
+      const commandDescriptor = commands.get(name.toLowerCase());
+      if (!commandDescriptor) throw new Error(`Unknown command: "${name}"`);
+      return commandDescriptor.thunk;
     }
 
     if (type === 'task') {
-      const taskThunk = tasks.get(name);
-      if (!taskThunk) throw new Error(`Unknown task: "${name}"`);
-      return taskThunk;
+      const taskDescriptor = tasks.get(name.toLowerCase());
+      if (!taskDescriptor) throw new Error(`Unknown task: "${name}"`);
+      return taskDescriptor.thunk;
     }
 
     if (type === 'script') {
-      const scriptThunk = scripts.get(name);
-      if (!scriptThunk) throw new Error(`Unknown script: "${name}"`);
-      return scriptThunk;
+      const scriptDescriptor = scripts.get(name.toLowerCase());
+      if (!scriptDescriptor) throw new Error(`Unknown script: "${name}"`);
+      return scriptDescriptor.thunk;
     }
   }
 
   throw new TypeError(`Expected instruction to be of type "string" or "function", got "${typeof value}".`);
+}
+
+
+/**
+ * Prints all available scripts and their descriptions. Also determines if `nr`
+ * is in the users $PATH and can be invoked directly, or if the user needs to
+ * use `npx`.
+ */
+export function printAvailableScripts() {
+  const allScripts = Array.from(scripts.values());
+
+  const groupsUsed = R.any(R.hasPath(['options', 'group']), allScripts);
+  const scriptSources = R.uniq(R.map(R.path(['sourcePackage']), allScripts));
+  const multipleSources = scriptSources.length > 1 || !R.includes('local', scriptSources);
+
+  const printScript = (descriptor: ScriptDescriptor) => {
+    const { name, sourcePackage, options: { description } } = descriptor;
+
+    const segments: Array<string> = [];
+
+    if (multipleSources) {
+      if (sourcePackage === 'local') {
+        segments.push(`${log.chalk.green(name)} ${log.chalk.gray.dim('(local)')}`);
+      } else {
+        segments.push(`${log.chalk.green(name)} ${log.chalk.gray.dim(`(${sourcePackage})`)}`);
+      }
+    } else {
+      segments.push(log.chalk.green(name));
+    }
+
+    if (description) {
+      segments.push(`${log.chalk.gray.dim('└─')} ${log.chalk.gray(description)}`);
+    }
+
+    console.log(segments.join(EOL));
+  };
+
+  console.log(`${EOL}${log.chalk.bold('Available scripts:')}${EOL}`);
+
+  if (groupsUsed) {
+    R.forEachObjIndexed((scriptConfigs, groupName) => {
+      console.log(log.chalk.underline(groupName));
+      R.forEach(printScript, scriptConfigs);
+      console.log('');
+    }, R.groupBy<ScriptDescriptor>(descriptor => descriptor.options.group ?? 'Other', allScripts));
+  } else {
+    R.forEach(printScript, allScripts);
+  }
+
+  let nrIsInPath = false;
+
+  try {
+    resolveCommand('nr');
+    nrIsInPath = true;
+  } catch {
+    // nr is not in $PATH.
+  }
+
+  if (nrIsInPath) {
+    console.log(log.chalk.gray(`${EOL}${emoji.get('sparkles')} ${log.chalk.white.bold('nr')} is in your PATH. You can run scripts using: ${log.chalk.white('nr <script name>')}`));
+  } else {
+    console.log(log.chalk.gray(`${EOL}${emoji.get('exclamation')} ${log.chalk.white.bold('nr')} is ${log.chalk.red('not')} in your PATH. You must run scripts using: ${log.chalk.white('npx nr <script name>')}`));
+  }
+}
+
+
+/**
+ * Provided a search query, matches the query to a registered script and returns
+ * its descriptor.
+ */
+export function matchScript(value: string | undefined) {
+  const scriptNames = [...scripts.keys()];
+
+  if (scriptNames.length === 0) {
+    throw new Error('No scripts have been registered.');
+  }
+
+  const scriptName = matchSegmentedName(scriptNames, value);
+
+  if (!scriptName) {
+    throw new Error(`"${value}" did not match any scripts.`);
+  }
+
+  log.verbose(`Matched ${log.chalk.green(value)} to script ${log.chalk.green(scriptName)}.`);
+
+  return scripts.get(scriptName.toLowerCase()) as ScriptDescriptor;
+}
+
+
+/**
+ * Provided a script name search query, matches the query to a registered script
+ * and executes it. If no match could be found, throws an error.
+ */
+export async function executeScript(scriptName: string) {
+  const scriptDescriptor = scripts.get(scriptName.toLowerCase());
+
+  if (!scriptDescriptor) {
+    throw new Error(`Unknown script: "${scriptName}".`);
+  }
+
+  const preScriptDescriptor = scripts.get(`pre${scriptName}`.toLowerCase());
+
+  if (preScriptDescriptor) {
+    await preScriptDescriptor.thunk();
+  }
+
+  await scriptDescriptor.thunk();
+
+  const postScriptDescriptor = scripts.get(`post${scriptName}`.toLowerCase());
+
+  if (postScriptDescriptor) {
+    await postScriptDescriptor.thunk();
+  }
 }
 
 
@@ -136,9 +242,12 @@ export function script(name: string, opts: CreateScriptOptions) {
       timing: ow.optional.boolean
     }));
 
-    // Map each entry in the instruction sequence to its corresponding command
-    // thunk or script thunk. For nested arrays, map the array to a thunk that
-    // runs each entry in parallel.
+    // Get the name of the package that defined this script.
+    const sourcePackage = getPackageNameFromCallsite(callsites()[1]);
+
+    // Map each entry in the instruction sequence to its corresponding command,
+    // task, or script. For nested arrays, map the array to a thunk that runs
+    // each entry in parallel.
     const validatedInstructions = opts.run.map(value => {
       if (Array.isArray(value)) {
         return async () => {
@@ -152,7 +261,7 @@ export function script(name: string, opts: CreateScriptOptions) {
     // NB: This function does not catch errors. Failed commands will log
     // appropriate error messages and then re-throw, propagating errors up to
     // this function's caller.
-    const scriptThunk: ScriptThunk = Object.assign(async () => {
+    const scriptThunk = async () => {
       // Instructions may be added to a script definition dynamically, meaning
       // it is possible that a script has zero instructions under certain
       // conditions. When this is the case, issue a warning and bail.
@@ -172,120 +281,22 @@ export function script(name: string, opts: CreateScriptOptions) {
       if (opts.timing) {
         log.verbose(log.prefix('script'), log.chalk.gray(`Script ${log.chalk.green.dim(name)} done in ${runTime}.`));
       }
-    }, {
-      [IS_SCRIPT_THUNK]: true as const
+    };
+
+    Object.defineProperties(scriptThunk, {
+      name: { value: name },
+      [IS_SCRIPT_THUNK]: { value: true as const }
     });
 
-    Reflect.defineProperty(scriptThunk, 'name', { value: name });
+    scripts.set(name.toLowerCase(), {
+      name,
+      sourcePackage,
+      options: opts,
+      thunk: scriptThunk as ScriptThunk
+    });
 
-    scripts.set(name, scriptThunk);
-    scriptConfigs.set(name, {...opts, name });
-
-    return scriptThunk;
+    return scriptThunk as ScriptThunk;
   } catch (err: any) {
     throw new Error(`Unable to create script "${name}": ${err.message}`);
-  }
-}
-
-
-/**
- * Prints all available scripts and their descriptions. Also determines if `nr`
- * is in the users $PATH and can be invoked directly, or if the user needs to
- * use `npx`.
- */
-export function printAvailableScripts() {
-  const allScripts = Array.from(scriptConfigs.values());
-
-  const printScript = (scriptConfig: ScriptConfiguration) => {
-    if (scriptConfig.description) {
-      console.log(log.chalk.green(scriptConfig.name), `– ${log.chalk.gray(scriptConfig.description)}`);
-    } else {
-      console.log(log.chalk.green(scriptConfig.name));
-    }
-  };
-
-  // Determine if any script was defined with a "group".
-  const groupsUsed = allScripts.some(scriptConfig => scriptConfig.group);
-
-  console.log(`${EOL}Available scripts:${EOL}`);
-
-  if (groupsUsed) {
-    R.forEachObjIndexed((scriptConfigs, groupName) => {
-      console.log(log.chalk.underline(groupName));
-      R.forEach(printScript, scriptConfigs);
-      console.log('');
-    }, R.groupBy<ScriptConfiguration>(scriptConfig => scriptConfig.group ?? 'Other', allScripts));
-  } else {
-    R.forEach(printScript, allScripts);
-  }
-
-  let nrIsInPath = false;
-
-  try {
-    resolveCommand('nr');
-    nrIsInPath = true;
-  } catch {
-    // nr is not in $PATH.
-  }
-
-  if (nrIsInPath) {
-    console.log(log.chalk.gray(`${EOL}${emoji.get('sparkles')} ${log.chalk.white.bold('nr')} is in your PATH. You can run scripts using: ${log.chalk.white('nr <script name>')}`));
-  } else {
-    console.log(log.chalk.gray(`${EOL}${emoji.get('exclamation')} ${log.chalk.white.bold('nr')} is ${log.chalk.red('not')} in your PATH. You must run scripts using: ${log.chalk.white('npx nr <script name>')}`));
-  }
-}
-
-
-/**
- * Provided a search query, matches the query to a registered script and returns
- * its configuration.
- */
-export function matchScript(value: string | undefined) {
-  const scriptNames = [...scripts.keys()];
-
-  if (scriptNames.length === 0) {
-    throw new Error('No scripts have been registered.');
-  }
-
-  const scriptName = matchSegmentedName(scriptNames, value);
-
-  if (!scriptName) {
-    throw new Error(`"${value}" did not match any scripts.`);
-  }
-
-  log.verbose(`Matched ${log.chalk.green(value)} to script ${log.chalk.green(scriptName)}.`);
-
-  const scriptThunk = scripts.get(scriptName) as ScriptThunk;
-  return scriptConfigs.get(scriptThunk.name) as ScriptConfiguration;
-}
-
-
-/**
- * Provided a script name search query, matches the query to a registered script
- * and executes it. If no match could be found, throws an error.
- */
-export async function executeScript(scriptName: string) {
-  if (!scripts.has(scriptName)) {
-    throw new Error(`Unknown script: "${scriptName}".`);
-  }
-
-  const preScriptName = `pre${scriptName}`;
-
-  if (scripts.has(preScriptName)) {
-    log.verbose(`Running pre-script "${preScriptName}"`);
-    const preScriptThunk = scripts.get(preScriptName) as ScriptThunk;
-    await preScriptThunk();
-  }
-
-  const scriptThunk = scripts.get(scriptName) as ScriptThunk;
-
-  await scriptThunk();
-
-  const postScriptName = `post${scriptName}`;
-
-  if (scripts.has(postScriptName)) {
-    log.verbose(`Running post-script "${preScriptName}"`);
-    const postScriptThunk = scripts.get(postScriptName) as ScriptThunk;
-    await postScriptThunk();
   }
 }
