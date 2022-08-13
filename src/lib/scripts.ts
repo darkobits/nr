@@ -123,7 +123,7 @@ export function script(name: string, opts: CreateScriptOptions) {
 
     // Validate options.
     ow<Required<CreateScriptOptions>>(opts, ow.object.exactShape({
-      description: ow.string,
+      description: ow.optional.string,
       group: ow.optional.string,
       run: ow.array.ofType(ow.any(
         ow.string,
@@ -189,17 +189,43 @@ export function script(name: string, opts: CreateScriptOptions) {
 
 
 /**
- * Prints all available scripts and their descriptions.
+ * Prints all available scripts and their descriptions. Also determines if `nr`
+ * is in the users $PATH and can be invoked directly, or if the user needs to
+ * use `npx`.
  */
 export function printAvailableScripts() {
+  const allScripts = Array.from(scriptConfigs.values());
+
+  const printScript = (scriptConfig: ScriptConfiguration) => {
+    if (scriptConfig.description) {
+      console.log(log.chalk.green(scriptConfig.name), `– ${log.chalk.gray(scriptConfig.description)}`);
+    } else {
+      console.log(log.chalk.green(scriptConfig.name));
+    }
+  };
+
+  // Determine if any script was defined with a "group".
+  const groupsUsed = allScripts.some(scriptConfig => scriptConfig.group);
+
+  console.log(`${EOL}Available scripts:${EOL}`);
+
+  if (groupsUsed) {
+    R.forEachObjIndexed((scriptConfigs, groupName) => {
+      console.log(log.chalk.underline(groupName));
+      R.forEach(printScript, scriptConfigs);
+      console.log('');
+    }, R.groupBy<ScriptConfiguration>(scriptConfig => scriptConfig.group ?? 'Other', allScripts));
+  } else {
+    R.forEach(printScript, allScripts);
+  }
+
   let nrIsInPath = false;
-  const allConfigs = Array.from(scriptConfigs.values());
 
   try {
     resolveCommand('nr');
     nrIsInPath = true;
   } catch {
-    // nr is not in PATH.
+    // nr is not in $PATH.
   }
 
   if (nrIsInPath) {
@@ -207,20 +233,6 @@ export function printAvailableScripts() {
   } else {
     console.log(log.chalk.gray(`${EOL}${emoji.get('exclamation')} ${log.chalk.white.bold('nr')} is ${log.chalk.red('not')} in your PATH. You must run scripts using: ${log.chalk.white('npx nr <script name>')}`));
   }
-
-  console.log(`${EOL}Available scripts:${EOL}`);
-
-  R.forEachObjIndexed((scriptConfigs, groupName) => {
-    console.log(log.chalk.underline(groupName));
-
-    R.forEach(scriptConfig => {
-      console.log(log.chalk.green(scriptConfig.name), `– ${log.chalk.gray(scriptConfig.description)}`);
-    }, scriptConfigs);
-
-    console.log('');
-  }, R.groupBy<CreateScriptOptions & { name: string }>(scriptConfig => {
-    return scriptConfig.group ?? 'Other';
-  }, allConfigs));
 }
 
 

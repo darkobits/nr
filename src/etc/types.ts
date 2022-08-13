@@ -129,17 +129,6 @@ export interface ParsedInstruction {
  */
 export interface CreateScriptOptions {
   /**
-   * Description of what the script does. This will be printed if the --scripts
-   * flag is passed, which lists all available scripts and their descriptions.
-   */
-  description: string;
-
-  /**
-   * Optional group to use with the --scripts flag.
-   */
-  group?: string;
-
-  /**
    * Array of Instructions that this script will run.
    *
    * An inner array may be used to indicate that a set of Instructions should be
@@ -168,6 +157,18 @@ export interface CreateScriptOptions {
    * ]
    */
   run: Array<Instruction | Array<Instruction>>;
+
+  /**
+   * Optional description of what the script does. Used when showing available
+   * scripts with the --scripts flag.
+   */
+  description?: string;
+
+  /**
+   * Optional group for the script. Used when showing available scripts with the
+   * --scripts flag.
+   */
+  group?: string;
 
   /**
    * Set to `true` to print a script's total run time once it has finished.
