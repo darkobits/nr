@@ -60,12 +60,12 @@ A configuration file is responsible for creating **commands**, **tasks**, and **
 A configuration file should export a function that will be passed a context object that contains the
 following keys:
 
-| Key                                                               | Type       | Description                                                                |
-|-------------------------------------------------------------------|------------|----------------------------------------------------------------------------|
+| Key                   | Type       | Description                                                                |
+|-----------------------|------------|----------------------------------------------------------------------------|
 | [`command`](#command) | `function` | Create a new command.                                                      |
 | [`task`](#task)       | `function` | Create a new task.                                                         |
 | [`script`](#script)   | `function` | Create a new script.                                                       |
-| `isCI`                                                            | `boolean`  | `true` in CI environments. See [`is-ci`](https://github.com/watson/is-ci). |
+| `isCI`                | `boolean`  | `true` in CI environments. See [`is-ci`](https://github.com/watson/is-ci). |
 
 **Example:**
 
@@ -97,23 +97,23 @@ nr build
 
 ### `command`
 
-| Parameter  | Type                                             | Description               |
-|------------|--------------------------------------------------|---------------------------|
-| `name`     | `string`                                         | Name of the command.      |
-| `args`     | [`CreateCommandArguments`](src/etc/types.ts#L13-L35) | Executable and arguments. |
-| `options?` | [`CreateCommandOptions`](src/etc/types.ts#L38-L68)   | Optional configuration.   |
+| Parameter  | Type                                           | Description               |
+|------------|------------------------------------------------|---------------------------|
+| `name`     | `string`                                       | Name of the command.      |
+| `args`     | [`CommandArguments`](src/etc/types.ts#L13-L35) | Executable and arguments. |
+| `options?` | [`CommandOptions`](src/etc/types.ts#L38-L68)   | Optional configuration.   |
 
-| Return Type                                | Description                                                      |
-|--------------------------------------------|------------------------------------------------------------------|
-| [`CommandThunk`](src/etc/types.ts#L78-L84) | Value that may be provided to `createScript` to run the command. |
+| Return Type                                | Description                                                |
+|--------------------------------------------|------------------------------------------------------------|
+| [`CommandThunk`](src/etc/types.ts#L78-L84) | Value that may be provided to `script` to run the command. |
 
-This function accepts a name, an array indicating the executable and its arguments, [`CreateCommandArguments`](src/etc/types.ts#L13-L35),
-and an optional options object, [`CreateCommandOptions`](src/etc/types.ts#L38-L68). It will register the
+This function accepts a name, an array indicating the executable and its arguments, [`CommandArguments`](src/etc/types.ts#L13-L35),
+and an optional options object, [`CommandOptions`](src/etc/types.ts#L38-L68). It will register the
 command using the provided `name` and return a value. To reference a command in a script, use either the
 return value from `command` directly or a string in the format `cmd:name`. Commands are executed using
 [`execa`](https://github.com/sindresorhus/execa).
 
-[`CreateCommandArguments`](src/etc/types.ts#L13-L35) may take one of four forms:
+[`CommandArguments`](src/etc/types.ts#L13-L35) may take one of four forms:
 * `[executable]` of type `[string]`
 * `[executable, positionals]` of type `[string, Array<string>]`
 * `[executable, flags]` of type `[string, Record<string, any>]`
@@ -158,16 +158,16 @@ extensions: `ts`, `tsx`, `js`, `jsx`.
 
 ### `task`
 
-| Parameter | Type                                 | Description          |
-|-----------|--------------------------------------|----------------------|
-| `name`    | `string`                             | Name of the task.    |
-| `taskFn`  | [`TaskFn`](src/etc/types.ts#L95-L98) | Function to execute. |
+| Parameter | Type                                   | Description          |
+|-----------|----------------------------------------|----------------------|
+| `name`    | `string`                               | Name of the task.    |
+| `taskFn`  | [`TaskFn`](src/etc/types.ts#L101-L104) | Function to execute. |
 
 | Return Type                               | Description                                             |
 |-------------------------------------------|---------------------------------------------------------|
-| [`TaskThunk`](src/etc/types.ts#L78-L84) | Value that may be provided to `script` to run the task. |
+| [`TaskThunk`](src/etc/types.ts#L107-L113) | Value that may be provided to `script` to run the task. |
 
-This function accepts a name and a function, [`TaskFn`](src/etc/types.ts#L95-L98), It will register the
+This function accepts a name and a function, [`TaskFn`](src/etc/types.ts#L101-L104), It will register the
 task using the provided `name` and return a value. To reference a task in a script, use either the
 return value from `task` directly or a string in the format `task:name`.
 
@@ -195,21 +195,20 @@ export default ({ task, script }) => {
 
 ### `script`
 
-| Parameter | Type                                                | Description           |
-|-----------|-----------------------------------------------------|-----------------------|
-| `name`    | `string`                                            | Name of the command.  |
-| `options` | [`CreateScriptOptions`](src/etc/types.ts#L147-L197) | Script configuration. |
+| Parameter | Type                                          | Description           |
+|-----------|-----------------------------------------------|-----------------------|
+| `name`    | `string`                                      | Name of the command.  |
+| `options` | [`ScriptOptions`](src/etc/types.ts#L153-L204) | Script configuration. |
 
-| Return Type                            | Description                                                     |
-|----------------------------------------|-----------------------------------------------------------------|
-| [`ScriptThunk`](src/etc/types.ts#L191) | Value that may be provided to `createScript` to run the script. |
+| Return Type                                 | Description                                               |
+|---------------------------------------------|-----------------------------------------------------------|
+| [`ScriptThunk`](src/etc/types.ts#L206-L212) | Value that may be provided to `script` to run the script. |
 
-This function accepts name and an options object, [`CreateScriptOptions`](src/etc/types.ts#L147-L197).
-It will register the script using the provided `name` and return a value. To reference a script in
-another script, use either the return value from `script` directly or a string in the format
-`script:name`.
+This function accepts a name and an options object, [`ScriptOptions`](src/etc/types.ts#L153-L204). It
+will register the script using the provided `name` and return a value. To reference a script in another
+script, use either the return value from `script` directly or a string in the format `script:name`.
 
-The `run` option must be an array of [`Instruction`](src/etc/types.ts#L125-L134) which may be:
+The `run` option must be an array of [`Instruction`](src/etc/types.ts#L131-L140) which may be:
 
 * A reference to a command by name using a `string` in the format `cmd:name` or by value using the value
   returned by `command`.
@@ -218,7 +217,7 @@ The `run` option must be an array of [`Instruction`](src/etc/types.ts#L125-L134)
 * A reference to another script by name using a `string` in the format `script:name` or by value using
   the value returned by `script`.
 
-To indicate that a group of [`Instructions`](src/etc/types.ts#L125-L134) should be run in parallel, wrap
+To indicate that a group of [`Instructions`](src/etc/types.ts#L131-L140) should be run in parallel, wrap
 them in an array. However, no more than one level of array nesting is allowed. If you need more complex
 parallelization, write separate, smaller scripts and compose them.
 
@@ -300,7 +299,6 @@ export default nr(({ command, task, script }) => {
 
 `nr` also supports TypeScript configuration files. Name your configuration file `nr.config.ts` and use
 the helper for a fully type-safe experience.
-
 
 # Use
 

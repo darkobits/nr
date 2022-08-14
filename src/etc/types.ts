@@ -165,39 +165,40 @@ export interface ScriptOptions {
    * @example
    *
    * For example, if Commands 'lint', 'babel', 'type-check', and 'cleanup' were
-   * registered, and we wanted to run the 'lint' command, then 'babel' and
-   * 'type-check' in parallel, followed by the 'cleanup' command, we would
-   * express that thusly:
+   * registered, and we wanted to run the 'babel', 'lint', and 'type-check'
+   * commands in parallel followed by the 'cleanup' command, we would express
+   * that thusly:
    *
-   * commands: [
-   *   'lint',
-   *   ['babel', 'type-check'],
-   *   'cleanup'
+   * run: [
+   *   ['cmd:babel', 'cmd:lint', 'cmd:type-check'],
+   *   'cmd:cleanup'
    * ]
    *
    * Note: If a script should run a single group of Instructions in parallel,
    * a nested array is still required to indicate parallelization:
    *
-   * commands: [
-   *   ['lint', 'test', 'build']
+   * run: [
+   *   ['cmd:build', 'cmd:lint', 'cmd:test']
    * ]
    */
   run: Array<Instruction | Array<Instruction>>;
 
   /**
-   * Optional description of what the script does. Used when showing available
-   * scripts with the --scripts flag.
+   * Description of what the script does. Used when showing available scripts
+   * with the --scripts flag.
    */
   description?: string;
 
   /**
-   * Optional group for the script. Used when showing available scripts with the
+   * Group for the script. Used when showing available scripts with the
    * --scripts flag.
    */
   group?: string;
 
   /**
    * Set to `true` to print a script's total run time once it has finished.
+   *
+   * @default false
    */
   timing?: boolean;
 }
