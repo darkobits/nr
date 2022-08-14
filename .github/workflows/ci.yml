@@ -1,7 +1,15 @@
 name: ci
 on:
-  - push
-  - pull_request
+  push:
+    paths-ignore:
+        - '**/README.md'
+        - '**/CHANGELOG.md'
+        - 'LICENSE'
+  pull_request:
+    paths-ignore:
+      - '**/README.md'
+      - '**/CHANGELOG.md'
+      - 'LICENSE'
 env:
   FORCE_COLOR: 3
 concurrency:
