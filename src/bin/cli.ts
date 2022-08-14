@@ -25,10 +25,12 @@ cli.command<CLIArguments, any>({
   },
   builder: ({ command }) => {
     command.example('$0 test', 'Runs the script named "test".');
+    command.example('$0 --scripts', 'Lists available scripts.');
 
     command.positional('query', {
       type: 'string',
-      description: 'Script name or query.'
+      description: 'Script name or query.',
+      conflicts: ['commands', 'tasks', 'scripts']
     });
 
     command.option('commands', {

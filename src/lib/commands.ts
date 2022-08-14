@@ -73,7 +73,7 @@ const commonExecaOptions: ExecaOptions = {
  * Provided an arguments array, returns an array of strings representing the
  * "un-parsed" arguments.
  */
-function parseArguments(args: CreateCommandArguments, preserveArguments?: boolean) {
+function parseArguments(args: CreateCommandArguments, preserveArgumentCasing?: boolean) {
   ow(args, 'command and arguments', ow.array.maxLength(3));
   ow(args[0], 'command', ow.string);
 
@@ -107,7 +107,7 @@ function parseArguments(args: CreateCommandArguments, preserveArguments?: boolea
   // flags to kebab-case, unless preserveKeys is truthy.
   return unParseArgs(Object.assign(
     {_: positionals},
-    preserveArguments ? flags : kebabCaseKeys(flags)
+    preserveArgumentCasing ? flags : kebabCaseKeys(flags)
   ));
 }
 
@@ -196,14 +196,14 @@ function commandBuilder(builderOptions: CommandBuilderOptions): CommandThunk {
     ow(name, 'command name', ow.string);
 
     // Parse and validate command and arguments.
-    const parsedArguments = parseArguments(args, opts?.preserveArguments);
+    const parsedArguments = parseArguments(args, opts?.preserveArgumentCasing);
     const [executableName] = args;
 
     // Validate options.
     ow<Required<CreateCommandOptions>>(opts, ow.optional.object.exactShape({
       prefix: ow.optional.function,
       execaOptions: ow.optional.object,
-      preserveArguments: ow.optional.boolean
+      preserveArgumentCasing: ow.optional.boolean
     }));
 
     const commandThunk = async () => {
@@ -282,7 +282,7 @@ export function printCommandInfo() {
   R.forEach(command => {
     const segments: Array<string> = [];
     const executable = command.arguments[0];
-    const parsedArguments = parseArguments(command.arguments, command.options?.preserveArguments).join(' ');
+    const parsedArguments = parseArguments(command.arguments, command.options?.preserveArgumentCasing).join(' ');
 
     if (multipleSources) {
       if (command.sourcePackage === 'local') {

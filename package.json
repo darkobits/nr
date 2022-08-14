@@ -55,7 +55,8 @@
     "yargs-unparser": "^2.0.0"
   },
   "devDependencies": {
-    "@darkobits/ts": "^0.10.6",
+    "@darkobits/eslint-plugin": "^0.2.9",
+    "@darkobits/ts": "^0.10.7-beta.10",
     "@types/micromatch": "^4.0.2",
     "@types/node-emoji": "^1.8.1",
     "@types/ramda": "^0.28.15",

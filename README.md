@@ -11,6 +11,22 @@
 `nr` (shorthand for "[NPM run](https://docs.npmjs.com/cli/v7/commands/npm-run-script)") is a task runner for JavaScript projects. It can serve as a replacement for or complement to
 traditional [NPM package scripts](https://docs.npmjs.com/cli/v7/using-npm/scripts).
 
+## Contents
+
+- [Install](#install)
+- [Configure](#configure)
+  - [`command`](#command)
+  - [`task`](#task)
+  - [`script`](#script)
+  - [Type-safe Configuration & IntelliSense](#type-safe-configuration--intellisense)
+- [Use](#use)
+  - [Script Name Matching](#script-name-matching)
+  - [Pre and Post Scripts](#pre-and-post-scripts)
+  - [Discoverability](#discoverability)
+  - [Providing an Explicit Configuration File](#providing-an-explicit-configuration-file)
+- [Prior Art](#prior-art)
+
+
 # Install
 
 ```
@@ -18,43 +34,45 @@ npm install --save-dev @darkobits/nr
 ```
 
 This will install the package and create an executable in the local NPM bin path (ie:
-`node_modules/.bin`). If your shell is [configured to add this path to your `$PATH` variable](https://gist.github.com/darkobits/ffaee26c0f322ce9e1a8b9b65697701d),
+`node_modules/.bin`). If your shell is [configured to add this location to your `$PATH`](https://gist.github.com/darkobits/ffaee26c0f322ce9e1a8b9b65697701d),
 you can invoke the CLI by simply running `nr`. Otherwise, you may invoke the CLI by running `npx nr`.
+
+You may install `nr` globally, but this is highly discouraged; a project that depends on `nr` should
+enumerate it in its `devDependencies`, guaranteeing version compatibility. And, if your `$PATH` is
+configured to include `$(npm bin)`, the developer experience is identical to installing `nr` globally.
 
 # Configure
 
-`nr` is configured using a JavaScript configuration file, `nr.config.js`. `nr` will search for this file
-in the directory from which it is invoked, and then every directory above it until a configuration file
-is found.
+`nr` is configured using a JavaScript configuration file, `nr.config.js`, or a TypeScript configuration
+file, `nr.config.ts`. `nr` will search for this file in the directory from which it was invoked, and
+then every directory above it until a configuration file is found.
 
-A configuration file is responsible for creating **commands**, **tasks**, and **scripts**.
+A configuration file is responsible for creating **commands**, **tasks**, and **scripts**:
 
-**Commands** describe the invocation of a single executable and any arguments provided to it, as well as
-any configuration related to how the command will run.
-
-**Tasks** are functions that may execute arbitrary code. They may be synchronous or asynchronous. `nr`
-will `await` these functions so that script pipelines behave the same way regardless of how a task is
-implemented.
-
-**Scripts** compose commands, tasks, and other scripts that may run sequentially, in parallel, or a
-combination of both.
+- **Commands** describe the invocation of a single executable and any arguments provided to it, as well
+  as any configuration related to how the command will run.
+- **Tasks** are functions that may execute arbitrary code. They may be synchronous or asynchronous. `nr`
+  will `await` these functions so that script pipelines behave the same way regardless of how a task is
+  implemented.
+- **Scripts** compose commands, tasks, and other scripts that may run sequentially, in parallel, or a
+  combination of both.
 
 A configuration file should export a function that will be passed a context object that contains the
 following keys:
 
-| Key             | Description                                                           |
-|-----------------|-----------------------------------------------------------------------|
-| `command`       | Function used to register commands.                                   |
-| `script`        | Function used to register scripts.                                    |
-| `task`          | Function used to register tasks (user-provided JavaScript functions). |
-| `isCI`          | Boolean value that will be `true` in CI environments.                 |
+| Key                                                               | Type       | Description                                                                |
+|-------------------------------------------------------------------|------------|----------------------------------------------------------------------------|
+| [`command`](#command) | `function` | Create a new command.                                                      |
+| [`task`](#task)       | `function` | Create a new task.                                                         |
+| [`script`](#script)   | `function` | Create a new script.                                                       |
+| `isCI`                                                            | `boolean`  | `true` in CI environments. See [`is-ci`](https://github.com/watson/is-ci). |
 
 **Example:**
 
 > `nr.config.js`
 
 ```js
-export default ({ command, script, task }) => {
+export default ({ command, task, script }) => {
   const babelCmd = command('babel', ['babel', ['src'], { outDir: 'dist' }]);
 
   script('build', {
@@ -77,60 +95,33 @@ We can then invoke the `build` script thusly:
 nr build
 ```
 
-## Type-safe Configuration & IntelliSense
-
-For users who want to ensure their configuration file is type-safe, or who want IntelliSense, you may
-use a JSDoc annotation:
-
-> `nr.config.js`
-
-```js
-/** @type {import('./dist/index').ConfigurationFactory} */
-export default ({ command, task, script }) => {
-
-};
-```
-
-Alternatively, `nr` exports a helper which provides type-safety and IntelliSense without requiring a
-JSDoc annotation:
-
-```js
-import nr from '@darkobits/nr';
-
-export default nr(({ command, task, script, isCI }) => {
-
-});
-```
-
-`nr` also supports TypeScript configuration files. Name your configuration file `nr.config.ts` and use
-the helper for a fully type-safe experience.
-
----
-
 ### `command`
 
-| Parameter | Type                                             | Description               |
-|-----------|--------------------------------------------------|---------------------------|
-| `name`    | `string`                                         | Name of the command.      |
-| `args`    | [`CreateCommandArguments`](src/etc/types.ts#L27) | Executable and arguments. |
-| `opts?`   | [`CreateCommandOptions`](src/etc/types.ts#L41)   | Optional configuration.   |
+| Parameter  | Type                                             | Description               |
+|------------|--------------------------------------------------|---------------------------|
+| `name`     | `string`                                         | Name of the command.      |
+| `args`     | [`CreateCommandArguments`](src/etc/types.ts#L13-L35) | Executable and arguments. |
+| `options?` | [`CreateCommandOptions`](src/etc/types.ts#L38-L68)   | Optional configuration.   |
 
-| Return Type                            | Description                                                      |
-|----------------------------------------|------------------------------------------------------------------|
-| [`CommandThunk`](src/etc/types.ts#L75) | Value that may be provided to `createScript` to run the command. |
+| Return Type                                | Description                                                      |
+|--------------------------------------------|------------------------------------------------------------------|
+| [`CommandThunk`](src/etc/types.ts#L78-L84) | Value that may be provided to `createScript` to run the command. |
 
-This function accepts a name, an array indicating the executable and its arguments, [`CreateCommandArguments`](src/etc/types.ts#L27),
-and an optional options object, [`CreateCommandOptions`](src/etc/types.ts#L41). It will register the
+This function accepts a name, an array indicating the executable and its arguments, [`CreateCommandArguments`](src/etc/types.ts#L13-L35),
+and an optional options object, [`CreateCommandOptions`](src/etc/types.ts#L38-L68). It will register the
 command using the provided `name` and return a value. To reference a command in a script, use either the
-return value from `command` directly or a string in the format `cmd:name`.
+return value from `command` directly or a string in the format `cmd:name`. Commands are executed using
+[`execa`](https://github.com/sindresorhus/execa).
 
-[`CreateCommandArguments`](src/etc/types.ts#L34) may take one of four forms:
+[`CreateCommandArguments`](src/etc/types.ts#L13-L35) may take one of four forms:
 * `[executable]` of type `[string]`
 * `[executable, positionals]` of type `[string, Array<string>]`
 * `[executable, flags]` of type `[string, Record<string, any>]`
 * `[executable, positionals, flags]` of type `[string, Array<string>, Record<string, any>]`
 
 **Example:**
+
+> `nr.config.js`
 
 ```js
 export default ({ command, script }) => {
@@ -146,29 +137,43 @@ export default ({ command, script }) => {
     'tsc', { emitDeclarationOnly: true }
   ], {
     // Do not convert flags to kebab-case.
-    preserveArguments: true
+    preserveArgumentCasing: true
   });
 };
 ```
+
+#### `command.node`
+
+This function has the same signature as `command`. It can be used to execute a Node script using the
+current version of Node. This variant uses [`execaNode`](https://github.com/sindresorhus/execa#execanodescriptpath-arguments-options).
+
+#### `command.babel`
+
+This function has the same signature as `command`. It can be used to execute a Node script using
+[`babel-node`](https://babeljs.io/docs/en/babel-node). This variant uses [`execaNode`](https://github.com/sindresorhus/execa#execanodescriptpath-arguments-options)
+and configures [`babel-node`](https://babeljs.io/docs/en/babel-node) to recognize the following
+extensions: `ts`, `tsx`, `js`, `jsx`.
 
 ---
 
 ### `task`
 
-| Parameter | Type                             | Description          |
-|-----------|----------------------------------|----------------------|
-| `name`    | `string`                         | Name of the task.    |
-| `taskFn`  | [`TaskFn`](src/etc/types.ts#L87) | Function to execute. |
+| Parameter | Type                                 | Description          |
+|-----------|--------------------------------------|----------------------|
+| `name`    | `string`                             | Name of the task.    |
+| `taskFn`  | [`TaskFn`](src/etc/types.ts#L95-L98) | Function to execute. |
 
-| Return Type                         | Description                                             |
-|-------------------------------------|---------------------------------------------------------|
-| [`TaskThunk`](src/etc/types.ts#L93) | Value that may be provided to `script` to run the task. |
+| Return Type                               | Description                                             |
+|-------------------------------------------|---------------------------------------------------------|
+| [`TaskThunk`](src/etc/types.ts#L78-L84) | Value that may be provided to `script` to run the task. |
 
-This function accepts a name and a task function, [`TaskFn`](src/etc/types.ts#L87), It will register the
+This function accepts a name and a function, [`TaskFn`](src/etc/types.ts#L95-L98), It will register the
 task using the provided `name` and return a value. To reference a task in a script, use either the
 return value from `task` directly or a string in the format `task:name`.
 
 **Example:**
+
+> `nr.config.js`
 
 ```js
 export default ({ task, script }) => {
@@ -190,20 +195,21 @@ export default ({ task, script }) => {
 
 ### `script`
 
-| Parameter | Type                                           | Description           |
-|-----------|------------------------------------------------|-----------------------|
-| `name`    | `string`                                       | Name of the command.  |
-| `opts`    | [`CreateScriptOptions`](src/etc/types.ts#L130) | Script configuration. |
+| Parameter | Type                                                | Description           |
+|-----------|-----------------------------------------------------|-----------------------|
+| `name`    | `string`                                            | Name of the command.  |
+| `options` | [`CreateScriptOptions`](src/etc/types.ts#L147-L197) | Script configuration. |
 
 | Return Type                            | Description                                                     |
 |----------------------------------------|-----------------------------------------------------------------|
 | [`ScriptThunk`](src/etc/types.ts#L191) | Value that may be provided to `createScript` to run the script. |
 
-This function accepts name and an options object, [`CreateScriptOptions`](src/etc/types.ts#L130). It
-will register the script using the provided `name` and return a value. To reference a script in another
-script, use either the return value from `script` directly or a string in the format `script:name`.
+This function accepts name and an options object, [`CreateScriptOptions`](src/etc/types.ts#L147-L197).
+It will register the script using the provided `name` and return a value. To reference a script in
+another script, use either the return value from `script` directly or a string in the format
+`script:name`.
 
-The `run` option must be an array of [`Instruction`](src/etc/types.ts#L114) which may be:
+The `run` option must be an array of [`Instruction`](src/etc/types.ts#L125-L134) which may be:
 
 * A reference to a command by name using a `string` in the format `cmd:name` or by value using the value
   returned by `command`.
@@ -212,11 +218,13 @@ The `run` option must be an array of [`Instruction`](src/etc/types.ts#L114) whic
 * A reference to another script by name using a `string` in the format `script:name` or by value using
   the value returned by `script`.
 
-To indicate that a group of [`Instructions`](src/etc/types.ts#L114) should be run in parallel, wrap them
-in an array. However, no more than one level of array nesting is allowed. If you need more complex
+To indicate that a group of [`Instructions`](src/etc/types.ts#L125-L134) should be run in parallel, wrap
+them in an array. However, no more than one level of array nesting is allowed. If you need more complex
 parallelization, write separate, smaller scripts and compose them.
 
 **Example:**
+
+> `nr.config.js`
 
 ```js
 export default ({ command, task, script }) => {
@@ -224,16 +232,17 @@ export default ({ command, task, script }) => {
   command('lint', ['eslint', ['src']]);
   command('test', ['jest']);
   task('done', () => {
-    console.log('All done!');
+    console.log('Excelsior!');
   });
 
-  script('build', {
-    description: 'Test and lint in parallel, then build the project.',
+  script('prepare', {
+    description: 'Build and lint in parallel, then run unit tests.',
     run: [
       // Run these instructions in parallel.
       ['cmd:build', 'cmd:lint']
       // Then run this instruction.
       'cmd:test',
+      // Then run this task.
       'task:done'
     ]
   });
@@ -243,8 +252,8 @@ export default ({ command, task, script }) => {
   script('test.coverage', {
     description: 'Test the project and generate a coverage report.',
     run: [
-      // In such cases, the command's "name" is less important, but it will
-      // still be used for error reporting, and should therefore be descriptive.
+      // In such cases, the command's "name" is still significant; it is used
+      // for error-reporting, and should therefore be descriptive.
       command('jest-coverage', ['jest', { coverage: true }]);
     ]
   });
@@ -259,6 +268,39 @@ export default ({ command, task, script }) => {
 > created after the invocation of `script` that uses the same name as an instruction in the script
 > (something `nr` permits), the script will still use the value as it was at the time `script` was
 > invoked.
+
+---
+
+## Type-safe Configuration & IntelliSense
+
+For users who want to ensure their configuration file is type-safe, or who want IntelliSense, you may
+use a JSDoc annotation:
+
+> `nr.config.js`
+
+```js
+/** @type {import('@darkobits/nr').ConfigurationFactory} */
+export default ({ command, task, script }) => {
+
+};
+```
+
+Alternatively, `nr` exports a helper which provides type-safety and IntelliSense without requiring a
+JSDoc annotation:
+
+> `nr.config.js`
+
+```js
+import nr from '@darkobits/nr';
+
+export default nr(({ command, task, script }) => {
+
+});
+```
+
+`nr` also supports TypeScript configuration files. Name your configuration file `nr.config.ts` and use
+the helper for a fully type-safe experience.
+
 
 # Use
 
@@ -277,7 +319,7 @@ nr t.c
 
 More on this below.
 
-## CLI Script Name Matching
+## Script Name Matching
 
 `nr` supports a matching feature that allows the user to pass a shorthand for the desired script name.
 Script names may be segmented using a dot, and the matcher will match each segment individually. The
@@ -295,18 +337,29 @@ query `testscript` would successfully match it.
 
 ## Pre and Post Scripts
 
-Like NPM package scripts, `nr` supports pre and post scripts. Once a query from the CLI is matched to
-a specific script name, `nr` will look for a script named `pre<scriptName>` and `post<scriptName>`. If
-found, these scripts will be run before and after the matched script, respectively.
+Like [NPM package scripts](https://docs.npmjs.com/cli/v8/using-npm/scripts#pre--post-scripts), `nr`
+supports pre and post scripts. Once a query from the CLI is matched to a specific script, `nr` will look
+for a script named `pre<scriptName>` and `post<scriptName>`. If found, these scripts will be run before
+and after the matched script, respectively.
 
-## Discovering Available Commands, Tasks, & Scripts
+> 💡 **Protip**
+>
+> Because script name matching is case insensitive, a script named `build` may have pre and post scripts
+> named `preBuild` and `postBuild`.
 
-Discoverability is an important feature of `nr`. The `--commands`, `--tasks`, and `--scripts` flags may
-be passed to list information about all known entities of that type.
+## Discoverability
+
+Discoverability and self-documentation are encouraged with `nr`. While optional, consider leveraging the
+`group` and/or `description` options when defining scripts. Thoughtfully organizing your scripts and
+documenting what they do can go a long way in reducing friction for new contributors.
+
+The `--commands`, `--tasks`, and `--scripts` flags may be passed to list information about all known
+entities of that type. If `nr` detects that a command, task, or script was registered from a third-party
+package, it will indicate the name of the package that created it.
 
 A new contributor to a project may want an overview of available scripts, and may not be familiar with
-with the `nr` CLI. To make this feature easily accessible, consider adding an NPM script to your
-`package.json`:
+with the `nr` CLI. To make this feature easily accessible, consider adding an NPM script to the
+project's `package.json`:
 
 ```json
 {
@@ -316,6 +369,9 @@ with the `nr` CLI. To make this feature easily accessible, consider adding an NP
 }
 ```
 
+`npm run help` will now print instructions on how to interact with `nr`, what scripts are available, and
+(hopefully) what each does.
+
 ## Providing an Explicit Configuration File
 
 To have `nr` skip searching for a configuration file and use a file at a particular path, pass the
@@ -323,9 +379,11 @@ To have `nr` skip searching for a configuration file and use a file at a particu
 
 # Prior Art
 
-`nr` was inspired by [NPS](https://github.com/sezna/nps), originally created by [Kent C. Dodds](https://kentcdodds.com/),
-which itself was inspired by [a tweet](https://twitter.com/sindresorhus/status/724259780676575232) by
-[Sindre is a Horse](https://sindresorhus.com/).
+- [NPS](https://github.com/sezna/nps) - `nr` was heavily inspired by [NPS](https://github.com/sezna/nps),
+  originally created by [Kent C. Dodds](https://kentcdodds.com/), which itself was inspired by [a tweet](https://twitter.com/sindresorhus/status/724259780676575232)
+  by [Sindre is a Horse](https://sindresorhus.com/).
+- [`npm-run-all`](https://www.npmjs.com/package/npm-run-all) - The original package scripts
+  parallelization tool.
 
 <br />
 <a href="#top">
