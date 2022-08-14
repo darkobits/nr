@@ -304,3 +304,8 @@ export interface CLIArguments extends Arguments {
    */
   scripts: boolean | undefined;
 }
+
+
+// ----- Miscellaneous ---------------------------------------------------------
+
+export type MapValueType<M> = M extends Map<any, infer V> ? V : never;

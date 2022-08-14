@@ -3,6 +3,7 @@ import { EOL } from 'node:os';
 import { readPackageUpSync } from 'read-pkg-up';
 
 import type { CallSite } from 'callsites';
+import type { MapValueType } from 'etc/types';
 import type { ExecaError } from 'execa';
 
 
@@ -80,10 +81,10 @@ export function getPackageNameFromCallsite(callSite: CallSite | undefined, fallb
 /**
  * Performs a case-insensitive lookup in a Map keyed using strings.
  */
-export function caseInsensitiveGet(key: string, map: Map<string, any>) {
+export function caseInsensitiveGet<M extends Map<string, any>>(key: string, map: M) {
   const keys = Array.from(map.keys());
 
   for (const curKey of keys) {
-    if (key.toLowerCase() === curKey.toLowerCase()) return map.get(curKey);
+    if (key.toLowerCase() === curKey.toLowerCase()) return map.get(curKey) as MapValueType<M>;
   }
 }

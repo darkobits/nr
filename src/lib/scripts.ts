@@ -31,7 +31,7 @@ import {
 
 
 /**
- * Map of registered script names to their corresponding script thunks.
+ * Map of registered script names to their descriptors.
  */
 export const scripts = new Map<string, ScriptDescriptor>();
 
@@ -42,7 +42,7 @@ export const scripts = new Map<string, ScriptDescriptor>();
  * Parses a string identifier for a script or command and returns an object
  * describing it.
  */
-function parseInstruction(value: string) {
+function parseStringInstruction(value: string) {
   if (!value.includes(':')) {
     throw new Error(`Invalid instruction identifier: "${value}"`);
   }
@@ -77,13 +77,13 @@ function resolveInstruction(value: Instruction): Thunk {
       return value;
     }
 
-    throw new TypeError('Provided function is not a CommandThunk, TaskThunk, or ScriptThunk.');
+    throw new TypeError('Provided function is not a command, task, or script.');
   }
 
   // If the user provided a string, parse it and look-up the indicated command,
   // task, or script.
   if (typeof value === 'string') {
-    const { type, name } = parseInstruction(value);
+    const { type, name } = parseStringInstruction(value);
 
     if (type === 'cmd') {
       const commandDescriptor = caseInsensitiveGet(name, commands);
@@ -180,7 +180,7 @@ export function printScriptInfo() {
  * Provided a search query, matches the query to a registered script and returns
  * its descriptor.
  */
-export function matchScript(value: string | undefined) {
+export function matchScript(value?: string) {
   const scriptNames = [...scripts.keys()];
 
   if (scriptNames.length === 0) {
@@ -188,41 +188,29 @@ export function matchScript(value: string | undefined) {
   }
 
   const scriptName = matchSegmentedName(scriptNames, value);
+  const descriptor = scripts.get(scriptName ?? '');
 
-  if (!scriptName) {
+  if (!descriptor) {
     throw new Error(`"${value}" did not match any scripts.`);
   }
 
-  log.verbose(`Matched ${log.chalk.green(value)} to script ${log.chalk.green(scriptName)}.`);
+  log.verbose(log.prefix('matchScript'), `Matched ${log.chalk.green(value)} to script ${log.chalk.green(scriptName)}.`);
 
-  return caseInsensitiveGet(scriptName, scripts) as ScriptDescriptor;
+  return descriptor;
 }
 
 
 /**
- * Provided a script name search query, matches the query to a registered script
- * and executes it. If no match could be found, throws an error.
+ * Provided a script descriptor, executes the script and any pre/post scripts
+ * associated with it.
  */
-export async function executeScript(scriptName: string) {
-  const scriptDescriptor = caseInsensitiveGet(scriptName, scripts);
+export async function executeScript(script: ScriptDescriptor) {
+  const preScript = caseInsensitiveGet(`pre${script.name}`, scripts);
+  const postScript = caseInsensitiveGet(`post${script.name}`, scripts);
 
-  if (!scriptDescriptor) {
-    throw new Error(`Unknown script: "${scriptName}".`);
-  }
-
-  const preScriptDescriptor = caseInsensitiveGet(`pre${scriptName}`, scripts);
-
-  if (preScriptDescriptor) {
-    await preScriptDescriptor.thunk();
-  }
-
-  await scriptDescriptor.thunk();
-
-  const postScriptDescriptor = caseInsensitiveGet(`post${scriptName}`, scripts);
-
-  if (postScriptDescriptor) {
-    await postScriptDescriptor.thunk();
-  }
+  if (preScript) await preScript.thunk();
+  await script.thunk();
+  if (postScript) await postScript.thunk();
 }
 
 

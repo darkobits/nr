@@ -13,10 +13,10 @@ import {
 import { printTaskInfo } from 'lib/tasks';
 import { parseError } from 'lib/utils';
 
-import type { CLIArguments, ScriptDescriptor } from 'etc/types';
+import type { CLIArguments, ConfigurationFactory } from 'etc/types';
 
 
-cli.command<CLIArguments, any>({
+cli.command<CLIArguments, ConfigurationFactory>({
   command: '* [query]',
   description: 'Run the script matched by the provided query.',
   config: {
@@ -62,46 +62,32 @@ cli.command<CLIArguments, any>({
 
     command.epilogue(log.chalk.gray('For full usage instructions, see https://github.com/darkobits/nr'));
   },
-  handler: async opts => {
-    let scriptDescriptor: ScriptDescriptor | undefined;
-
+  handler: async context => {
     try {
-      const { argv } = opts;
+      // Load the user's configuration file, which should populate the commands,
+      // tasks, and/or scripts registries.
+      await loadConfig(context);
 
-      // Load the user's configuration file.
-      await loadConfig(opts);
+      const { argv } = context;
 
       // If the --commands, --tasks, or --scripts flags were used, print
       // information about the indicated instruction type, then bail.
-      if (argv.commands) {
-        printCommandInfo();
-        return;
-      }
+      if (argv.commands) return printCommandInfo();
+      if (argv.tasks) return printTaskInfo();
+      if (argv.scripts) return printScriptInfo();
 
-      if (argv.tasks) {
-        printTaskInfo();
-        return;
-      }
-
-      if (argv.scripts) {
-        printScriptInfo();
-        return;
-      }
-
-      // Ensure that a query was provided.
+      // Otherwise, ensure that a query was provided.
       if (!argv.query) {
         throw new Error('No query provided. Run "nr --scripts" to show available scripts.');
       }
 
-      // Match and execute the indicated script.
       const runTime = log.createTimer();
-      scriptDescriptor = matchScript(argv.query);
-      await executeScript(scriptDescriptor.name);
 
-      // If the parent script is configured to log timing, do so.
-      if (scriptDescriptor.options.timing) {
-        log.info(log.chalk.gray(`Done in ${runTime}.`));
-      }
+      // Match and execute the indicated script.
+      const script = matchScript(argv.query);
+      await executeScript(script);
+
+      if (script.options.timing) log.info(log.chalk.gray(`Done in ${runTime}.`));
     } catch (err: any) {
       const { message, stack } = parseError(err);
       log.error(log.chalk.red.bold(message));
@@ -112,6 +98,4 @@ cli.command<CLIArguments, any>({
 });
 
 
-cli.init(yargs => {
-  yargs.scriptName('nr');
-});
+cli.init(yargs => void yargs.scriptName('nr'));

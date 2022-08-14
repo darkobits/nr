@@ -2,7 +2,8 @@ import path from 'node:path';
 
 import isCI from 'is-ci';
 
-import { command } from 'lib/commands';
+import { command, commands } from 'lib/commands';
+import log from 'lib/log';
 import { script, scripts } from 'lib/scripts';
 import { task, tasks } from 'lib/tasks';
 
@@ -21,15 +22,15 @@ export default async function loadConfig({ argv, config, configPath, configIsEmp
     config = (await import(configPath)).default;
   } else if (configIsEmpty) {
     // Otherwise, if Cosmiconfig found an empty configuration file, throw.
-    throw new Error(`Configuration file at ${configPath} is empty.`);
+    throw new Error(`Configuration file at ${log.chalk.green(configPath)} is empty.`);
   } else if (!configPath) {
     // Otherwise, if Cosmiconfig did not find a configuration file, throw.
-    throw new Error('Unable to find an nr.config.js file.');
+    throw new Error('Unable to find an nr configuration file.');
   }
 
   // If the config file did not export a function, throw.
   if (typeof config !== 'function') {
-    throw new TypeError(`Configuration file at ${configPath} does not have a default export of type "function".`);
+    throw new TypeError(`Expected default export of configuration file at ${log.chalk.green(configPath)} to be of type "function", got "${typeof config}".`);
   }
 
   // Invoke the user's configuration function.
@@ -40,16 +41,9 @@ export default async function loadConfig({ argv, config, configPath, configIsEmp
     isCI
   });
 
-  // Ensure that after calling the user's configuration function, our scripts
-  // registry is not empty.
-  if (scripts.size === 0) {
-    throw new Error('Configuration did not register any scripts.');
-  }
-
-  // Ensure that after calling the user's configuration function, our tasks and
-  // commands registries are not empty.
-  if (scripts.size === 0 && tasks.size === 0) {
-    throw new Error('Configuration did not register any commands or tasks.');
+  // Ensure that the user's configuration function actually did something.
+  if (commands.size === 0 && tasks.size === 0 && scripts.size === 0) {
+    throw new Error(`Configuration file at ${log.chalk.green(configPath)} did not register any commands, tasks, or scripts.`);
   }
 
   return config;

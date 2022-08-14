@@ -16,7 +16,7 @@ import type {
 
 
 /**
- * Map of registered task names to their corresponding task thunks.
+ * Map of registered task names to their corresponding descriptors.
  */
 export const tasks = new Map<string, TaskDescriptor>();
 

@@ -31,7 +31,7 @@ import type {
 
 
 /**
- * Map of registered command names to their corresponding command thunks.
+ * Map of registered command names to their corresponding descriptors.
  */
 export const commands = new Map<string, CommandDescriptor>();
 
