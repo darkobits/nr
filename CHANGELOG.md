@@ -1,3 +1,15 @@
+## [0.14.0](https://github.com/darkobits/nr/compare/v0.13.0...v0.14.0) (2022-08-14)
+
+
+### ✨ Features
+
+* Add `--commands`, `--tasks` CLI arguments. ([31d90d1](https://github.com/darkobits/nr/commit/31d90d1f5ab939d674ca28d779c308c739a93e98))
+
+
+### 📖 Documentation
+
+* Update README. ([772b607](https://github.com/darkobits/nr/commit/772b607d6c96ef333b471ef2157e449af076f169))
+
 ## [0.13.0](https://github.com/darkobits/nr/compare/v0.12.0...v0.13.0) (2022-08-14)
 
 
