@@ -77,6 +77,34 @@ We can then invoke the `build` script thusly:
 nr build
 ```
 
+## Type-safe Configuration & IntelliSense
+
+For users who want to ensure their configuration file is type-safe, or who want IntelliSense, you may
+use a JSDoc annotation:
+
+> `nr.config.js`
+
+```js
+/** @type {import('./dist/index').ConfigurationFactory} */
+export default ({ command, task, script }) => {
+
+};
+```
+
+Alternatively, `nr` exports a helper which provides type-safety and IntelliSense without requiring a
+JSDoc annotation:
+
+```js
+import nr from '@darkobits/nr';
+
+export default nr(({ command, task, script, isCI }) => {
+
+});
+```
+
+`nr` also supports TypeScript configuration files. Name your configuration file `nr.config.ts` and use
+the helper for a fully type-safe experience.
+
 ---
 
 ### `command`
@@ -252,15 +280,24 @@ More on this below.
 ## CLI Script Name Matching
 
 `nr` supports a matching feature that allows the user to pass a shorthand for the desired script name.
-Script names may be "segmented" using a single dot, and the matcher will match each segment
-individually. The minimum number of characters you will need to provide to invoke a particular script
-will vary based on how many scripts you have defined with similar names.
+Script names may be segmented using a dot, and the matcher will match each segment individually. The
+minimum number of characters you will need to provide to invoke a particular script will vary based on
+how many scripts you have defined with similar names.
 
 For example, if we wanted to execute a script named `build.watch`, we could call:
 
 ```
 nr b.w
 ```
+
+Additionally, script name matching is case insensitive, so if we had a script named `testScript`, the
+query `testscript` would successfully match it.
+
+## Pre and Post Scripts
+
+Like NPM package scripts, `nr` supports pre and post scripts. Once a query from the CLI is matched to
+a specific script name, `nr` will look for a script named `pre<scriptName>` and `post<scriptName>`. If
+found, these scripts will be run before and after the matched script, respectively.
 
 ## Listing Available Scripts
 
