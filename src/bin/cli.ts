@@ -74,10 +74,14 @@ cli.command<CLIArguments, any>({
       if (argv.commands) {
         printCommandInfo();
         return;
-      } else if (argv.tasks) {
+      }
+
+      if (argv.tasks) {
         printTaskInfo();
         return;
-      } else if (argv.scripts) {
+      }
+
+      if (argv.scripts) {
         printScriptInfo();
         return;
       }

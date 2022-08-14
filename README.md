@@ -18,8 +18,8 @@ npm install --save-dev @darkobits/nr
 ```
 
 This will install the package and create an executable in the local NPM bin path (ie:
-`node_modules/.bin`). If your shell is configured to add this path to your `$PATH` variable, you can
-invoke the CLI by simply running `nr`. Otherwise, you may invoke the CLI by running `npx nr`.
+`node_modules/.bin`). If your shell is [configured to add this path to your `$PATH` variable](https://gist.github.com/darkobits/ffaee26c0f322ce9e1a8b9b65697701d),
+you can invoke the CLI by simply running `nr`. Otherwise, you may invoke the CLI by running `npx nr`.
 
 # Configure
 
@@ -299,16 +299,14 @@ Like NPM package scripts, `nr` supports pre and post scripts. Once a query from 
 a specific script name, `nr` will look for a script named `pre<scriptName>` and `post<scriptName>`. If
 found, these scripts will be run before and after the matched script, respectively.
 
-## Listing Available Scripts
+## Discovering Available Commands, Tasks, & Scripts
 
-Discoverability is an important feature of `nr`. A new contributor to a project may want an easy
-overview of available scripts, and may not be familiar with the `nr` CLI.
+Discoverability is an important feature of `nr`. The `--commands`, `--tasks`, and `--scripts` flags may
+be passed to list information about all known entities of that type.
 
-To have `nr` print a list of all registered scripts, their descriptions, and how to invoke `nr`, pass
-the `--scripts` flag. When this flag is provided, `nr` will ignore all other arguments and only print
-script information. Scripts will be grouped according to their `group` value.
-
-To make this feature easily accessible, consider adding an NPM script to your `package.json`:
+A new contributor to a project may want an overview of available scripts, and may not be familiar with
+with the `nr` CLI. To make this feature easily accessible, consider adding an NPM script to your
+`package.json`:
 
 ```json
 {
