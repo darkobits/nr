@@ -1,3 +1,22 @@
+## [0.14.1](https://github.com/darkobits/nr/compare/v0.14.0...v0.14.1) (2022-08-14)
+
+
+### 🏗 Chores
+
+* Add `@babel/node` as a peer dependency. ([bb7b482](https://github.com/darkobits/nr/commit/bb7b482a01222811c86f0949983954066df1c5b9))
+
+
+### 📖 Documentation
+
+* Update README. ([04783a2](https://github.com/darkobits/nr/commit/04783a210d43aee48698c13bb3e020cf627ed70d))
+* Update README. ([edb0d39](https://github.com/darkobits/nr/commit/edb0d394137bf99c0eb6e71a4f89c30e99207398))
+
+
+### 🛠 Refactoring
+
+* Miscellaneous cleanup. ([7b1df92](https://github.com/darkobits/nr/commit/7b1df92f730b907639ff8d906755209cc5d1d4c4))
+* Rename types. ([a9ee37b](https://github.com/darkobits/nr/commit/a9ee37becd98068cf7e51850bf485740162b0f9d))
+
 ## [0.14.0](https://github.com/darkobits/nr/compare/v0.13.0...v0.14.0) (2022-08-14)
 
 
