@@ -9,6 +9,7 @@ import { execa, execaNode,  Options as ExecaOptions } from 'execa';
 import kebabCaseKeys from 'kebabcase-keys';
 import { npmRunPath } from 'npm-run-path';
 import * as R from 'ramda';
+import resolveBin from 'resolve-bin';
 import which from 'which';
 import unParseArgs from 'yargs-unparser';
 
@@ -151,12 +152,13 @@ const executeNodeCommand: CommandExecutor = (name, scriptPath, parsedArguments, 
 const executeBabelNodeCommand: CommandExecutor = (name, scriptPath, parsedArguments, opts) => {
   const cwd = opts?.execaOptions?.cwd;
   const resolvedScriptPath = resolveCommand(scriptPath, cwd);
+  const babelNodePath = resolveBin.sync('@babel/node', { executable: 'babel-node' });
 
   const cmd = execaNode(resolvedScriptPath, parsedArguments, merge.all([
     commonExecaOptions,
     opts?.execaOptions ?? {},
     {
-      nodePath: 'babel-node',
+      nodePath: babelNodePath,
       nodeOptions: ['--extensions', '.ts,.tsx,.js,.jsx,.json']
     }
   ]));
