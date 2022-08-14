@@ -46,7 +46,7 @@ export function task(name: string, taskFn: TaskFn) {
       [IS_TASK_THUNK]: { value: true as const }
     });
 
-    tasks.set(name.toLowerCase(), {
+    tasks.set(name, {
       name,
       sourcePackage,
       thunk: taskThunk as TaskThunk

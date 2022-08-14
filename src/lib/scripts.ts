@@ -24,7 +24,10 @@ import log from 'lib/log';
 import matchSegmentedName from 'lib/matcher';
 import ow from 'lib/ow';
 import { tasks } from 'lib/tasks';
-import { getPackageNameFromCallsite } from 'lib/utils';
+import {
+  caseInsensitiveGet,
+  getPackageNameFromCallsite
+} from 'lib/utils';
 
 
 /**
@@ -83,19 +86,19 @@ function resolveInstruction(value: Instruction): Thunk {
     const { type, name } = parseInstruction(value);
 
     if (type === 'cmd') {
-      const commandDescriptor = commands.get(name.toLowerCase());
+      const commandDescriptor = caseInsensitiveGet(name, commands);
       if (!commandDescriptor) throw new Error(`Unknown command: "${name}"`);
       return commandDescriptor.thunk;
     }
 
     if (type === 'task') {
-      const taskDescriptor = tasks.get(name.toLowerCase());
+      const taskDescriptor = caseInsensitiveGet(name, tasks);
       if (!taskDescriptor) throw new Error(`Unknown task: "${name}"`);
       return taskDescriptor.thunk;
     }
 
     if (type === 'script') {
-      const scriptDescriptor = scripts.get(name.toLowerCase());
+      const scriptDescriptor = caseInsensitiveGet(name, scripts);
       if (!scriptDescriptor) throw new Error(`Unknown script: "${name}"`);
       return scriptDescriptor.thunk;
     }
@@ -187,7 +190,7 @@ export function matchScript(value: string | undefined) {
 
   log.verbose(`Matched ${log.chalk.green(value)} to script ${log.chalk.green(scriptName)}.`);
 
-  return scripts.get(scriptName.toLowerCase()) as ScriptDescriptor;
+  return caseInsensitiveGet(scriptName, scripts) as ScriptDescriptor;
 }
 
 
@@ -196,13 +199,13 @@ export function matchScript(value: string | undefined) {
  * and executes it. If no match could be found, throws an error.
  */
 export async function executeScript(scriptName: string) {
-  const scriptDescriptor = scripts.get(scriptName.toLowerCase());
+  const scriptDescriptor = caseInsensitiveGet(scriptName, scripts);
 
   if (!scriptDescriptor) {
     throw new Error(`Unknown script: "${scriptName}".`);
   }
 
-  const preScriptDescriptor = scripts.get(`pre${scriptName}`.toLowerCase());
+  const preScriptDescriptor = caseInsensitiveGet(`pre${scriptName}`, scripts);
 
   if (preScriptDescriptor) {
     await preScriptDescriptor.thunk();
@@ -210,7 +213,7 @@ export async function executeScript(scriptName: string) {
 
   await scriptDescriptor.thunk();
 
-  const postScriptDescriptor = scripts.get(`post${scriptName}`.toLowerCase());
+  const postScriptDescriptor = caseInsensitiveGet(`post${scriptName}`, scripts);
 
   if (postScriptDescriptor) {
     await postScriptDescriptor.thunk();
@@ -288,7 +291,7 @@ export function script(name: string, opts: CreateScriptOptions) {
       [IS_SCRIPT_THUNK]: { value: true as const }
     });
 
-    scripts.set(name.toLowerCase(), {
+    scripts.set(name, {
       name,
       sourcePackage,
       options: opts,

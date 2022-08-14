@@ -216,7 +216,7 @@ function commandBuilder(builderOptions: CommandBuilderOptions): CommandThunk {
       [IS_COMMAND_THUNK]: { value: true as const }
     });
 
-    commands.set(name.toLowerCase(), {
+    commands.set(name, {
       name,
       sourcePackage,
       arguments: args,

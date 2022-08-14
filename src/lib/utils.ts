@@ -75,3 +75,15 @@ export function getPackageNameFromCallsite(callSite: CallSite | undefined, fallb
   return sourcePackage.packageJson.name;
   // return fileName;
 }
+
+
+/**
+ * Performs a case-insensitive lookup in a Map keyed using strings.
+ */
+export function caseInsensitiveGet(key: string, map: Map<string, any>) {
+  const keys = Array.from(map.keys());
+
+  for (const curKey of keys) {
+    if (key.toLowerCase() === curKey.toLowerCase()) return map.get(curKey);
+  }
+}

@@ -43,7 +43,7 @@ export default function match(haystack: Array<string>, needle: string | undefine
     return segment.split('').map(char => `${char}*`).join('');
   }).join('.');
 
-  const results = micromatch(haystack, [modifiedSearch]);
+  const results = micromatch(haystack, [modifiedSearch], { nocase: true });
 
   // Handle cases where multiple results were found.
   if (results.length > 1) {
