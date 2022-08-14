@@ -1,4 +1,7 @@
+import { EOL } from 'node:os';
+
 import callsites from 'callsites';
+import * as R from 'ramda';
 
 import { IS_TASK_THUNK } from 'etc/constants';
 import log from 'lib/log';
@@ -16,6 +19,42 @@ import type {
  * Map of registered task names to their corresponding task thunks.
  */
 export const tasks = new Map<string, TaskDescriptor>();
+
+
+/**
+ * Prints all available tasks.
+ */
+export function printTaskInfo() {
+  const allTasks = Array.from(tasks.values());
+
+  if (allTasks.length === 0) {
+    console.log('No tasks have been registered.');
+    return;
+  }
+
+  const taskSources = R.uniq(R.map(R.path(['sourcePackage']), allTasks));
+  const multipleSources = taskSources.length > 1 || !R.includes('local', taskSources);
+
+  console.log(`${EOL}${log.chalk.bold('Available tasks:')}${EOL}`);
+
+  R.forEach(task => {
+    const segments: Array<string> = [];
+
+    if (multipleSources) {
+      if (task.sourcePackage === 'local') {
+        segments.push(`${log.chalk.green(task.name)} ${log.chalk.gray.dim('(local)')}`);
+      } else {
+        segments.push(`${log.chalk.green(task.name)} ${log.chalk.gray.dim(`(${task.sourcePackage})`)}`);
+      }
+    } else {
+      segments.push(log.chalk.green(task.name));
+    }
+
+    console.log(segments.join(EOL));
+  }, allTasks);
+
+  console.log('');
+}
 
 
 /**

@@ -279,7 +279,21 @@ export interface CLIArguments extends Arguments {
   /**
    * [Flag]
    *
-   * If set, will list the names and descriptions of all registered scripts.
+   * If set, will list the names, groups, and descriptions of all commands.
+   */
+  commands: boolean | undefined;
+
+  /**
+   * [Flag]
+   *
+   * If set, will list the names, groups, and descriptions of all tasks.
+   */
+  tasks: boolean | undefined;
+
+  /**
+   * [Flag]
+   *
+   * If set, will list the names, groups, and descriptions of all scripts.
    */
   scripts: boolean | undefined;
 }

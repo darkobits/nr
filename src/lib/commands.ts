@@ -1,3 +1,5 @@
+import { EOL } from 'node:os';
+
 import callsites from 'callsites';
 import merge from 'deepmerge';
 // @ts-expect-error - This package does not have type definitions.
@@ -6,6 +8,7 @@ import { execa, execaNode,  Options as ExecaOptions } from 'execa';
 // @ts-expect-error - This package does not have type definitions.
 import kebabCaseKeys from 'kebabcase-keys';
 import { npmRunPath } from 'npm-run-path';
+import * as R from 'ramda';
 import which from 'which';
 import unParseArgs from 'yargs-unparser';
 
@@ -138,11 +141,38 @@ const executeNodeCommand: CommandExecutor = (name, scriptPath, parsedArguments, 
 };
 
 
+/**
+ * @private
+ *
+ * Executes a command using `execaNode` and `babel-node`.
+ *
+ * See: https://github.com/sindresorhus/execa#execanodescriptpath-arguments-options
+ */
+const executeBabelNodeCommand: CommandExecutor = (name, scriptPath, parsedArguments, opts) => {
+  const cwd = opts?.execaOptions?.cwd;
+  const resolvedScriptPath = resolveCommand(scriptPath, cwd);
+
+  const cmd = execaNode(resolvedScriptPath, parsedArguments, merge.all([
+    commonExecaOptions,
+    opts?.execaOptions ?? {},
+    {
+      nodePath: 'babel-node',
+      nodeOptions: ['--extensions', '.ts,.tsx,.js,.jsx,.json']
+    }
+  ]));
+
+  const escapedCommand = getEscapedCommand(undefined, cmd.spawnargs);
+  log.verbose(log.prefix(`cmd:${name}`), 'exec:', log.chalk.gray(escapedCommand));
+  return cmd;
+};
+
+
 interface CommandBuilderOptions {
   executor: CommandExecutor;
   name: string;
   args: CreateCommandArguments;
   opts: CreateCommandOptions | undefined;
+  sourcePackage: string;
 }
 
 
@@ -157,7 +187,7 @@ interface CommandBuilderOptions {
  * CommandExecutor strategy.
  */
 function commandBuilder(builderOptions: CommandBuilderOptions): CommandThunk {
-  const { executor, name, args, opts } = builderOptions;
+  const { executor, name, args, opts, sourcePackage } = builderOptions;
 
   try {
     // Validate name.
@@ -173,9 +203,6 @@ function commandBuilder(builderOptions: CommandBuilderOptions): CommandThunk {
       execaOptions: ow.optional.object,
       preserveArguments: ow.optional.boolean
     }));
-
-    // Get the name of the package that defined this command.
-    const sourcePackage = getPackageNameFromCallsite(callsites()[1]);
 
     const commandThunk = async () => {
       try {
@@ -235,14 +262,58 @@ function commandBuilder(builderOptions: CommandBuilderOptions): CommandThunk {
 
 
 /**
+ * Prints all available commands.
+ */
+export function printCommandInfo() {
+  const allCommands = Array.from(commands.values());
+
+  if (allCommands.length === 0) {
+    console.log('No commands have been registered.');
+    return;
+  }
+
+  const commandSources = R.uniq(R.map(R.path(['sourcePackage']), allCommands));
+  const multipleSources = commandSources.length > 1 || !R.includes('local', commandSources);
+
+  console.log(`${EOL}${log.chalk.bold('Available commands:')}${EOL}`);
+
+  R.forEach(command => {
+    const segments: Array<string> = [];
+    const executable = command.arguments[0];
+    const parsedArguments = parseArguments(command.arguments, command.options?.preserveArguments).join(' ');
+
+    if (multipleSources) {
+      if (command.sourcePackage === 'local') {
+        segments.push(`${log.chalk.green(command.name)} ${log.chalk.gray.dim('(local)')}`);
+      } else {
+        segments.push(`${log.chalk.green(command.name)} ${log.chalk.gray.dim(`(${command.sourcePackage})`)}`);
+      }
+    } else {
+      segments.push(log.chalk.green(command.name));
+    }
+
+    segments.push(`${log.chalk.gray.dim('└─')} ${log.chalk.gray(executable)} ${log.chalk.gray(parsedArguments)}`);
+
+    console.log(segments.join(EOL));
+  }, allCommands);
+
+  console.log('');
+}
+
+
+/**
  * Creates a `CommandThunk` that executes a command directly using `execa`.
  */
 export function command(name: string, args: CreateCommandArguments, opts?: CreateCommandOptions) {
+  // Get the name of the package that defined this command.
+  const sourcePackage = getPackageNameFromCallsite(callsites()[1]);
+
   return commandBuilder({
     executor: executeCommand,
     name,
     args,
-    opts
+    opts,
+    sourcePackage
   });
 }
 
@@ -251,11 +322,15 @@ export function command(name: string, args: CreateCommandArguments, opts?: Creat
  * Creates a `CommandThunk` that executes a command using `execa.node()`.
  */
 command.node = (name: string, args: CreateCommandArguments, opts?: CreateCommandOptions) => {
+  // Get the name of the package that defined this command.
+  const sourcePackage = getPackageNameFromCallsite(callsites()[1]);
+
   return commandBuilder({
     executor: executeNodeCommand,
     name,
     args,
-    opts
+    opts,
+    sourcePackage
   });
 };
 
@@ -267,10 +342,21 @@ command.node = (name: string, args: CreateCommandArguments, opts?: CreateCommand
 command.babel = (...params: Parameters<typeof command.node>) => {
   const [name, args, opts] = params;
 
-  return command.node(name, args, merge({
-    execaOptions: {
-      nodePath: 'babel-node',
-      nodeOptions: ['--extensions', '.ts,.tsx,.js,.jsx,.json']
-    }
-  }, opts ?? {}));
+  // Get the name of the package that defined this command.
+  const sourcePackage = getPackageNameFromCallsite(callsites()[1]);
+
+  return commandBuilder({
+    executor: executeBabelNodeCommand,
+    name,
+    args,
+    opts,
+    sourcePackage
+  });
+
+  // return command.node(name, args, merge({
+  //   execaOptions: {
+  //     nodePath: 'babel-node',
+  //     nodeOptions: ['--extensions', '.ts,.tsx,.js,.jsx,.json']
+  //   }
+  // }, opts ?? {}));
 };

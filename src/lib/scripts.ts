@@ -113,8 +113,13 @@ function resolveInstruction(value: Instruction): Thunk {
  * is in the users $PATH and can be invoked directly, or if the user needs to
  * use `npx`.
  */
-export function printAvailableScripts() {
+export function printScriptInfo() {
   const allScripts = Array.from(scripts.values());
+
+  if (allScripts.length === 0) {
+    console.log('No scripts have been registered.');
+    return;
+  }
 
   const groupsUsed = R.any(R.hasPath(['options', 'group']), allScripts);
   const scriptSources = R.uniq(R.map(R.path(['sourcePackage']), allScripts));
@@ -164,9 +169,9 @@ export function printAvailableScripts() {
   }
 
   if (nrIsInPath) {
-    console.log(log.chalk.gray(`${EOL}${emoji.get('sparkles')} ${log.chalk.white.bold('nr')} is in your PATH. You can run scripts using: ${log.chalk.white('nr <script name>')}`));
+    console.log(log.chalk.gray(`${emoji.get('sparkles')} ${log.chalk.white.bold('nr')} is in your PATH. You can run scripts using: ${log.chalk.white('nr <script name>')}`));
   } else {
-    console.log(log.chalk.gray(`${EOL}${emoji.get('exclamation')} ${log.chalk.white.bold('nr')} is ${log.chalk.red('not')} in your PATH. You must run scripts using: ${log.chalk.white('npx nr <script name>')}`));
+    console.log(log.chalk.gray(`${emoji.get('exclamation')} ${log.chalk.white.bold('nr')} is ${log.chalk.red('not')} in your PATH. You must run scripts using: ${log.chalk.white('npx nr <script name>')}`));
   }
 }
 

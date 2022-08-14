@@ -2,9 +2,15 @@
 
 import cli from '@darkobits/saffron';
 
+import { printCommandInfo } from 'lib/commands';
 import loadConfig from 'lib/configuration';
 import log from 'lib/log';
-import { matchScript, executeScript, printAvailableScripts } from 'lib/scripts';
+import {
+  matchScript,
+  executeScript,
+  printScriptInfo
+} from 'lib/scripts';
+import { printTaskInfo } from 'lib/tasks';
 import { parseError } from 'lib/utils';
 
 import type { CLIArguments, ScriptDescriptor } from 'etc/types';
@@ -25,10 +31,25 @@ cli.command<CLIArguments, any>({
       description: 'Script name or query.'
     });
 
+    command.option('commands', {
+      type: 'boolean',
+      required: false,
+      description: 'Show all registered commands.',
+      conflicts: ['tasks', 'scripts']
+    });
+
+    command.option('tasks', {
+      type: 'boolean',
+      required: false,
+      description: 'Show all registered tasks.',
+      conflicts: ['commands', 'scripts']
+    });
+
     command.option('scripts', {
       type: 'boolean',
       required: false,
-      description: 'Show all registered scripts.'
+      description: 'Show all registered scripts.',
+      conflicts: ['commands', 'tasks']
     });
 
     command.option('config', {
@@ -45,23 +66,28 @@ cli.command<CLIArguments, any>({
     try {
       const { argv } = opts;
 
-      // If the user did not pass the --scripts option, ensure that they did
-      // pass a positional argument indicating a script to run.
-      if (!argv.scripts && !argv.query) {
-        throw new Error('No query provided. Run "nr --scripts" to show available scripts.');
-      }
-
       // Load the user's configuration file.
       await loadConfig(opts);
 
-      // Finally, if the --scripts option was used, print the names and
-      // descriptions of each registered script, then return.
-      if (argv.scripts) {
-        printAvailableScripts();
+      // If the --commands, --tasks, or --scripts flags were used, print
+      // information about the indicated instruction type, then bail.
+      if (argv.commands) {
+        printCommandInfo();
+        return;
+      } else if (argv.tasks) {
+        printTaskInfo();
+        return;
+      } else if (argv.scripts) {
+        printScriptInfo();
         return;
       }
 
-      // Otherwise, match and execute the indicated script.
+      // Ensure that a query was provided.
+      if (!argv.query) {
+        throw new Error('No query provided. Run "nr --scripts" to show available scripts.');
+      }
+
+      // Match and execute the indicated script.
       const runTime = log.createTimer();
       scriptDescriptor = matchScript(argv.query);
       await executeScript(scriptDescriptor.name);
