@@ -25,8 +25,8 @@ import type {
   CommandDescriptor,
   CommandExecutor,
   CommandThunk,
-  CreateCommandArguments,
-  CreateCommandOptions
+  CommandArguments,
+  CommandOptions
 } from 'etc/types';
 
 
@@ -73,7 +73,7 @@ const commonExecaOptions: ExecaOptions = {
  * Provided an arguments array, returns an array of strings representing the
  * "un-parsed" arguments.
  */
-function parseArguments(args: CreateCommandArguments, preserveArgumentCasing?: boolean) {
+function parseArguments(args: CommandArguments, preserveArgumentCasing?: boolean) {
   ow(args, 'command and arguments', ow.array.maxLength(3));
   ow(args[0], 'command', ow.string);
 
@@ -81,8 +81,8 @@ function parseArguments(args: CreateCommandArguments, preserveArgumentCasing?: b
     return [];
   }
 
-  let positionals: CreateCommandArguments['1'] = [];
-  let flags: CreateCommandArguments['2'] = {};
+  let positionals: CommandArguments['1'] = [];
+  let flags: CommandArguments['2'] = {};
 
 
   if (args.length === 2) {
@@ -172,8 +172,8 @@ const executeBabelNodeCommand: CommandExecutor = (name, scriptPath, parsedArgume
 interface CommandBuilderOptions {
   executor: CommandExecutor;
   name: string;
-  args: CreateCommandArguments;
-  opts: CreateCommandOptions | undefined;
+  args: CommandArguments;
+  opts: CommandOptions | undefined;
   sourcePackage: string;
 }
 
@@ -200,7 +200,7 @@ function commandBuilder(builderOptions: CommandBuilderOptions): CommandThunk {
     const [executableName] = args;
 
     // Validate options.
-    ow<Required<CreateCommandOptions>>(opts, ow.optional.object.exactShape({
+    ow<Required<CommandOptions>>(opts, ow.optional.object.exactShape({
       prefix: ow.optional.function,
       execaOptions: ow.optional.object,
       preserveArgumentCasing: ow.optional.boolean
@@ -306,7 +306,7 @@ export function printCommandInfo() {
 /**
  * Creates a `CommandThunk` that executes a command directly using `execa`.
  */
-export function command(name: string, args: CreateCommandArguments, opts?: CreateCommandOptions) {
+export function command(name: string, args: CommandArguments, opts?: CommandOptions) {
   // Get the name of the package that defined this command.
   const sourcePackage = getPackageNameFromCallsite(callsites()[1]);
 
@@ -323,7 +323,7 @@ export function command(name: string, args: CreateCommandArguments, opts?: Creat
 /**
  * Creates a `CommandThunk` that executes a command using `execa.node()`.
  */
-command.node = (name: string, args: CreateCommandArguments, opts?: CreateCommandOptions) => {
+command.node = (name: string, args: CommandArguments, opts?: CommandOptions) => {
   // Get the name of the package that defined this command.
   const sourcePackage = getPackageNameFromCallsite(callsites()[1]);
 

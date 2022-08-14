@@ -24,7 +24,7 @@ import type { Arguments } from 'yargs-unparser';
  * If passing both positional arguments and flags, positionals should be
  * provided as the second member and flags as the third.
  */
-export type CreateCommandArguments =
+export type CommandArguments =
   // Command only.
   [string] |
   // Command and positional arguments.
@@ -38,7 +38,7 @@ export type CreateCommandArguments =
 /**
  * Additional options that may be provided to `command`.
  */
-export interface CreateCommandOptions {
+export interface CommandOptions {
   /**
    * Function that will be passed a Chalk instance and should return a string.
    * This string will be used to prefix all output from the command.
@@ -72,7 +72,7 @@ export interface CreateCommandOptions {
  * Signature of a command executor. Returns an execa invocation using different
  * strategies.
  */
-export type CommandExecutor = (name: string, command: string, args: Array<string>, opts?: CreateCommandOptions) => ExecaChildProcess;
+export type CommandExecutor = (name: string, command: string, args: Array<string>, opts?: CommandOptions) => ExecaChildProcess;
 
 
 /**
@@ -90,8 +90,8 @@ export interface CommandThunk {
 export interface CommandDescriptor {
   name: string;
   sourcePackage: string;
-  arguments: CreateCommandArguments;
-  options: CreateCommandOptions;
+  arguments: CommandArguments;
+  options: CommandOptions;
   thunk: CommandThunk;
 }
 
@@ -153,7 +153,7 @@ export interface ParsedInstruction {
 /**
  * Configuration options passed as the second argument to `script`.
  */
-export interface CreateScriptOptions {
+export interface ScriptOptions {
   /**
    * Array of Instructions that this script will run.
    *
@@ -218,7 +218,7 @@ export interface ScriptThunk {
 export interface ScriptDescriptor {
   name: string;
   sourcePackage: string;
-  options: CreateScriptOptions;
+  options: ScriptOptions;
   thunk: ScriptThunk;
 }
 

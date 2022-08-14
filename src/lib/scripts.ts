@@ -12,7 +12,7 @@ import {
   IS_SCRIPT_THUNK
 } from 'etc/constants';
 import {
-  CreateScriptOptions,
+  ScriptOptions,
   Instruction,
   ParsedInstruction,
   ScriptDescriptor,
@@ -230,13 +230,13 @@ export async function executeScript(scriptName: string) {
  * Provided a script options object, returns a function that, when invoked, will
  * execute the script. This function is then added to the scripts registry.
  */
-export function script(name: string, opts: CreateScriptOptions) {
+export function script(name: string, opts: ScriptOptions) {
   try {
     // Validate name.
     ow(name, 'script name', ow.string);
 
     // Validate options.
-    ow<Required<CreateScriptOptions>>(opts, ow.object.exactShape({
+    ow<Required<ScriptOptions>>(opts, ow.object.exactShape({
       description: ow.optional.string,
       group: ow.optional.string,
       run: ow.array.ofType(ow.any(
