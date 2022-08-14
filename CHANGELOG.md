@@ -1,3 +1,22 @@
+## [0.13.0](https://github.com/darkobits/nr/compare/v0.12.0...v0.13.0) (2022-08-14)
+
+
+### ✨ Features
+
+* Indicate scripts from third-party packages in `--scripts` output. ([dad1b93](https://github.com/darkobits/nr/commit/dad1b934129b2f432a7636bf0fec65fb4aa9cec7))
+
+
+### 🏗 Chores
+
+* Improve output of `--scripts`. ([d3d9ab7](https://github.com/darkobits/nr/commit/d3d9ab731f1127479780a9bf2db5464aea98d75f))
+* Improve script name matching. ([91045c6](https://github.com/darkobits/nr/commit/91045c62fbe45dd051a3f00cb93d6317ad14e811))
+
+
+### 📖 Documentation
+
+* Update README. ([8c1fd15](https://github.com/darkobits/nr/commit/8c1fd15d320ced520273276fbaa7cde57d6a5ee3))
+* Update README. ([3bbaddc](https://github.com/darkobits/nr/commit/3bbaddc739a881b6f4f261da3730e665732e7176))
+
 # Changelog
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
