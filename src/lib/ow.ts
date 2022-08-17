@@ -1,4 +1,4 @@
-import _ow from 'ow';
+import _ow, { type Ow } from 'ow';
 
 
 /**
@@ -26,6 +26,8 @@ export function getDefaultExport<T extends object>(value: T): T {
   }
 }
 
-const ow: typeof _ow = getDefaultExport(_ow);
+
+const ow: Ow = getDefaultExport(_ow);
+
 
 export default ow;

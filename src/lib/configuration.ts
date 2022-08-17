@@ -7,7 +7,7 @@ import log from 'lib/log';
 import { script, scripts } from 'lib/scripts';
 import { task, tasks } from 'lib/tasks';
 
-import type { SaffronHandlerOptions } from '@darkobits/saffron';
+import type { SaffronHandlerContext } from '@darkobits/saffron';
 import type { CLIArguments, ConfigurationFactory } from 'etc/types';
 
 
@@ -15,7 +15,7 @@ import type { CLIArguments, ConfigurationFactory } from 'etc/types';
  * Responsible for interpreting command line arguments and Cosmiconfig results
  * to locate and parse the user's configuration file, then return the results.
  */
-export default async function loadConfig({ argv, config, configPath, configIsEmpty }: SaffronHandlerOptions<CLIArguments, ConfigurationFactory>) {
+export default async function loadConfig({ argv, config, configPath, configIsEmpty }: SaffronHandlerContext<CLIArguments, ConfigurationFactory>) {
   // If the --config option was used, load the file at the indicated path.
   if (argv.config) {
     configPath = path.resolve(argv.config);

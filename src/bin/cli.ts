@@ -20,8 +20,7 @@ cli.command<CLIArguments, ConfigurationFactory>({
   command: '* [query]',
   description: 'Run the script matched by the provided query.',
   config: {
-    auto: false,
-    fileName: 'nr'
+    auto: false
   },
   builder: ({ command }) => {
     command.example('$0 test', 'Runs the script named "test".');
@@ -101,4 +100,4 @@ cli.command<CLIArguments, ConfigurationFactory>({
 });
 
 
-cli.init(yargs => void yargs.scriptName('nr'));
+cli.init();

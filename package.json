@@ -1,7 +1,7 @@
 {
   "name": "@darkobits/nr",
   "version": "0.14.1",
-  "description": "Task runner for JavaScript projects.",
+  "description": "A modern, type-safe task runner for JavaScript projects.",
   "author": "darkobits",
   "license": "WTFPL",
   "type": "module",
@@ -33,7 +33,7 @@
   },
   "dependencies": {
     "@darkobits/log": "^2.0.0-beta.15",
-    "@darkobits/saffron": "^0.4.22",
+    "@darkobits/saffron": "0.4.27",
     "@types/is-ci": "^3.0.0",
     "@types/yargs-unparser": "^2.0.1",
     "callsites": "^4.0.0",
@@ -56,7 +56,7 @@
   },
   "devDependencies": {
     "@darkobits/eslint-plugin": "^0.2.9",
-    "@darkobits/ts": "^0.10.7-beta.10",
+    "@darkobits/ts": "^0.11.0-beta.0",
     "@types/micromatch": "^4.0.2",
     "@types/node-emoji": "^1.8.1",
     "@types/ramda": "^0.28.15",
