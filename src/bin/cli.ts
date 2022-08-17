@@ -34,6 +34,7 @@ cli.command<CLIArguments, ConfigurationFactory>({
     });
 
     command.option('commands', {
+      group: 'Introspection:',
       type: 'boolean',
       required: false,
       description: 'Show all registered commands.',
@@ -41,6 +42,7 @@ cli.command<CLIArguments, ConfigurationFactory>({
     });
 
     command.option('tasks', {
+      group: 'Introspection:',
       type: 'boolean',
       required: false,
       description: 'Show all registered tasks.',
@@ -48,6 +50,7 @@ cli.command<CLIArguments, ConfigurationFactory>({
     });
 
     command.option('scripts', {
+      group: 'Introspection:',
       type: 'boolean',
       required: false,
       description: 'Show all registered scripts.',
