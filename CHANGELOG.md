@@ -1,3 +1,20 @@
+## [0.14.2](https://github.com/darkobits/nr/compare/v0.14.1...v0.14.2) (2022-08-17)
+
+
+### 🐞 Bug Fixes
+
+* Wrap multi-line script descriptions correctly. ([706a56d](https://github.com/darkobits/nr/commit/706a56d180720650e3ca67006887b3973d658f66))
+
+
+### 🛠 Refactoring
+
+* Group introspection scripts in CLI help. ([b84fc54](https://github.com/darkobits/nr/commit/b84fc5414960d844cc4f8bfbc3b0f228a65197a8))
+
+
+### 🏗 Chores
+
+* **deps:** Update dependencies. ([11806fd](https://github.com/darkobits/nr/commit/11806fd471f61cb9dfff186076a2b622e4512d5d))
+
 ## [0.14.1](https://github.com/darkobits/nr/compare/v0.14.0...v0.14.1) (2022-08-14)
 
 
