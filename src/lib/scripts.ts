@@ -141,7 +141,13 @@ export function printScriptInfo() {
     }
 
     if (description) {
-      segments.push(`${log.chalk.gray.dim('└─')} ${log.chalk.gray(description)}`);
+      description.split(EOL).forEach((line, index) => {
+        if (index === 0) {
+          segments.push(`${log.chalk.gray.dim('└─')} ${log.chalk.gray(line)}`);
+        } else {
+          segments.push(`   ${log.chalk.gray(line)}`);
+        }
+      });
     }
 
     console.log(segments.join(EOL));
