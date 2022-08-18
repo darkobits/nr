@@ -3,7 +3,6 @@ import { EOL } from 'node:os';
 import { readPackageUpSync } from 'read-pkg-up';
 
 import type { CallSite } from 'callsites';
-import type { MapValueType } from 'etc/types';
 import type { ExecaError } from 'execa';
 
 
@@ -76,6 +75,9 @@ export function getPackageNameFromCallsite(callSite: CallSite | undefined, fallb
   return sourcePackage.packageJson.name;
   // return fileName;
 }
+
+
+type MapValueType<M> = M extends Map<any, infer V> ? V : never;
 
 
 /**

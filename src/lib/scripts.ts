@@ -14,7 +14,6 @@ import {
 import {
   ScriptOptions,
   Instruction,
-  ParsedInstruction,
   ScriptDescriptor,
   ScriptThunk,
   Thunk
@@ -28,6 +27,16 @@ import {
   caseInsensitiveGet,
   getPackageNameFromCallsite
 } from 'lib/utils';
+
+
+/**
+ * An `Instruction` in `string` form will be converted into an object of the
+ * following shape.
+ */
+export interface ParsedInstruction {
+  type: 'cmd' | 'task' | 'script';
+  name: string;
+}
 
 
 /**

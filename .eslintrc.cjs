@@ -4,6 +4,7 @@ module.exports = {
     '@typescript-eslint/no-unsafe-call': 'off',
     'no-console': 'off',
     'unicorn/no-nested-ternary': 'off',
-    'unicorn/prefer-spread': 'off'
+    'unicorn/prefer-spread': 'off',
+    'unicorn/import-style': 'off'
   }
 };
