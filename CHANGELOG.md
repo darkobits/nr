@@ -1,3 +1,10 @@
+## [0.14.3](https://github.com/darkobits/nr/compare/v0.14.2...v0.14.3) (2022-08-18)
+
+
+### 🛠 Refactoring
+
+* Reorganize types. ([27cc172](https://github.com/darkobits/nr/commit/27cc1725dab5957e6e48c083b1d859e73bd0f7c0))
+
 ## [0.14.2](https://github.com/darkobits/nr/compare/v0.14.1...v0.14.2) (2022-08-17)
 
 
