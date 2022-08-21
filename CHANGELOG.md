@@ -1,3 +1,10 @@
+## [0.14.8](https://github.com/darkobits/nr/compare/v0.14.7...v0.14.8) (2022-08-21)
+
+
+### 🏗 Chores
+
+* Add debug logging. ([249d085](https://github.com/darkobits/nr/commit/249d0856136777075ee0939c9ff302a92daec6e5))
+
 ## [0.14.7](https://github.com/darkobits/nr/compare/v0.14.6...v0.14.7) (2022-08-21)
 
 
