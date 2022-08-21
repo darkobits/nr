@@ -11,7 +11,7 @@ import { npmRunPath } from 'npm-run-path';
 import * as R from 'ramda';
 import resolveBin from 'resolve-bin';
 import which from 'which';
-import unParseArgs from 'yargs-unparser';
+import yargsUnparser from 'yargs-unparser';
 
 import { IS_COMMAND_THUNK } from 'etc/constants';
 import log, { LogPipe } from 'lib/log';
@@ -73,10 +73,10 @@ const commonExecaOptions: ExecaOptions = {
 /**
  * @private
  *
- * Provided an arguments array, returns an array of strings representing the
- * "un-parsed" arguments.
+ * Provided a CommandArguments list, returns an array of strings representing
+ * the "un-parsed" arguments.
  */
-function parseArguments(args: CommandArguments, preserveArgumentCasing?: boolean) {
+function unParseArguments(args: CommandArguments, preserveArgumentCasing?: boolean) {
   ow(args, 'command and arguments', ow.array.maxLength(3));
   ow(args[0], 'command', ow.string);
 
@@ -86,7 +86,6 @@ function parseArguments(args: CommandArguments, preserveArgumentCasing?: boolean
 
   let positionals: CommandArguments['1'] = [];
   let flags: CommandArguments['2'] = {};
-
 
   if (args.length === 2) {
     if (Array.isArray(args[1])) {
@@ -108,7 +107,7 @@ function parseArguments(args: CommandArguments, preserveArgumentCasing?: boolean
 
   // Convert arguments object to an array of strings, first converting any
   // flags to kebab-case, unless preserveKeys is truthy.
-  return unParseArgs(Object.assign(
+  return yargsUnparser(Object.assign(
     {_: positionals},
     preserveArgumentCasing ? flags : kebabCaseKeys(flags)
   ));
@@ -199,7 +198,7 @@ function commandBuilder(builderOptions: CommandBuilderOptions): CommandThunk {
     ow(name, 'command name', ow.string);
 
     // Parse and validate command and arguments.
-    const parsedArguments = parseArguments(args, opts?.preserveArgumentCasing);
+    const unParsedArguments = unParseArguments(args, opts?.preserveArgumentCasing);
     const [executableName] = args;
 
     // Validate options.
@@ -212,7 +211,7 @@ function commandBuilder(builderOptions: CommandBuilderOptions): CommandThunk {
     const commandThunk = async () => {
       try {
         const runTime = log.createTimer();
-        const command = executor(name, executableName, parsedArguments, opts);
+        const command = executor(name, executableName, unParsedArguments, opts);
 
         // If the user provided a custom prefix function, generate it now.
         const prefix = opts?.prefix ? opts.prefix(log.chalk) : '';
@@ -285,7 +284,7 @@ export function printCommandInfo() {
   R.forEach(command => {
     const segments: Array<string> = [];
     const executable = command.arguments[0];
-    const parsedArguments = parseArguments(command.arguments, command.options?.preserveArgumentCasing).join(' ');
+    const argumentsString = unParseArguments(command.arguments, command.options?.preserveArgumentCasing).join(' ');
 
     if (multipleSources) {
       if (command.sourcePackage === 'local') {
@@ -297,7 +296,7 @@ export function printCommandInfo() {
       segments.push(log.chalk.green(command.name));
     }
 
-    segments.push(`${log.chalk.gray.dim('└─')} ${log.chalk.gray(executable)} ${log.chalk.gray(parsedArguments)}`);
+    segments.push(`${log.chalk.gray.dim('└─')} ${log.chalk.gray(executable)} ${log.chalk.gray(argumentsString)}`);
 
     console.log(segments.join(EOL));
   }, allCommands);

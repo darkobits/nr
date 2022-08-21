@@ -162,15 +162,16 @@ export function printScriptInfo() {
     console.log(segments.join(EOL));
   };
 
-  console.log(`${EOL}${log.chalk.bold('Available scripts:')}${EOL}`);
+  console.log(`${EOL}${log.chalk.bold('Available scripts:')}`);
 
   if (groupsUsed) {
     R.forEachObjIndexed((scriptConfigs, groupName) => {
+      console.log('');
       console.log(log.chalk.underline(groupName));
       R.forEach(printScript, scriptConfigs);
-      console.log('');
     }, R.groupBy<ScriptDescriptor>(descriptor => descriptor.options.group ?? 'Other', allScripts));
   } else {
+    console.log('');
     R.forEach(printScript, allScripts);
   }
 
