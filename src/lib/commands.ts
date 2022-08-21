@@ -40,11 +40,14 @@ export const commands = new Map<string, CommandDescriptor>();
  * Uses `which` to attempt to resolve the absolute path to the provided command.
  * Throws an ENOENT system error if the command cannot be found.
  */
-export function resolveCommand(cmd: string, cwd: string | URL | undefined = process.cwd()) {
+export function resolveCommand(cmd: string, cwd = process.cwd()) {
   try {
-    return which.sync(cmd, { path: cwd ? String(cwd) : undefined });
+    return which.sync(cmd, { path: npmRunPath({ cwd }) });
   } catch {
-    throw Object.assign(new Error(`ENOENT: no such file or directory: '${cmd}'`), errno.code.ENOENT);
+    throw Object.assign(
+      new Error(`ENOENT: no such file or directory: '${cmd}'`),
+      errno.code.ENOENT
+    );
   }
 }
 
@@ -134,7 +137,7 @@ const executeCommand: CommandExecutor = (name, executableName, parsedArguments, 
  */
 const executeNodeCommand: CommandExecutor = (name, scriptPath, parsedArguments, opts) => {
   const cwd = opts?.execaOptions?.cwd;
-  const resolvedScriptPath = resolveCommand(scriptPath, cwd && npmRunPath({ cwd }));
+  const resolvedScriptPath = resolveCommand(scriptPath, cwd?.toString());
   const cmd = execaNode(resolvedScriptPath, parsedArguments, merge(commonExecaOptions, opts?.execaOptions ?? {}));
   const escapedCommand = getEscapedCommand(undefined, cmd.spawnargs);
   log.verbose(log.prefix(`cmd:${name}`), 'exec:', log.chalk.gray(escapedCommand));
@@ -151,7 +154,7 @@ const executeNodeCommand: CommandExecutor = (name, scriptPath, parsedArguments, 
  */
 const executeBabelNodeCommand: CommandExecutor = (name, scriptPath, parsedArguments, opts) => {
   const cwd = opts?.execaOptions?.cwd;
-  const resolvedScriptPath = resolveCommand(scriptPath, cwd && npmRunPath({ cwd }));
+  const resolvedScriptPath = resolveCommand(scriptPath, cwd?.toString());
   const babelNodePath = resolveBin.sync('@babel/node', { executable: 'babel-node' });
 
   const cmd = execaNode(resolvedScriptPath, parsedArguments, merge.all([
