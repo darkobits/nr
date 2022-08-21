@@ -1,3 +1,15 @@
+## [0.14.10](https://github.com/darkobits/nr/compare/v0.14.9...v0.14.10) (2022-08-21)
+
+
+### 🏗 Chores
+
+* Misc. cleanup. ([fba87bc](https://github.com/darkobits/nr/commit/fba87bcf004097d1f1d1b1cbee800cdf2c22e3cd))
+
+
+### 🛠 Refactoring
+
+* Disable `ow`. ([c3f7e17](https://github.com/darkobits/nr/commit/c3f7e17817602aa85090a6bd8af249d1b57093ae))
+
 ## [0.14.9](https://github.com/darkobits/nr/compare/v0.14.8...v0.14.9) (2022-08-21)
 
 
