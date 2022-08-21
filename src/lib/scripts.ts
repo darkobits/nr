@@ -142,7 +142,7 @@ export function printScriptInfo() {
     if (multipleSources) {
       if (sourcePackage === 'local') {
         segments.push(`${log.chalk.green(name)} ${log.chalk.gray.dim('(local)')}`);
-      } else {
+      } else if (sourcePackage !== 'unknown') {
         segments.push(`${log.chalk.green(name)} ${log.chalk.gray.dim(`(${sourcePackage})`)}`);
       }
     } else {
