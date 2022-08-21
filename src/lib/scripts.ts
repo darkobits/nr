@@ -1,6 +1,6 @@
 import { EOL } from 'node:os';
 
-import callsites from 'callsites';
+import { default as callsites } from 'callsites';
 import emoji from 'node-emoji';
 import pAll from 'p-all';
 import pSeries from 'p-series';

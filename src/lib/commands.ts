@@ -1,6 +1,6 @@
 import { EOL } from 'node:os';
 
-import callsites from 'callsites';
+import { default as callsites } from 'callsites';
 import merge from 'deepmerge';
 // @ts-expect-error - This package does not have type definitions.
 import errno from 'errno';
