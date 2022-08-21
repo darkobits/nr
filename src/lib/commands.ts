@@ -15,7 +15,7 @@ import yargsUnparser from 'yargs-unparser';
 
 import { IS_COMMAND_THUNK } from 'etc/constants';
 import log, { LogPipe } from 'lib/log';
-import ow from 'lib/ow';
+// import ow from 'lib/ow';
 import {
   getEscapedCommand,
   getPackageNameFromCallsite
@@ -77,8 +77,8 @@ const commonExecaOptions: ExecaOptions = {
  * the "un-parsed" arguments.
  */
 function unParseArguments(args: CommandArguments, preserveArgumentCasing?: boolean) {
-  ow(args, 'command and arguments', ow.array.maxLength(3));
-  ow(args[0], 'command', ow.string);
+  // ow(args, 'command and arguments', ow.array.maxLength(3));
+  // ow(args[0], 'command', ow.string);
 
   if (args.length === 1) {
     return [];
@@ -90,18 +90,18 @@ function unParseArguments(args: CommandArguments, preserveArgumentCasing?: boole
   if (args.length === 2) {
     if (Array.isArray(args[1])) {
       // Got [command, positionals] form.
-      ow(args[1], 'positional arguments', ow.array.ofType(ow.string));
+      // ow(args[1], 'positional arguments', ow.array.ofType(ow.string));
       positionals = args[1];
     } else {
       // Got [command, flags] form.
-      ow(args[1], 'flags', ow.object);
+      // ow(args[1], 'flags', ow.object);
       flags = args[1];
     }
   } else if (args.length === 3) {
     // Got [command, positionals, flags] form.
-    ow(args[1], 'positional arguments', ow.array.ofType(ow.string));
+    // ow(args[1], 'positional arguments', ow.array.ofType(ow.string));
     positionals = args[1];
-    ow(args[2], 'flags', ow.object);
+    // ow(args[2], 'flags', ow.object);
     flags = args[2];
   }
 
@@ -195,18 +195,18 @@ function commandBuilder(builderOptions: CommandBuilderOptions): CommandThunk {
 
   try {
     // Validate name.
-    ow(name, 'command name', ow.string);
+    // ow(name, 'command name', ow.string);
 
     // Parse and validate command and arguments.
     const unParsedArguments = unParseArguments(args, opts?.preserveArgumentCasing);
     const [executableName] = args;
 
     // Validate options.
-    ow<Required<CommandOptions>>(opts, ow.optional.object.exactShape({
-      prefix: ow.optional.function,
-      execaOptions: ow.optional.object,
-      preserveArgumentCasing: ow.optional.boolean
-    }));
+    // ow<Required<CommandOptions>>(opts, ow.optional.object.exactShape({
+    //   prefix: ow.optional.function,
+    //   execaOptions: ow.optional.object,
+    //   preserveArgumentCasing: ow.optional.boolean
+    // }));
 
     const commandThunk = async () => {
       try {
@@ -251,7 +251,7 @@ function commandBuilder(builderOptions: CommandBuilderOptions): CommandThunk {
       name,
       sourcePackage,
       arguments: args,
-      options: opts,
+      options: opts as Required<CommandOptions>,
       thunk: commandThunk as CommandThunk
     });
 
