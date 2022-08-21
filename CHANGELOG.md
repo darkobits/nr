@@ -1,3 +1,10 @@
+## [0.14.6](https://github.com/darkobits/nr/compare/v0.14.5...v0.14.6) (2022-08-21)
+
+
+### 🐞 Bug Fixes
+
+* Don't use `npm-run-path` by default when resolving commands. ([2f54f29](https://github.com/darkobits/nr/commit/2f54f298d23f4575cc3ff975da424875cceabe42))
+
 ## [0.14.5](https://github.com/darkobits/nr/compare/v0.14.4...v0.14.5) (2022-08-21)
 
 
