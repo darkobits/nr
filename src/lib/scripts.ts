@@ -183,6 +183,8 @@ export function printScriptInfo() {
     // nr is not in $PATH.
   }
 
+  console.log('');
+
   if (nrIsInPath) {
     console.log(log.chalk.gray(`${emoji.get('sparkles')} ${log.chalk.white.bold('nr')} is in your PATH. You can run scripts using: ${log.chalk.white('nr <script name>')}`));
   } else {

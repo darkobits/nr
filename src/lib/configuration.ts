@@ -34,6 +34,7 @@ export default async function loadConfig({ argv, config, configPath, configIsEmp
 
   // If the config file did not export a function, throw.
   if (typeof config !== 'function') {
+    log.verbose(log.prefix('config'), config);
     throw new TypeError(`Expected default export of configuration file at ${log.chalk.green(configPath)} to be of type "function", got "${typeof config}".`);
   }
 
