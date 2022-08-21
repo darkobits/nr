@@ -1,3 +1,10 @@
+## [0.14.14](https://github.com/darkobits/nr/compare/v0.14.13...v0.14.14) (2022-08-21)
+
+
+### 🐞 Bug Fixes
+
+* Use correct type for `execaNode` options. ([655fb06](https://github.com/darkobits/nr/commit/655fb06c2f820eff2c7ad478463c8e0965ec47d6))
+
 ## [0.14.13](https://github.com/darkobits/nr/compare/v0.14.12...v0.14.13) (2022-08-21)
 
 
