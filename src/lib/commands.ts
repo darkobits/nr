@@ -42,7 +42,7 @@ export const commands = new Map<string, CommandDescriptor>();
  */
 export function resolveCommand(cmd: string, cwd: string | URL | undefined = process.cwd()) {
   try {
-    return which.sync(cmd, { path: npmRunPath({ cwd }) });
+    return which.sync(cmd, { path: cwd ? String(cwd) : undefined });
   } catch {
     throw Object.assign(new Error(`ENOENT: no such file or directory: '${cmd}'`), errno.code.ENOENT);
   }
@@ -134,7 +134,7 @@ const executeCommand: CommandExecutor = (name, executableName, parsedArguments, 
  */
 const executeNodeCommand: CommandExecutor = (name, scriptPath, parsedArguments, opts) => {
   const cwd = opts?.execaOptions?.cwd;
-  const resolvedScriptPath = resolveCommand(scriptPath, cwd);
+  const resolvedScriptPath = resolveCommand(scriptPath, cwd && npmRunPath({ cwd }));
   const cmd = execaNode(resolvedScriptPath, parsedArguments, merge(commonExecaOptions, opts?.execaOptions ?? {}));
   const escapedCommand = getEscapedCommand(undefined, cmd.spawnargs);
   log.verbose(log.prefix(`cmd:${name}`), 'exec:', log.chalk.gray(escapedCommand));
@@ -151,7 +151,7 @@ const executeNodeCommand: CommandExecutor = (name, scriptPath, parsedArguments, 
  */
 const executeBabelNodeCommand: CommandExecutor = (name, scriptPath, parsedArguments, opts) => {
   const cwd = opts?.execaOptions?.cwd;
-  const resolvedScriptPath = resolveCommand(scriptPath, cwd);
+  const resolvedScriptPath = resolveCommand(scriptPath, cwd && npmRunPath({ cwd }));
   const babelNodePath = resolveBin.sync('@babel/node', { executable: 'babel-node' });
 
   const cmd = execaNode(resolvedScriptPath, parsedArguments, merge.all([
