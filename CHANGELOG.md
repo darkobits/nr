@@ -1,3 +1,10 @@
+## [0.14.5](https://github.com/darkobits/nr/compare/v0.14.4...v0.14.5) (2022-08-21)
+
+
+### 🐞 Bug Fixes
+
+* **config:** Check for nested `default` property in configuration. ([7092723](https://github.com/darkobits/nr/commit/709272369a8bcf8cce8dd60b60a592c996db18a0))
+
 ## [0.14.4](https://github.com/darkobits/nr/compare/v0.14.3...v0.14.4) (2022-08-21)
 
 
