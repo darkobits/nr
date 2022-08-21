@@ -1,3 +1,10 @@
+## [0.14.9](https://github.com/darkobits/nr/compare/v0.14.8...v0.14.9) (2022-08-21)
+
+
+### 🐞 Bug Fixes
+
+* `loadConfig` handles nested default exports. ([249c177](https://github.com/darkobits/nr/commit/249c17722475e43cc203207ff4cf57adb2cb037f))
+
 ## [0.14.8](https://github.com/darkobits/nr/compare/v0.14.7...v0.14.8) (2022-08-21)
 
 
