@@ -1,3 +1,10 @@
+## [0.14.12](https://github.com/darkobits/nr/compare/v0.14.11...v0.14.12) (2022-08-21)
+
+
+### 🛠 Refactoring
+
+* Improve script logging. ([0ed6513](https://github.com/darkobits/nr/commit/0ed6513b2eb3d703e2f5966d504dfcbd4023a425))
+
 ## [0.14.11](https://github.com/darkobits/nr/compare/v0.14.10...v0.14.11) (2022-08-21)
 
 
