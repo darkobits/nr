@@ -1,3 +1,10 @@
+## [0.14.13](https://github.com/darkobits/nr/compare/v0.14.12...v0.14.13) (2022-08-21)
+
+
+### 🛠 Refactoring
+
+* Improve command, task logging. ([6524a97](https://github.com/darkobits/nr/commit/6524a97dd9e0bfe7872ba4323cdea9d92f1a0422))
+
 ## [0.14.12](https://github.com/darkobits/nr/compare/v0.14.11...v0.14.12) (2022-08-21)
 
 
