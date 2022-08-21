@@ -1,4 +1,4 @@
-import type { Options } from 'execa';
+import type { Options, NodeOptions } from 'execa';
 import type log from 'lib/log';
 
 
@@ -15,7 +15,7 @@ export interface CommandOptions {
   prefix?: (chalk: typeof log.chalk) => string;
 
   /**
-   * Options to pass to execa, which executes the commands.
+   * Options to pass to execa, which executes the command.
    *
    * See: https://github.com/sindresorhus/execa
    */
@@ -32,4 +32,19 @@ export interface CommandOptions {
    * @default false
    */
   preserveArgumentCasing?: boolean;
+}
+
+
+/**
+ * Additional options that may be provided to `command.node` and
+ * `command.babel`.
+ */
+export interface CommandOptionsNode extends CommandOptions {
+  /**
+   * Options to pass to execa, which executes the command. Identical to standard
+   * execa options with the addition of `nodePath` and `nodeOptions` properties.
+   *
+   * See: https://github.com/sindresorhus/execa#nodepath-for-node-only
+   */
+  execaOptions: NodeOptions;
 }

@@ -3,7 +3,7 @@ export type { CLIArguments } from './CliArguments.ts';
 export type { CommandArguments } from './CommandArguments';
 export type { CommandDescriptor } from './CommandDescriptor';
 export type { CommandExecutor } from './CommandExecutor';
-export type { CommandOptions } from './CommandOptions';
+export type { CommandOptions, CommandOptionsNode } from './CommandOptions';
 export type { CommandThunk } from './CommandThunk';
 
 export type { ConfigurationFactory } from './ConfigurationFactory';

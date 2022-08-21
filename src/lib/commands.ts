@@ -26,7 +26,8 @@ import type {
   CommandExecutor,
   CommandThunk,
   CommandArguments,
-  CommandOptions
+  CommandOptions,
+  CommandOptionsNode
 } from 'etc/types';
 
 
@@ -327,7 +328,7 @@ export function command(name: string, args: CommandArguments, opts?: CommandOpti
 /**
  * Creates a `CommandThunk` that executes a command using `execa.node()`.
  */
-command.node = (name: string, args: CommandArguments, opts?: CommandOptions) => {
+command.node = (name: string, args: CommandArguments, opts?: CommandOptionsNode) => {
   // Get the name of the package that defined this command.
   const sourcePackage = getPackageNameFromCallsite(callsites()[1]);
 
