@@ -1,3 +1,10 @@
+## [0.14.11](https://github.com/darkobits/nr/compare/v0.14.10...v0.14.11) (2022-08-21)
+
+
+### 🐞 Bug Fixes
+
+* Don't count unknown package sources. ([d1ac1e1](https://github.com/darkobits/nr/commit/d1ac1e1a6df06f8251df3f407c902210e8c5f1bf))
+
 ## [0.14.10](https://github.com/darkobits/nr/compare/v0.14.9...v0.14.10) (2022-08-21)
 
 
