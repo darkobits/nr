@@ -140,10 +140,12 @@ export function printScriptInfo() {
     const segments: Array<string> = [];
 
     if (multipleSources) {
-      if (sourcePackage === 'local') {
-        segments.push(`${log.chalk.green(name)} ${log.chalk.gray.dim('(local)')}`);
-      } else if (sourcePackage !== 'unknown') {
+      if (sourcePackage !== 'unknown') {
+        // includes "local", and other third-party packages.
         segments.push(`${log.chalk.green(name)} ${log.chalk.gray.dim(`(${sourcePackage})`)}`);
+      } else {
+        // if the source is "unknown", only show the script's name.
+        segments.push(`${log.chalk.green(name)}`);
       }
     } else {
       segments.push(log.chalk.green(name));
