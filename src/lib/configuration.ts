@@ -19,11 +19,7 @@ export default async function loadConfig({ argv, config, configPath, configIsEmp
   // If the --config option was used, load the file at the indicated path.
   if (argv.config) {
     configPath = path.resolve(argv.config);
-    config = (await import(configPath)).default;
-    // Due to ESM interop issues, we can sometimes get a module with 2 levels of
-    // "default" properties.
-    // @ts-expect-error
-    if (config?.default) config = config.default;
+    config = await import(configPath);
   } else if (configIsEmpty) {
     // Otherwise, if Cosmiconfig found an empty configuration file, throw.
     throw new Error(`Configuration file at ${log.chalk.green(configPath)} is empty.`);
@@ -32,14 +28,21 @@ export default async function loadConfig({ argv, config, configPath, configIsEmp
     throw new Error('Unable to find an nr configuration file.');
   }
 
-  // If the config file did not export a function, throw.
-  if (typeof config !== 'function') {
-    log.verbose(log.prefix('config'), config);
+  // Handle ESM interop issues resulting in multiple nested "default" properties
+  // on modules.
+  let configFn = config ?? {};
+  while (Reflect.has(configFn, 'default')) {
+    configFn = Reflect.get(configFn, 'default');
+  }
+
+  // If the config file did not default-export a function, throw.
+  if (typeof configFn !== 'function') {
+    log.verbose(log.prefix('config'), configFn);
     throw new TypeError(`Expected default export of configuration file at ${log.chalk.green(configPath)} to be of type "function", got "${typeof config}".`);
   }
 
   // Invoke the user's configuration function.
-  await config({
+  await configFn({
     command,
     script,
     task,
