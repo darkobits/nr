@@ -20,6 +20,10 @@ export default async function loadConfig({ argv, config, configPath, configIsEmp
   if (argv.config) {
     configPath = path.resolve(argv.config);
     config = (await import(configPath)).default;
+    // Due to ESM interop issues, we can sometimes get a module with 2 levels of
+    // "default" properties.
+    // @ts-expect-error
+    if (config?.default) config = config.default;
   } else if (configIsEmpty) {
     // Otherwise, if Cosmiconfig found an empty configuration file, throw.
     throw new Error(`Configuration file at ${log.chalk.green(configPath)} is empty.`);
