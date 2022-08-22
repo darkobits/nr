@@ -49,7 +49,7 @@ export function getEscapedCommand(file: string | undefined, args: Array<string>)
     ? arg
     : `"${arg.replace(/"/g, '\\"')}"`);
 
-  return normalizeArgs(file, args).map(arg => escapeArg(arg)).join(' ');
+  return normalizeArgs(file, args).map(arg => escapeArg(arg)).join(' ').trim();
 }
 
 
