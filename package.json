@@ -56,7 +56,7 @@
   },
   "devDependencies": {
     "@darkobits/eslint-plugin": "^0.2.9",
-    "@darkobits/ts": "^0.11.0-beta.0",
+    "@darkobits/ts": "^0.11.0-beta.1",
     "@types/micromatch": "^4.0.2",
     "@types/node-emoji": "^1.8.1",
     "@types/ramda": "^0.28.15",
