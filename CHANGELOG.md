@@ -1,3 +1,16 @@
+## [0.14.15](https://github.com/darkobits/nr/compare/v0.14.14...v0.14.15) (2022-08-22)
+
+
+### 🐞 Bug Fixes
+
+* Dereference parallal instructions during script definition. ([223da80](https://github.com/darkobits/nr/commit/223da801f172eca2edd4aba37bba3ab653dd2ab3))
+
+
+### 🏗 Chores
+
+* **deps:** Update dependencies. ([34d80ac](https://github.com/darkobits/nr/commit/34d80accc742d61d3932c14cf3956bf0e8422b59))
+* Trim whitespace in escaped commands. ([540d309](https://github.com/darkobits/nr/commit/540d309276f4caecba42c88406435e55584f3e61))
+
 ## [0.14.14](https://github.com/darkobits/nr/compare/v0.14.13...v0.14.14) (2022-08-21)
 
 
