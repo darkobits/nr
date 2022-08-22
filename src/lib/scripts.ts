@@ -264,10 +264,12 @@ export function script(name: string, opts: ScriptOptions) {
     // Map each entry in the instruction sequence to its corresponding command,
     // task, or script. For nested arrays, map the array to a thunk that runs
     // each entry in parallel.
-    const validatedInstructions = opts.run.map(value => {
+    const resolvedInstructions = opts.run.map(value => {
       if (Array.isArray(value)) {
+        const resolvedInstructions = value.map(resolveInstruction);
+
         return async () => {
-          await pAll(value.map(resolveInstruction));
+          await pAll(resolvedInstructions);
         };
       }
 
@@ -281,7 +283,7 @@ export function script(name: string, opts: ScriptOptions) {
       // Instructions may be added to a script definition dynamically, meaning
       // it is possible that a script has zero instructions under certain
       // conditions. When this is the case, issue a warning and bail.
-      if (validatedInstructions.length === 0) {
+      if (resolvedInstructions.length === 0) {
         log.warn(log.prefix('script'), log.chalk.yellow.bold(`Script "${name}" contains no instructions.`));
         return;
       }
@@ -292,7 +294,7 @@ export function script(name: string, opts: ScriptOptions) {
 
       // Run each item in the command list in series. If an item is itself an
       // array, all commands in that step will be run in parallel.
-      await pSeries(validatedInstructions);
+      await pSeries(resolvedInstructions);
 
       if (opts.timing) {
         log.verbose(log.prefix('script'), log.chalk.gray(`Script ${log.chalk.green.dim(name)} done in ${runTime}.`));
