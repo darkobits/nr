@@ -3,7 +3,7 @@
 </a>
 <p align="center">
   <a href="https://www.npmjs.com/package/@darkobits/nr"><img src="https://img.shields.io/npm/v/@darkobits/nr.svg?style=flat-square"></a>
-  <a href="https://github.com/darkobits/nr/actions?query=workflow%3Aci"><img src="https://img.shields.io/github/workflow/status/darkobits/nr/ci/master?style=flat-square"></a>
+  <a href="https://github.com/darkobits/nr/actions?query=workflow%3Aci"><img src="https://img.shields.io/github/actions/workflow/status/darkobits/nr/ci.yml?style=flat-square"></a>
   <a href="https://depfu.com/repos/github/darkobits/nr"><img src="https://img.shields.io/depfu/darkobits/nr?style=flat-square"></a>
   <a href="https://conventionalcommits.org"><img src="https://img.shields.io/static/v1?label=commits&message=conventional&style=flat-square&color=398AFB"></a>
 </p>
