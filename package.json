@@ -33,7 +33,7 @@
   },
   "dependencies": {
     "@darkobits/log": "^2.0.0-beta.15",
-    "@darkobits/saffron": "~0.30.0-beta.1",
+    "@darkobits/saffron": "~0.30.0-beta.3",
     "@types/is-ci": "^3.0.0",
     "@types/yargs-unparser": "^2.0.1",
     "callsites": "^4.0.0",
