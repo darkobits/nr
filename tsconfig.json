@@ -5,6 +5,7 @@
   "include": ["src"],
   "compilerOptions": {
     "baseUrl": "src",
-    "outDir": "dist"
+    "outDir": "dist",
+    "skipLibCheck": true
   }
 }

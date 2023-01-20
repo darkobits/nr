@@ -29,11 +29,11 @@
     "help": "nr --scripts"
   },
   "peerDependencies": {
-    "@babel/node": ">=7.0.0"
+    "@babel/node": ">=7.20.7"
   },
   "dependencies": {
     "@darkobits/log": "^2.0.0-beta.15",
-    "@darkobits/saffron": "~0.4.28",
+    "@darkobits/saffron": "~0.4.30-beta.0",
     "@types/is-ci": "^3.0.0",
     "@types/yargs-unparser": "^2.0.1",
     "callsites": "^4.0.0",
@@ -51,15 +51,15 @@
     "ramda": "^0.28.0",
     "read-pkg-up": "^9.1.0",
     "resolve-bin": "^1.0.1",
-    "which": "^2.0.2",
+    "which": "^3.0.0",
     "yargs-unparser": "^2.0.0"
   },
   "devDependencies": {
     "@darkobits/eslint-plugin": "^0.2.9",
-    "@darkobits/ts": "^0.11.0-beta.1",
+    "@darkobits/ts": "^0.13.0",
     "@types/micromatch": "^4.0.2",
-    "@types/node-emoji": "^1.8.1",
-    "@types/ramda": "^0.28.15",
+    "@types/node-emoji": "^1.8.2",
+    "@types/ramda": "^0.28.21",
     "@types/resolve-bin": "^0.4.1",
     "@types/which": "^2.0.1"
   }
