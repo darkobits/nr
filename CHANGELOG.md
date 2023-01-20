@@ -1,3 +1,17 @@
+## [0.14.16-beta.1](https://github.com/darkobits/nr/compare/v0.14.15...v0.14.16-beta.1) (2023-01-20)
+
+
+### 📖 Documentation
+
+* Update README. ([46253a0](https://github.com/darkobits/nr/commit/46253a05f930b26c9e89d7ccf3c961f178d570c2))
+* Update README. ([5b7d694](https://github.com/darkobits/nr/commit/5b7d6944bec72f7c087093c00e8c8c6c656c2476))
+
+
+### 🏗 Chores
+
+* **deps:** Update dependencies. ([93092d9](https://github.com/darkobits/nr/commit/93092d97ae178f28eb331ee8d56b9c2c3b98d4ac))
+* Update `.ci.yml`. ([d7af831](https://github.com/darkobits/nr/commit/d7af83103d3c139a9299149917e418b6816c5eb5))
+
 ## [0.14.15](https://github.com/darkobits/nr/compare/v0.14.14...v0.14.15) (2022-08-22)
 
 
