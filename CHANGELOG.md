@@ -1,3 +1,15 @@
+## [0.14.16](https://github.com/darkobits/nr/compare/v0.14.15...v0.14.16) (2023-01-25)
+
+
+### 📖 Documentation
+
+* Update README. ([5b7d694](https://github.com/darkobits/nr/commit/5b7d6944bec72f7c087093c00e8c8c6c656c2476))
+
+
+### 🐞 Bug Fixes
+
+* **scripts:** Ensure `pre` and `post` scripts are run for nested script calls. ([b0ba8ad](https://github.com/darkobits/nr/commit/b0ba8ad2b789538ffaca161ef170c747585b91f7))
+
 ## [0.14.15](https://github.com/darkobits/nr/compare/v0.14.14...v0.14.15) (2022-08-22)
 
 
