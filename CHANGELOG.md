@@ -1,3 +1,15 @@
+## [0.14.24](https://github.com/darkobits/nr/compare/v0.14.23...v0.14.24) (2023-01-25)
+
+
+### 🛠 Refactoring
+
+* Remove `command.babel`. ([8735860](https://github.com/darkobits/nr/commit/873586091605ed5af0d1042765c38032708ce81e))
+
+
+### 🏗 Chores
+
+* **deps:** Update dependencies. ([d2ecfd5](https://github.com/darkobits/nr/commit/d2ecfd5482d0911c71a948241798fbc89381f19d))
+
 ## [0.14.23](https://github.com/darkobits/nr/compare/v0.14.22...v0.14.23) (2023-01-25)
 
 
