@@ -225,12 +225,12 @@ export function matchScript(value?: string) {
  * associated with it.
  */
 export async function executeScript(script: ScriptDescriptor) {
-  const preScript = caseInsensitiveGet(`pre${script.name}`, scripts);
-  const postScript = caseInsensitiveGet(`post${script.name}`, scripts);
+  // const preScript = caseInsensitiveGet(`pre${script.name}`, scripts);
+  // const postScript = caseInsensitiveGet(`post${script.name}`, scripts);
 
-  if (preScript) await preScript.thunk();
+  // if (preScript) await preScript.thunk();
   await script.thunk();
-  if (postScript) await postScript.thunk();
+  // if (postScript) await postScript.thunk();
 }
 
 
@@ -294,7 +294,18 @@ export function script(name: string, opts: ScriptOptions) {
 
       // Run each item in the command list in series. If an item is itself an
       // array, all commands in that step will be run in parallel.
+      const preScript = caseInsensitiveGet(`pre${script.name}`, scripts);
+      const postScript = caseInsensitiveGet(`post${script.name}`, scripts);
+
+      if (preScript) {
+        await preScript.thunk();
+      }
+
       await pSeries(resolvedInstructions);
+
+      if (postScript) {
+        await postScript.thunk();
+      }
 
       if (opts.timing) {
         log.verbose(log.prefix('script'), log.chalk.gray(`Script ${log.chalk.green.dim(name)} done in ${runTime}.`));
