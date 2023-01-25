@@ -1,6 +1,6 @@
 import { EOL } from 'node:os';
 
-import { readPackageUpSync } from 'read-pkg-up';
+import readPkgUp from 'read-pkg-up';
 
 import type { CallSite } from 'callsites';
 import type { ExecaError } from 'execa';
@@ -63,9 +63,9 @@ export function getPackageNameFromCallsite(callSite: CallSite | undefined, fallb
   const fileName = callSite.getFileName();
   if (!fileName) return fallback;
 
-  const localPackage = readPackageUpSync();
+  const localPackage = readPkgUp.sync();
 
-  const sourcePackage = readPackageUpSync({ cwd: fileName });
+  const sourcePackage = readPkgUp.sync({ cwd: fileName });
   if (!sourcePackage) return fallback;
 
   if (localPackage && localPackage.packageJson.name === sourcePackage.packageJson.name) {

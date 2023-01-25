@@ -4,7 +4,7 @@ import { default as callsites } from 'callsites';
 import merge from 'deepmerge';
 // @ts-expect-error - This package does not have type definitions.
 import errno from 'errno';
-import { execa, execaNode,  Options as ExecaOptions } from 'execa';
+import execa, { Options as ExecaOptions } from 'execa';
 // @ts-expect-error - This package does not have type definitions.
 import kebabCaseKeys from 'kebabcase-keys';
 import { npmRunPath } from 'npm-run-path';
@@ -138,7 +138,7 @@ const executeCommand: CommandExecutor = (name, executableName, parsedArguments, 
 const executeNodeCommand: CommandExecutor = (name, scriptPath, parsedArguments, opts) => {
   const cwd = opts?.execaOptions?.cwd;
   const resolvedScriptPath = resolveCommand(scriptPath, cwd?.toString());
-  const cmd = execaNode(resolvedScriptPath, parsedArguments, merge(commonExecaOptions, opts?.execaOptions ?? {}));
+  const cmd = execa.node(resolvedScriptPath, parsedArguments, merge(commonExecaOptions, opts?.execaOptions ?? {}));
   const escapedCommand = getEscapedCommand(undefined, cmd.spawnargs);
   log.verbose(log.prefix(`cmd:${name}`), 'exec:', log.chalk.gray(escapedCommand));
   return cmd;
@@ -157,7 +157,7 @@ const executeBabelNodeCommand: CommandExecutor = (name, scriptPath, parsedArgume
   const resolvedScriptPath = resolveCommand(scriptPath, cwd?.toString());
   const babelNodePath = resolveBin.sync('@babel/node', { executable: 'babel-node' });
 
-  const cmd = execaNode(resolvedScriptPath, parsedArguments, merge.all([
+  const cmd = execa.node(resolvedScriptPath, parsedArguments, merge.all([
     commonExecaOptions,
     opts?.execaOptions ?? {},
     {
