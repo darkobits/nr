@@ -1,3 +1,10 @@
+## [0.14.17](https://github.com/darkobits/nr/compare/v0.14.16...v0.14.17) (2023-01-25)
+
+
+### 🛠 Refactoring
+
+* Publish as CommonJS. ([200e741](https://github.com/darkobits/nr/commit/200e7417cce030b245ee018996ea94c2af378b2b))
+
 ## [0.14.16](https://github.com/darkobits/nr/compare/v0.14.15...v0.14.16) (2023-01-25)
 
 
