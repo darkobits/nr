@@ -294,14 +294,15 @@ export function script(name: string, opts: ScriptOptions) {
 
       // Run each item in the command list in series. If an item is itself an
       // array, all commands in that step will be run in parallel.
-      const preScript = caseInsensitiveGet(`pre${script.name}`, scripts);
-      const postScript = caseInsensitiveGet(`post${script.name}`, scripts);
+      const preScript = caseInsensitiveGet(`pre${name}`, scripts);
 
       if (preScript) {
         await preScript.thunk();
       }
 
       await pSeries(resolvedInstructions);
+
+      const postScript = caseInsensitiveGet(`post${name}`, scripts);
 
       if (postScript) {
         await postScript.thunk();
