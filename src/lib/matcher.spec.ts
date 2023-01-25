@@ -4,7 +4,7 @@ import {
   expect
 } from 'vitest';
 
-import match from './matcher';
+import match from 'lib/matcher';
 
 
 describe('matcher', () => {

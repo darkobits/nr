@@ -9,7 +9,6 @@ import execa, { Options as ExecaOptions } from 'execa';
 import kebabCaseKeys from 'kebabcase-keys';
 import npmRunPath from 'npm-run-path';
 import * as R from 'ramda';
-import resolveBin from 'resolve-bin';
 import which from 'which';
 import yargsUnparser from 'yargs-unparser';
 
@@ -139,33 +138,6 @@ const executeNodeCommand: CommandExecutor = (name, scriptPath, parsedArguments, 
   const cwd = opts?.execaOptions?.cwd;
   const resolvedScriptPath = resolveCommand(scriptPath, cwd?.toString());
   const cmd = execa.node(resolvedScriptPath, parsedArguments, merge(commonExecaOptions, opts?.execaOptions ?? {}));
-  const escapedCommand = getEscapedCommand(undefined, cmd.spawnargs);
-  log.verbose(log.prefix(`cmd:${name}`), 'exec:', log.chalk.gray(escapedCommand));
-  return cmd;
-};
-
-
-/**
- * @private
- *
- * Executes a command using `execaNode` and `babel-node`.
- *
- * See: https://github.com/sindresorhus/execa#execanodescriptpath-arguments-options
- */
-const executeBabelNodeCommand: CommandExecutor = (name, scriptPath, parsedArguments, opts) => {
-  const cwd = opts?.execaOptions?.cwd;
-  const resolvedScriptPath = resolveCommand(scriptPath, cwd?.toString());
-  const babelNodePath = resolveBin.sync('@babel/node', { executable: 'babel-node' });
-
-  const cmd = execa.node(resolvedScriptPath, parsedArguments, merge.all([
-    commonExecaOptions,
-    opts?.execaOptions ?? {},
-    {
-      nodePath: babelNodePath,
-      nodeOptions: ['--extensions', '.ts,.tsx,.js,.jsx,.json']
-    }
-  ]));
-
   const escapedCommand = getEscapedCommand(undefined, cmd.spawnargs);
   log.verbose(log.prefix(`cmd:${name}`), 'exec:', log.chalk.gray(escapedCommand));
   return cmd;
@@ -339,31 +311,4 @@ command.node = (name: string, args: CommandArguments, opts?: CommandOptionsNode)
     opts,
     sourcePackage
   });
-};
-
-
-/**
- * Creates a `CommandThunk` that executes a command using `execa.node()` with
- * `babel-node` as the executable.
- */
-command.babel = (...params: Parameters<typeof command.node>) => {
-  const [name, args, opts] = params;
-
-  // Get the name of the package that defined this command.
-  const sourcePackage = getPackageNameFromCallsite(callsites()[1]);
-
-  return commandBuilder({
-    executor: executeBabelNodeCommand,
-    name,
-    args,
-    opts,
-    sourcePackage
-  });
-
-  // return command.node(name, args, merge({
-  //   execaOptions: {
-  //     nodePath: 'babel-node',
-  //     nodeOptions: ['--extensions', '.ts,.tsx,.js,.jsx,.json']
-  //   }
-  // }, opts ?? {}));
 };
