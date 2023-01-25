@@ -17,6 +17,7 @@ export function getDefaultExport<T extends object>(value: T): T {
     let result = value;
 
     while (Reflect.has(result, 'default')) {
+      // @ts-expect-error
       result = Reflect.get(result, 'default');
     }
 

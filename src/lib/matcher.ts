@@ -1,7 +1,5 @@
 import micromatch from 'micromatch';
 
-// import ow from 'lib/ow';
-
 
 /**
  * @private

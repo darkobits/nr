@@ -1,10 +1,11 @@
 {
-  "extends": "@darkobits/ts",
-  // N.B. This is only needed if we have top-level .ts files outside of 'src'
-  // which TypeScript will use to incorrectly infer the project root.
+  // Note: Vitest requires an explicit path to tsconfig.json. Otherwise, it will
+  // try to read index.js at the indicated package root.
+  "extends": "@darkobits/ts/config/tsconfig.json",
   "include": ["src"],
   "compilerOptions": {
     "baseUrl": "src",
-    "outDir": "dist"
+    "outDir": "dist",
+    "skipLibCheck": true
   }
 }
