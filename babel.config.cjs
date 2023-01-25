@@ -1,3 +1,3 @@
 module.exports = {
-  extends: require('@darkobits/ts').babelEsm
+  extends: require('@darkobits/ts').babel
 };
