@@ -4,7 +4,6 @@
   "description": "A modern, type-safe task runner for JavaScript projects.",
   "author": "darkobits",
   "license": "WTFPL",
-  "type": "module",
   "engines": {
     "node": ">=16"
   },
@@ -33,7 +32,7 @@
   },
   "dependencies": {
     "@darkobits/log": "^2.0.0-beta.15",
-    "@darkobits/saffron": "~0.30.0-beta.3",
+    "@darkobits/saffron": "~0.30.0-beta.5",
     "@types/is-ci": "^3.0.0",
     "@types/yargs-unparser": "^2.0.1",
     "callsites": "^4.0.0",
@@ -62,5 +61,8 @@
     "@types/ramda": "^0.28.21",
     "@types/resolve-bin": "^0.4.1",
     "@types/which": "^2.0.1"
+  },
+  "overrides": {
+    "@darkobits/saffron": "~0.30.0-beta.5"
   }
 }
