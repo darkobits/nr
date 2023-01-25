@@ -1,3 +1,10 @@
+## [0.14.22](https://github.com/darkobits/nr/compare/v0.14.21...v0.14.22) (2023-01-25)
+
+
+### 🐞 Bug Fixes
+
+* **scripts:** Lookup `pre` and `post` scripts correctly. ([d457422](https://github.com/darkobits/nr/commit/d4574226cb6fac01afef65c76d62ae143eef6e71))
+
 ## [0.14.21](https://github.com/darkobits/nr/compare/v0.14.20...v0.14.21) (2023-01-25)
 
 
