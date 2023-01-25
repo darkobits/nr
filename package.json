@@ -1,6 +1,6 @@
 {
   "name": "@darkobits/nr",
-  "version": "0.14.20",
+  "version": "0.14.21",
   "description": "A modern, type-safe task runner for JavaScript projects.",
   "author": "darkobits",
   "license": "WTFPL",
