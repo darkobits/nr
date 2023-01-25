@@ -1,3 +1,15 @@
+## [0.14.16-beta.4](https://github.com/darkobits/nr/compare/v0.14.16-beta.3...v0.14.16-beta.4) (2023-01-25)
+
+
+### 🏗 Chores
+
+* **deps:** Update dependencies. ([b8caced](https://github.com/darkobits/nr/commit/b8caced57fe48f9865ee2dcc4b3dfa2bd2335b4d))
+
+
+### 🐞 Bug Fixes
+
+* **scripts:** Ensure `pre` and `post` scripts are run for nested script calls. ([fc41b67](https://github.com/darkobits/nr/commit/fc41b67e8e04220060fac0a1b17e9c431444bab9))
+
 ## [0.14.16-beta.3](https://github.com/darkobits/nr/compare/v0.14.16-beta.2...v0.14.16-beta.3) (2023-01-20)
 
 
