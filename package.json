@@ -43,7 +43,7 @@
     "kebabcase-keys": "^1.0.0",
     "micromatch": "^4.0.5",
     "node-emoji": "^1.11.0",
-    "npm-run-path": "^5.1.0",
+    "npm-run-path": "^4.0.1",
     "ow": "^0.28.1",
     "p-all": "^3.0.0",
     "p-series": "^2.1.0",

@@ -7,7 +7,7 @@ import errno from 'errno';
 import execa, { Options as ExecaOptions } from 'execa';
 // @ts-expect-error - This package does not have type definitions.
 import kebabCaseKeys from 'kebabcase-keys';
-import { npmRunPath } from 'npm-run-path';
+import npmRunPath from 'npm-run-path';
 import * as R from 'ramda';
 import resolveBin from 'resolve-bin';
 import which from 'which';
