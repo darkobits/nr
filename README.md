@@ -147,13 +147,6 @@ export default ({ command, script }) => {
 This function has the same signature as `command`. It can be used to execute a Node script using the
 current version of Node. This variant uses [`execaNode`](https://github.com/sindresorhus/execa#execanodescriptpath-arguments-options).
 
-#### `command.babel`
-
-This function has the same signature as `command`. It can be used to execute a Node script using
-[`babel-node`](https://babeljs.io/docs/en/babel-node). This variant uses [`execaNode`](https://github.com/sindresorhus/execa#execanodescriptpath-arguments-options)
-and configures [`babel-node`](https://babeljs.io/docs/en/babel-node) to recognize the following
-extensions: `ts`, `tsx`, `js`, `jsx`.
-
 ---
 
 ### `task`
