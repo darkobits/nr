@@ -1,3 +1,15 @@
+## [0.14.26](https://github.com/darkobits/nr/compare/v0.14.25...v0.14.26) (2023-01-28)
+
+
+### 🏗 Chores
+
+* **deps:** Update dependencies. ([f2fa997](https://github.com/darkobits/nr/commit/f2fa997dffcedc14f753e481034c8677d21ecc9d))
+
+
+### 📖 Documentation
+
+* Update README. ([7dec1ed](https://github.com/darkobits/nr/commit/7dec1ed2f2ff11f9fe0f7163db823e840efb1e84))
+
 ## [0.14.25](https://github.com/darkobits/nr/compare/v0.14.24...v0.14.25) (2023-01-28)
 
 
