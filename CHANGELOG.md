@@ -1,3 +1,15 @@
+## [0.14.25](https://github.com/darkobits/nr/compare/v0.14.24...v0.14.25) (2023-01-28)
+
+
+### 🏗 Chores
+
+* **deps:** Update dependencies. ([267b3d1](https://github.com/darkobits/nr/commit/267b3d1799a0ed339e709dec117d173be6cdca72))
+
+
+### 🐞 Bug Fixes
+
+* **scripts:** Report script timing for sub-scripts. ([24c7958](https://github.com/darkobits/nr/commit/24c7958c26197405a6d1c1ace74024574c3dddf2))
+
 ## [0.14.24](https://github.com/darkobits/nr/compare/v0.14.23...v0.14.24) (2023-01-25)
 
 
