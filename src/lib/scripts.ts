@@ -280,6 +280,8 @@ export function script(name: string, opts: ScriptOptions) {
     // appropriate error messages and then re-throw, propagating errors up to
     // this function's caller.
     const scriptThunk = async () => {
+      const runTime = log.createTimer();
+
       // Instructions may be added to a script definition dynamically, meaning
       // it is possible that a script has zero instructions under certain
       // conditions. When this is the case, issue a warning and bail.
@@ -289,8 +291,6 @@ export function script(name: string, opts: ScriptOptions) {
       }
 
       log.verbose(log.prefix('script'), 'exec:', log.chalk.green(name));
-
-      const runTime = log.createTimer();
 
       // Run each item in the command list in series. If an item is itself an
       // array, all commands in that step will be run in parallel.
@@ -309,7 +309,7 @@ export function script(name: string, opts: ScriptOptions) {
       }
 
       if (opts.timing) {
-        log.verbose(log.prefix('script'), log.chalk.gray(`Script ${log.chalk.green.dim(name)} done in ${runTime}.`));
+        log.info(log.prefix(name), log.chalk.gray(`Done in ${runTime}.`));
       }
     };
 

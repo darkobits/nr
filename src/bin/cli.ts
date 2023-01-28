@@ -83,13 +83,8 @@ cli.command<CLIArguments, ConfigurationFactory>({
         throw new Error('No query provided. Run "nr --scripts" to show available scripts.');
       }
 
-      const runTime = log.createTimer();
-
       // Match and execute the indicated script.
-      const script = matchScript(argv.query);
-      await executeScript(script);
-
-      if (script.options.timing) log.info(log.chalk.gray(`Done in ${runTime}.`));
+      await executeScript(matchScript(argv.query));
     } catch (err: any) {
       const { message, stack } = parseError(err);
       log.error(log.chalk.red.bold(message));
