@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.14.28](https://github.com/darkobits/nr/compare/v0.14.27...v0.14.28) (2023-01-29)
+
+
+### 🏗 Chores
+
+* **deps:** Update dependencies. ([9d23fae](https://github.com/darkobits/nr/commit/9d23faedf4a732b9e42917a965adeac39ba078ab))
+
+
+### 🐞 Bug Fixes
+
+* Remove `node:` prefixes for built-ins. ([9e1216c](https://github.com/darkobits/nr/commit/9e1216c5355db41805195f8f33a4ae94c00ecf9f))
+
 ## [0.14.27](https://github.com/darkobits/nr/compare/v0.14.27-beta.0...v0.14.27) (2023-01-29)
 
 
