@@ -1,3 +1,19 @@
+# Changelog
+
+All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+## [0.14.27-beta.0](https://github.com/darkobits/nr/compare/v0.14.26...v0.14.27-beta.0) (2023-01-29)
+
+
+### 🛠 Refactoring
+
+* Resolve instructions when scripts are executed rather than defined. ([31d093a](https://github.com/darkobits/nr/commit/31d093ac93102a74aa805a197f00a1a58e41cc08))
+
+
+### 🏗 Chores
+
+* **deps:** Update dependencies. ([dfc43b8](https://github.com/darkobits/nr/commit/dfc43b8f6ebad62309d79b0074ec06beea03dbd7))
+
 ## [0.14.26](https://github.com/darkobits/nr/compare/v0.14.25...v0.14.26) (2023-01-28)
 
 
