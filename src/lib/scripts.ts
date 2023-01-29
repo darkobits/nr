@@ -1,4 +1,4 @@
-import { EOL } from 'node:os';
+import { EOL } from 'os';
 
 import { default as callsites } from 'callsites';
 import emoji from 'node-emoji';

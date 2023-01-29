@@ -1,4 +1,4 @@
-import { EOL } from 'node:os';
+import { EOL } from 'os';
 
 import readPkgUp from 'read-pkg-up';
 
