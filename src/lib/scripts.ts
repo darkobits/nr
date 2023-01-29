@@ -261,26 +261,26 @@ export function script(name: string, opts: ScriptOptions) {
     // Get the name of the package that defined this script.
     const sourcePackage = getPackageNameFromCallsite(callsites()[1]);
 
-    // Map each entry in the instruction sequence to its corresponding command,
-    // task, or script. For nested arrays, map the array to a thunk that runs
-    // each entry in parallel.
-    const resolvedInstructions = opts.run.map(value => {
-      if (Array.isArray(value)) {
-        const resolvedInstructions = value.map(resolveInstruction);
-
-        return async () => {
-          await pAll(resolvedInstructions);
-        };
-      }
-
-      return resolveInstruction(value);
-    });
-
     // NB: This function does not catch errors. Failed commands will log
     // appropriate error messages and then re-throw, propagating errors up to
     // this function's caller.
     const scriptThunk = async () => {
       const runTime = log.createTimer();
+
+      // Map each entry in the instruction sequence to its corresponding
+      // command, task, or script. For nested arrays, map the array to a thunk
+      // that runs each entry in parallel.
+      const resolvedInstructions = opts.run.map(value => {
+        if (Array.isArray(value)) {
+          const resolvedInstructions = value.map(resolveInstruction);
+
+          return async () => {
+            await pAll(resolvedInstructions);
+          };
+        }
+
+        return resolveInstruction(value);
+      });
 
       // Instructions may be added to a script definition dynamically, meaning
       // it is possible that a script has zero instructions under certain
