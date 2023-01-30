@@ -1,3 +1,10 @@
+## [0.14.29](https://github.com/darkobits/nr/compare/v0.14.28...v0.14.29) (2023-01-30)
+
+
+### 🏗 Chores
+
+* **deps:** Update dependencies. ([2c8db27](https://github.com/darkobits/nr/commit/2c8db27719c7031546187408a4cf3ecdec0880d3))
+
 # Changelog
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
