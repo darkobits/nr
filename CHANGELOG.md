@@ -1,3 +1,15 @@
+## [0.14.31-beta.2](https://github.com/darkobits/nr/compare/v0.14.31-beta.1...v0.14.31-beta.2) (2023-02-14)
+
+
+### 🏗 Chores
+
+* **deps:** Update dependencies. ([dec49e4](https://github.com/darkobits/nr/commit/dec49e461536ba6e07c747423b2ca6b7933b4a17))
+
+
+### 🛠 Refactoring
+
+* Publish as ESM. ([e067854](https://github.com/darkobits/nr/commit/e067854f7576677cbd647578b08c997e9a4e36e2))
+
 ## [0.14.31-beta.1](https://github.com/darkobits/nr/compare/v0.14.30...v0.14.31-beta.1) (2023-02-14)
 
 
