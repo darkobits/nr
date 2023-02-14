@@ -1,3 +1,10 @@
+## [0.14.32](https://github.com/darkobits/nr/compare/v0.14.31...v0.14.32) (2023-02-14)
+
+
+### 🛠 Refactoring
+
+* Improve script source reporting. ([6b79b2d](https://github.com/darkobits/nr/commit/6b79b2d2b95ef749ddf3149d68e872e93731c24c))
+
 # Changelog
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
