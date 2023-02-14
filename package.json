@@ -4,6 +4,7 @@
   "description": "A modern, type-safe task runner for JavaScript projects.",
   "author": "darkobits",
   "license": "WTFPL",
+  "type": "module",
   "engines": {
     "node": ">=16"
   },
