@@ -90,4 +90,6 @@ typings/
 .next
 
 # Build artifacts
-/dist
+/dist*
+
+/fixtures
