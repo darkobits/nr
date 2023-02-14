@@ -18,14 +18,15 @@ import {
   ScriptThunk,
   Thunk
 } from 'etc/types';
-import { commands, resolveCommand } from 'lib/commands';
+import { commands } from 'lib/commands';
 import log from 'lib/log';
 import matchSegmentedName from 'lib/matcher';
 // import ow from 'lib/ow';
 import { tasks } from 'lib/tasks';
 import {
   caseInsensitiveGet,
-  getPackageNameFromCallsite
+  getPackageNameFromCallsite,
+  resolveCommand
 } from 'lib/utils';
 
 

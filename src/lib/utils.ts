@@ -1,6 +1,10 @@
 import { EOL } from 'os';
 
+// @ts-expect-error - This package does not have type definitions.
+import errno from 'errno';
+import npmRunPath from 'npm-run-path';
 import readPkgUp from 'read-pkg-up';
+import which from 'which';
 
 import type { CallSite } from 'callsites';
 import type { ExecaError } from 'execa';
@@ -88,5 +92,21 @@ export function caseInsensitiveGet<M extends Map<string, any>>(key: string, map:
 
   for (const curKey of keys) {
     if (key.toLowerCase() === curKey.toLowerCase()) return map.get(curKey) as MapValueType<M>;
+  }
+}
+
+
+/**
+ * Uses `which` to attempt to resolve the absolute path to the provided command.
+ * Throws an ENOENT system error if the command cannot be found.
+ */
+export function resolveCommand(cmd: string, cwd = process.cwd()) {
+  try {
+    return which.sync(cmd, { path: npmRunPath({ cwd }) });
+  } catch {
+    throw Object.assign(
+      new Error(`ENOENT: no such file or directory: '${cmd}'`),
+      errno.code.ENOENT
+    );
   }
 }

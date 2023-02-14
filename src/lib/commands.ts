@@ -1,15 +1,12 @@
 import { EOL } from 'os';
+import path from 'path';
 
 import { default as callsites } from 'callsites';
 import merge from 'deepmerge';
-// @ts-expect-error - This package does not have type definitions.
-import errno from 'errno';
 import execa, { Options as ExecaOptions } from 'execa';
 // @ts-expect-error - This package does not have type definitions.
 import kebabCaseKeys from 'kebabcase-keys';
-import npmRunPath from 'npm-run-path';
 import * as R from 'ramda';
-import which from 'which';
 import yargsUnparser from 'yargs-unparser';
 
 import { IS_COMMAND_THUNK } from 'etc/constants';
@@ -34,22 +31,6 @@ import type {
  * Map of registered command names to their corresponding descriptors.
  */
 export const commands = new Map<string, CommandDescriptor>();
-
-
-/**
- * Uses `which` to attempt to resolve the absolute path to the provided command.
- * Throws an ENOENT system error if the command cannot be found.
- */
-export function resolveCommand(cmd: string, cwd = process.cwd()) {
-  try {
-    return which.sync(cmd, { path: npmRunPath({ cwd }) });
-  } catch {
-    throw Object.assign(
-      new Error(`ENOENT: no such file or directory: '${cmd}'`),
-      errno.code.ENOENT
-    );
-  }
-}
 
 
 /**
@@ -135,8 +116,17 @@ const executeCommand: CommandExecutor = (name, executableName, parsedArguments, 
  * See: https://github.com/sindresorhus/execa#execanodescriptpath-arguments-options
  */
 const executeNodeCommand: CommandExecutor = (name, scriptPath, parsedArguments, opts) => {
-  const cwd = opts?.execaOptions?.cwd;
-  const resolvedScriptPath = resolveCommand(scriptPath, cwd?.toString());
+  const cwd = opts?.execaOptions?.cwd ?? process.cwd();
+
+  // N.B. This function uses `which`, which requires that the target file have
+  // executable permissions set, which is not required here because we are
+  // running the script with Node.
+  // const resolvedScriptPath = resolveCommand(scriptPath, cwd?.toString());
+
+  const resolvedScriptPath = path.isAbsolute(scriptPath)
+    ? scriptPath
+    : path.resolve(cwd, scriptPath);
+
   const cmd = execa.node(resolvedScriptPath, parsedArguments, merge(commonExecaOptions, opts?.execaOptions ?? {}));
   const escapedCommand = getEscapedCommand(undefined, cmd.spawnargs);
   log.verbose(log.prefix(`cmd:${name}`), 'exec:', log.chalk.gray(escapedCommand));
