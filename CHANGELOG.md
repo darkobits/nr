@@ -1,3 +1,10 @@
+## [0.14.30](https://github.com/darkobits/nr/compare/v0.14.29...v0.14.30) (2023-02-14)
+
+
+### 🐞 Bug Fixes
+
+* Do not invoke `resolveCommand` for Node commands. ([cbe160a](https://github.com/darkobits/nr/commit/cbe160a59c01606726cb095788f151c4db4acfff))
+
 ## [0.14.29](https://github.com/darkobits/nr/compare/v0.14.28...v0.14.29) (2023-01-30)
 
 
