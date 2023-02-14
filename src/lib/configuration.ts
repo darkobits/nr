@@ -31,6 +31,7 @@ export default async function loadConfig({ argv, config, configPath, configIsEmp
   // Handle ESM interop issues resulting in multiple nested "default" properties
   // on modules.
   let configFn = config ?? {};
+
   while (Reflect.has(configFn, 'default')) {
     configFn = Reflect.get(configFn, 'default');
   }
@@ -38,21 +39,14 @@ export default async function loadConfig({ argv, config, configPath, configIsEmp
   // If the config file did not default-export a function, throw.
   if (typeof configFn !== 'function') {
     log.verbose(log.prefix('config'), configFn);
-    throw new TypeError(`Expected default export of configuration file at ${log.chalk.green(configPath)} to be of type "function", got "${typeof config}".`);
+    throw new TypeError(`Expected default export of configuration file at ${log.chalk.green(configPath)} to be of type "function", got "${typeof configFn}".`);
   }
 
-  // Invoke the user's configuration function.
-  await configFn({
-    command,
-    script,
-    task,
-    isCI
-  });
+  // Invoke the user's configuration function with the necessary context.
+  await configFn({ command, script, task, isCI });
 
   // Ensure that the user's configuration function actually did something.
   if (commands.size === 0 && tasks.size === 0 && scripts.size === 0) {
     throw new Error(`Configuration file at ${log.chalk.green(configPath)} did not register any commands, tasks, or scripts.`);
   }
-
-  return config;
 }

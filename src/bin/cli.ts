@@ -64,13 +64,13 @@ cli.command<CLIArguments, ConfigurationFactory>({
 
     command.epilogue(log.chalk.gray('For full usage instructions, see https://github.com/darkobits/nr'));
   },
-  handler: async context => {
+  handler: async saffronContext => {
     try {
       // Load the user's configuration file, which should populate the commands,
       // tasks, and/or scripts registries.
-      await loadConfig(context);
+      await loadConfig(saffronContext);
 
-      const { argv } = context;
+      const { argv } = saffronContext;
 
       // If the --commands, --tasks, or --scripts flags were used, print
       // information about the indicated instruction type, then bail.

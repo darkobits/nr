@@ -133,7 +133,8 @@ export function printScriptInfo() {
 
   const groupsUsed = R.any(R.hasPath(['options', 'group']), allScripts);
   const scriptSources = R.uniq(R.map(R.path(['sourcePackage']), allScripts));
-  const multipleSources = scriptSources.length > 1 || !R.includes('local', scriptSources);
+  const multipleSources = scriptSources.length > 1; // || !R.includes('local', scriptSources);
+  const onlyLocalSources = scriptSources.length === 1 && R.includes('local', scriptSources);
 
   const printScript = (descriptor: ScriptDescriptor) => {
     const { name, sourcePackage, options: { description } } = descriptor;
@@ -142,8 +143,13 @@ export function printScriptInfo() {
 
     if (multipleSources) {
       if (sourcePackage !== 'unknown') {
-        // includes "local", and other third-party packages.
-        segments.push(`${log.chalk.green(name)} ${log.chalk.gray.dim(`(${sourcePackage})`)}`);
+        if (sourcePackage === 'local') {
+          // Scripts from the local package.
+          segments.push(`${log.chalk.green(name)} ${log.chalk.dim(`(${sourcePackage})`)}`);
+        } else {
+          // Scripts from third-party packages.
+          segments.push(`${log.chalk.green(name)} ${log.chalk.dim(`(from ${sourcePackage})`)}`);
+        }
       } else {
         // if the source is "unknown", only show the script's name.
         segments.push(`${log.chalk.green(name)}`);
@@ -166,6 +172,10 @@ export function printScriptInfo() {
   };
 
   console.log(`${EOL}${log.chalk.bold('Available scripts:')}`);
+
+  if (!onlyLocalSources && !multipleSources) {
+    console.log(`${log.chalk.dim(`└─ All scripts from ${scriptSources[0]}.`)}`);
+  }
 
   if (groupsUsed) {
     R.forEachObjIndexed((scriptConfigs, groupName) => {
