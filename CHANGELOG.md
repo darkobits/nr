@@ -1,3 +1,10 @@
+## [0.14.31-beta.1](https://github.com/darkobits/nr/compare/v0.14.30...v0.14.31-beta.1) (2023-02-14)
+
+
+### 🛠 Refactoring
+
+* Build with Vite. ([95b9e9d](https://github.com/darkobits/nr/commit/95b9e9d9e71718a1e6a7e3bc0e11db63f8ca4d0f))
+
 ## [0.14.30](https://github.com/darkobits/nr/compare/v0.14.29...v0.14.30) (2023-02-14)
 
 
