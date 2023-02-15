@@ -1,3 +1,15 @@
+## [0.14.33](https://github.com/darkobits/nr/compare/v0.14.32...v0.14.33) (2023-02-15)
+
+
+### 🏗 Chores
+
+* **deps:** Update dependencies. ([2a29a34](https://github.com/darkobits/nr/commit/2a29a34176a0583d505353c3747aa3f6428dbcd1))
+
+
+### 🛠 Refactoring
+
+* Revert to publishing as CommonJS. ([e2b9b6b](https://github.com/darkobits/nr/commit/e2b9b6b2a447d67b78f517bc34bbb6b4e01409eb))
+
 ## [0.14.32](https://github.com/darkobits/nr/compare/v0.14.31...v0.14.32) (2023-02-14)
 
 
