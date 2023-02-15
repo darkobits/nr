@@ -1,3 +1,11 @@
+## [0.14.34](https://github.com/darkobits/nr/compare/v0.14.33...v0.14.34) (2023-02-15)
+
+
+### 🏗 Chores
+
+* **deps:** Update dependencies. ([a82b4c9](https://github.com/darkobits/nr/commit/a82b4c997261578f9496d9435ab76dc5470a90e8))
+* Run fixtures locally after builds. ([7676836](https://github.com/darkobits/nr/commit/7676836683f80f3c360b7171f09043e69825395e))
+
 ## [0.14.33](https://github.com/darkobits/nr/compare/v0.14.32...v0.14.33) (2023-02-15)
 
 
