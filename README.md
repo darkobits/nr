@@ -1,6 +1,16 @@
-<a href="#top" id="top">
-  <img src="https://user-images.githubusercontent.com/441546/125690793-94572887-8b20-4914-aa53-68fe60d89b9a.png" style="max-width: 100%;">
-</a>
+<p align="center">
+  <picture>
+    <source
+      media="(prefers-color-scheme: dark)"
+      srcset="https://user-images.githubusercontent.com/441546/220861827-236ad693-604e-482f-8f53-c1bb81f0643d.png"
+    >
+    <img
+      src="https://user-images.githubusercontent.com/441546/220861827-236ad693-604e-482f-8f53-c1bb81f0643d.png"
+      width="360"
+      alt="NR Logo"
+    >
+  </picture>
+</p>
 <p align="center">
   <a href="https://www.npmjs.com/package/@darkobits/nr"><img src="https://img.shields.io/npm/v/@darkobits/nr.svg?style=flat-square"></a>
   <a href="https://github.com/darkobits/nr/actions?query=workflow%3Aci"><img src="https://img.shields.io/github/actions/workflow/status/darkobits/nr/ci.yml?style=flat-square"></a>
