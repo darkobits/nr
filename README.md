@@ -265,12 +265,12 @@ export default ({ command, task, script }) => {
 
 > **Warning**
 >
-> Scripts will deference their instructions at the time the script is defined. For instructions passed
-> by value, this means that if the value is changed after the invocation of `script`, the new value will
-> not be used. For instructions referenced using a string, this means that if another instruction is
-> created after the invocation of `script` that uses the same name as an instruction in the script
-> (something `nr` permits), the script will still use the value as it was at the time `script` was
-> invoked.
+> Scripts will deference their instructions after the entire configuration file has been parsed. This
+> means that if a script calls a command via a string token and something downstream re-defines a new
+> command with the same name, the script will use the latter implementation of the command. This can be
+> a powerful feature, allowing shareable configurations that users can modify in very specific ways. If
+> you want to ensure that a script always uses a specific version of a command, use the pass-by-value
+> method instead of a string token.
 
 ---
 
