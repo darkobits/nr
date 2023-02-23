@@ -11,6 +11,7 @@
     "type": "git",
     "url": "https://github.com/darkobits/nr"
   },
+  "homepage": "https://darkobits.gitbook.io/nr",
   "files": [
     "dist"
   ],
@@ -28,8 +29,9 @@
     "help": "nr --scripts"
   },
   "dependencies": {
+    "@darkobits/interop-import-default": "^0.1.1",
     "@darkobits/log": "^2.0.0-beta.15",
-    "@darkobits/saffron": "~0.31.0",
+    "@darkobits/saffron": "~0.31.1",
     "@types/is-ci": "^3.0.0",
     "@types/yargs-unparser": "^2.0.1",
     "callsites": "~3.1.0",
@@ -41,7 +43,7 @@
     "micromatch": "^4.0.5",
     "node-emoji": "^1.11.0",
     "npm-run-path": "~4.0.1",
-    "ow": "^0.28.1",
+    "ow": "~0.28.1",
     "p-all": "~3.0.0",
     "p-series": "~2.1.0",
     "ramda": "^0.28.0",
@@ -51,7 +53,7 @@
   },
   "devDependencies": {
     "@darkobits/eslint-plugin": "^0.3.2",
-    "@darkobits/ts": "~0.14.0",
+    "@darkobits/ts": "~0.14.15",
     "@types/micromatch": "^4.0.2",
     "@types/node-emoji": "^1.8.2",
     "@types/ramda": "^0.28.23",

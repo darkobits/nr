@@ -92,4 +92,6 @@ typings/
 # Build artifacts
 /dist*
 
+# Miscellany
+/assets
 /fixtures

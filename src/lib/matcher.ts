@@ -1,5 +1,7 @@
 import micromatch from 'micromatch';
 
+import ow from 'lib/ow';
+
 
 /**
  * @private
@@ -18,7 +20,7 @@ function isSingleSegment(input: string) {
  */
 export default function match(haystack: Array<string>, needle: string | undefined): string | undefined {
   // Validate haystack type.
-  // ow(haystack, 'script list', ow.array.ofType(ow.string));
+  ow(haystack, 'script list', ow.array.ofType(ow.string));
 
   if (!needle) {
     return;
