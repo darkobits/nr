@@ -1,3 +1,22 @@
+## [0.14.35](https://github.com/darkobits/nr/compare/v0.14.34...v0.14.35) (2023-02-23)
+
+
+### 🛠 Refactoring
+
+* Re-enable `ow`. ([e094fc5](https://github.com/darkobits/nr/commit/e094fc514bc97419948b7ddb17ed0f359ca78d00))
+
+
+### 📖 Documentation
+
+* Update README. ([1786722](https://github.com/darkobits/nr/commit/17867222df03916db0c8a42873be9ce29f05deb4))
+* Update README. ([1b7b7c6](https://github.com/darkobits/nr/commit/1b7b7c67bbacb78c1ea4e8edac9f03ddd3df6dfd))
+
+
+### 🏗 Chores
+
+* **deps:** Update dependencies. ([0499969](https://github.com/darkobits/nr/commit/0499969cc7c2ed4fce06a64cce47d7f58c74840e))
+* **release:** 0.14.35-beta.1 ([b51b3f0](https://github.com/darkobits/nr/commit/b51b3f0e1087de4472dc8475cc9b772c163fc1ab))
+
 ## [0.14.35-beta.1](https://github.com/darkobits/nr/compare/v0.14.34...v0.14.35-beta.1) (2023-02-23)
 
 
