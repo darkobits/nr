@@ -5,7 +5,7 @@ import * as R from 'ramda';
 
 import { IS_TASK_THUNK } from 'etc/constants';
 import log from 'lib/log';
-// import ow from 'lib/ow';
+import ow from 'lib/ow';
 import { getPackageNameFromCallsite } from 'lib/utils';
 
 import type {
@@ -66,8 +66,8 @@ export function printTaskInfo() {
 export function task(name: string, taskFn: TaskFn) {
   try {
     // Validate parameters.
-    // ow(name, 'task name', ow.string);
-    // ow(taskFn, 'task function', ow.function);
+    ow(name, 'task name', ow.string);
+    ow(taskFn, 'task function', ow.function);
 
     // Get the name of the package that defined this task.
     const sourcePackage = getPackageNameFromCallsite(callsites()[1]);

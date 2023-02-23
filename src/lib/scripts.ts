@@ -21,7 +21,7 @@ import {
 import { commands } from 'lib/commands';
 import log from 'lib/log';
 import matchSegmentedName from 'lib/matcher';
-// import ow from 'lib/ow';
+import ow from 'lib/ow';
 import { tasks } from 'lib/tasks';
 import {
   caseInsensitiveGet,
@@ -252,22 +252,22 @@ export async function executeScript(script: ScriptDescriptor) {
 export function script(name: string, opts: ScriptOptions) {
   try {
     // Validate name.
-    // ow(name, 'script name', ow.string);
+    ow(name, 'script name', ow.string);
 
     // Validate options.
-    // ow<Required<ScriptOptions>>(opts, ow.object.exactShape({
-    //   description: ow.optional.string,
-    //   group: ow.optional.string,
-    //   run: ow.array.ofType(ow.any(
-    //     ow.string,
-    //     ow.function,
-    //     ow.array.ofType(ow.any(
-    //       ow.string,
-    //       ow.function
-    //     ))
-    //   )),
-    //   timing: ow.optional.boolean
-    // }));
+    ow<Required<ScriptOptions>>(opts, ow.object.exactShape({
+      description: ow.optional.string,
+      group: ow.optional.string,
+      run: ow.array.ofType(ow.any(
+        ow.string,
+        ow.function,
+        ow.array.ofType(ow.any(
+          ow.string,
+          ow.function
+        ))
+      )),
+      timing: ow.optional.boolean
+    }));
 
     // Get the name of the package that defined this script.
     const sourcePackage = getPackageNameFromCallsite(callsites()[1]);
