@@ -6,7 +6,7 @@
     >
     <img
       src="https://user-images.githubusercontent.com/441546/220861827-236ad693-604e-482f-8f53-c1bb81f0643d.png"
-      width="360"
+      width="280"
       alt="NR Logo"
     >
   </picture>
@@ -18,12 +18,18 @@
   <a href="https://conventionalcommits.org"><img src="https://img.shields.io/static/v1?label=commits&message=conventional&style=flat-square&color=398AFB"></a>
 </p>
 
-`nr` (shorthand for "[NPM run](https://docs.npmjs.com/cli/v7/commands/npm-run-script)") is a task runner for JavaScript projects. It can serve as a replacement for or complement to
-traditional [NPM package scripts](https://docs.npmjs.com/cli/v7/using-npm/scripts).
+<br />
+
+`nr` (short for [`npm run`](https://docs.npmjs.com/cli/v7/commands/npm-run-script)) is a
+[task runner](https://www.smashingmagazine.com/2016/06/harness-machines-productive-task-runners/) for
+JavaScript projects.
+
+It can serve as a replacement for or complement to traditional [NPM package scripts](https://docs.npmjs.com/cli/v7/using-npm/scripts).
 
 ## Contents
 
 - [Install](#install)
+- [Philosophy](#philosophy)
 - [Configure](#configure)
   - [`command`](#command)
   - [`task`](#task)
@@ -35,7 +41,6 @@ traditional [NPM package scripts](https://docs.npmjs.com/cli/v7/using-npm/script
   - [Discoverability](#discoverability)
   - [Providing an Explicit Configuration File](#providing-an-explicit-configuration-file)
 - [Prior Art](#prior-art)
-
 
 # Install
 
@@ -51,6 +56,27 @@ You may install `nr` globally, but this is highly discouraged; a project that de
 enumerate it in its `devDependencies`, guaranteeing version compatibility. And, if your `$PATH` is
 configured to include `$(npm bin)`, the developer experience is identical to installing `nr` globally.
 
+# Philosophy
+
+> _tl;dr Modern task runners don't need plugin systems._
+
+When tools like Grunt and Gulp were conceived, it was common to build JavaScript projects by manually
+streaming source files from one tool to another, each performing some specific modification before
+writing the resulting set of files to an adjacent directory for distribution.
+
+This pattern almost always relied on [Node streams](https://nodejs.org/api/stream.html), a notoriously
+unwieldy API, resulting in the need for a [plugin](https://www.npmjs.com/search?q=gulp%20plugin) for
+each tool that a task-runner supported, pushing a lot of complexity from build tools up to the
+developers that used them.
+
+Modern tools like Babel, Webpack, TypeScript, and Vite allow for robust enough configuration that they
+can often perform all of these jobs using a single invocation of a (usually well-documented)
+command-line interface, making the need for another layer of abstraction between the user and the CLI
+superfluous.
+
+Rather than relying on plugins to interface with tooling, `nr` provides an API for invoking other CLIs,
+and a means to formalize these invocations in a JavaScript configuration file.
+
 # Configure
 
 `nr` is configured using a JavaScript configuration file, `nr.config.js`, or a TypeScript configuration
@@ -60,10 +86,10 @@ then every directory above it until a configuration file is found.
 A configuration file is responsible for creating **commands**, **tasks**, and **scripts**:
 
 - **Commands** describe the invocation of a single executable and any arguments provided to it, as well
-  as any configuration related to how the command will run.
-- **Tasks** are functions that may execute arbitrary code. They may be synchronous or asynchronous. `nr`
-  will `await` these functions so that script pipelines behave the same way regardless of how a task is
-  implemented.
+  as any configuration related to how the command will run, such as environment variables and how STDIN
+  and STDOUT will be handled.
+- **Tasks** are functions that may execute arbitrary code. They may be synchronous or asynchronous.
+  Tasks can be used to interface with another program's Node API, for example.
 - **Scripts** compose commands, tasks, and other scripts that may run sequentially, in parallel, or a
   combination of both.
 
@@ -386,6 +412,8 @@ To have `nr` skip searching for a configuration file and use a file at a particu
   by [Sindre is a Horse](https://sindresorhus.com/).
 - [`npm-run-all`](https://www.npmjs.com/package/npm-run-all) - The original package scripts
   parallelization tool.
+- [Grunt](https://github.com/gruntjs/grunt) - _The JavaScript task-runner_.
+- [Gulp](https://github.com/gulpjs/gulp) - _The streaming build system_.
 
 <br />
 <a href="#top">
