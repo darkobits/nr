@@ -35,28 +35,27 @@
     "@types/is-ci": "^3.0.0",
     "@types/yargs-unparser": "^2.0.1",
     "callsites": "~3.1.0",
-    "deepmerge": "^4.3.0",
+    "deepmerge": "^4.3.1",
     "errno": "^1.0.0",
     "execa": "~5.1.1",
     "is-ci": "^3.0.1",
     "kebabcase-keys": "^1.0.0",
     "micromatch": "^4.0.5",
-    "node-emoji": "^1.11.0",
+    "node-emoji": "^2.0.2",
     "npm-run-path": "~4.0.1",
     "ow": "~0.28.1",
     "p-all": "~3.0.0",
     "p-series": "~2.1.0",
     "ramda": "^0.28.0",
     "read-pkg-up": "~7.0.1",
-    "which": "^3.0.0",
+    "which": "^3.0.1",
     "yargs-unparser": "^2.0.0"
   },
   "devDependencies": {
-    "@darkobits/eslint-plugin": "^0.3.2",
-    "@darkobits/ts": "~0.14.17",
+    "@darkobits/ts": "~0.15.4",
     "@types/micromatch": "^4.0.2",
     "@types/node-emoji": "^1.8.2",
-    "@types/ramda": "^0.28.23",
-    "@types/which": "^2.0.2"
+    "@types/ramda": "^0.28.0",
+    "@types/which": "^3.0.0"
   }
 }

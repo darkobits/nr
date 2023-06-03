@@ -51,7 +51,7 @@ export function getEscapedCommand(file: string | undefined, args: Array<string>)
 
   const escapeArg = (arg: string | undefined) => (typeof arg !== 'string' || /^[\w.-]+$/.test(arg)
     ? arg
-    : `"${arg.replace(/"/g, '\\"')}"`);
+    : `"${arg.replaceAll('"', '\\"')}"`);
 
   return normalizeArgs(file, args).map(arg => escapeArg(arg)).join(' ').trim();
 }
