@@ -1,7 +1,7 @@
 import { EOL } from 'os';
 
 import { default as callsites } from 'callsites';
-import emoji from 'node-emoji';
+// import emoji from 'node-emoji';
 import pAll from 'p-all';
 import pSeries from 'p-series';
 import * as R from 'ramda';
@@ -123,7 +123,10 @@ function resolveInstruction(value: Instruction): Thunk {
  * is in the users $PATH and can be invoked directly, or if the user needs to
  * use `npx`.
  */
-export function printScriptInfo() {
+export async function printScriptInfo() {
+  // N.B. This package is ESM and we are not.
+  const emoji = await import('node-emoji');
+
   const allScripts = Array.from(scripts.values());
 
   if (allScripts.length === 0) {

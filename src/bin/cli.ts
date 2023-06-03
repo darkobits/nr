@@ -76,7 +76,7 @@ cli.command<CLIArguments, ConfigurationFactory>({
       // information about the indicated instruction type, then bail.
       if (argv.commands) return printCommandInfo();
       if (argv.tasks) return printTaskInfo();
-      if (argv.scripts) return printScriptInfo();
+      if (argv.scripts) return await printScriptInfo();
 
       // Otherwise, ensure that a query was provided.
       if (!argv.query) {
