@@ -1,3 +1,15 @@
+## [0.14.36-beta.2](https://github.com/darkobits/nr/compare/v0.14.36-beta.1...v0.14.36-beta.2) (2023-06-10)
+
+
+### 📖 Documentation
+
+* Update README. ([6df30e1](https://github.com/darkobits/nr/commit/6df30e1552bada8d35983023bfe0b5086218b124))
+
+
+### 🏗 Chores
+
+* Update LICENSE. ([ad38098](https://github.com/darkobits/nr/commit/ad38098801f762bf45f9ac10b44e6e8ed0175e30))
+
 ## [0.14.36-beta.1](https://github.com/darkobits/nr/compare/v0.14.35...v0.14.36-beta.1) (2023-06-03)
 
 
