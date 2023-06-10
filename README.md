@@ -3,19 +3,40 @@
     <source
       media="(prefers-color-scheme: dark)"
       srcset="https://user-images.githubusercontent.com/441546/220861827-236ad693-604e-482f-8f53-c1bb81f0643d.png"
+      width="360"
     >
     <img
       src="https://user-images.githubusercontent.com/441546/220861827-236ad693-604e-482f-8f53-c1bb81f0643d.png"
-      width="280"
-      alt="NR Logo"
+      width="360"
     >
   </picture>
 </p>
 <p align="center">
-  <a href="https://www.npmjs.com/package/@darkobits/nr"><img src="https://img.shields.io/npm/v/@darkobits/nr.svg?style=flat-square"></a>
-  <a href="https://github.com/darkobits/nr/actions?query=workflow%3Aci"><img src="https://img.shields.io/github/actions/workflow/status/darkobits/nr/ci.yml?style=flat-square"></a>
-  <a href="https://depfu.com/repos/github/darkobits/nr"><img src="https://img.shields.io/depfu/darkobits/nr?style=flat-square"></a>
-  <a href="https://conventionalcommits.org"><img src="https://img.shields.io/static/v1?label=commits&message=conventional&style=flat-square&color=398AFB"></a>
+  <a
+    href="https://www.npmjs.com/package/@darkobits/nr"
+  ><img
+    src="https://img.shields.io/npm/v/@darkobits/nr.svg?style=flat-square"
+  ></a>
+  <a
+    href="https://github.com/darkobits/nr/actions?query=workflow%3Aci"
+  ><img
+    src="https://img.shields.io/github/actions/workflow/status/darkobits/nr/ci.yml?style=flat-square"
+  ></a>
+  <a
+    href="https://depfu.com/repos/github/darkobits/nr"
+  ><img
+    src="https://img.shields.io/depfu/darkobits/nr?style=flat-square"
+  ></a>
+  <a
+    href="https://conventionalcommits.org"
+  ><img
+    src="https://img.shields.io/static/v1?label=commits&message=conventional&style=flat-square&color=398AFB"
+  ></a>
+    <a
+    href="https://firstdonoharm.dev"
+  ><img
+    src="https://img.shields.io/static/v1?label=license&message=hippocratic&style=flat-square&color=753065"
+  ></a>
 </p>
 
 <br />
