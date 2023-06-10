@@ -1,3 +1,22 @@
+## [0.14.36](https://github.com/darkobits/nr/compare/v0.14.35...v0.14.36) (2023-06-10)
+
+
+### 🐞 Bug Fixes
+
+* Use dynamic import for `node-emoji`. ([c8c737a](https://github.com/darkobits/nr/commit/c8c737a4ec82591520f1c5d9d9706fc43fc06291))
+
+
+### 📖 Documentation
+
+* Update README. ([6df30e1](https://github.com/darkobits/nr/commit/6df30e1552bada8d35983023bfe0b5086218b124))
+
+
+### 🏗 Chores
+
+* **deps:** Update dependencies. ([a9852a5](https://github.com/darkobits/nr/commit/a9852a5d49b17251d474356e5a91c55fa79b84d8))
+* **release:** 0.14.36-beta.1 ([912197e](https://github.com/darkobits/nr/commit/912197e1bf86e359c9ac553faa8dd1207c446734))
+* Update LICENSE. ([8ad5190](https://github.com/darkobits/nr/commit/8ad5190a1eaeb6ffc46dd890cc66aed54a60c16a))
+
 ## [0.14.36-beta.1](https://github.com/darkobits/nr/compare/v0.14.35...v0.14.36-beta.1) (2023-06-03)
 
 
