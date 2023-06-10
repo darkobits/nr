@@ -32,7 +32,7 @@
   ><img
     src="https://img.shields.io/static/v1?label=commits&message=conventional&style=flat-square&color=398AFB"
   ></a>
-    <a
+  <a
     href="https://firstdonoharm.dev"
   ><img
     src="https://img.shields.io/static/v1?label=license&message=hippocratic&style=flat-square&color=753065"
@@ -81,7 +81,7 @@ configured to include `$(npm bin)`, the developer experience is identical to ins
 
 > _tl;dr Modern task runners don't need plugin systems._
 
-When tools like Grunt and Gulp were conceived, it was common to build JavaScript projects by manually
+When tools like Grunt and Gulp were conceived, it was common to build JavaScript projects by explicitly
 streaming source files from one tool to another, each performing some specific modification before
 writing the resulting set of files to an adjacent directory for distribution.
 
@@ -92,8 +92,8 @@ developers that used them.
 
 Modern tools like Babel, Webpack, TypeScript, and Vite allow for robust enough configuration that they
 can often perform all of these jobs using a single invocation of a (usually well-documented)
-command-line interface, making the need for another layer of abstraction between the user and the CLI
-superfluous.
+command-line interface, making plugin systems a superfluous layer of abstraction between the user and
+the CLI.
 
 Rather than relying on plugins to interface with tooling, `nr` provides an API for invoking other CLIs,
 and a means to formalize these invocations in a JavaScript configuration file.
