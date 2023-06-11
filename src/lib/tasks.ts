@@ -37,7 +37,9 @@ export function printTaskInfo() {
 
   console.log(`${EOL}${log.chalk.bold('Available tasks:')}${EOL}`);
 
-  R.forEach(task => {
+  // N.B. Ramda broke inference for array member types when using R.forEach in
+  // 0.29.0.
+  allTasks.forEach(task => {
     const segments: Array<string> = [];
 
     if (multipleSources) {
@@ -53,7 +55,7 @@ export function printTaskInfo() {
     }
 
     console.log(segments.join(EOL));
-  }, allTasks);
+  });
 
   console.log('');
 }

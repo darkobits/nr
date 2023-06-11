@@ -46,16 +46,16 @@
     "ow": "~0.28.1",
     "p-all": "~3.0.0",
     "p-series": "~2.1.0",
-    "ramda": "^0.28.0",
+    "ramda": "^0.29.0",
     "read-pkg-up": "~7.0.1",
     "which": "^3.0.1",
     "yargs-unparser": "^2.0.0"
   },
   "devDependencies": {
-    "@darkobits/ts": "~0.15.4",
+    "@darkobits/ts": "~0.16.1",
     "@types/micromatch": "^4.0.2",
     "@types/node-emoji": "^1.8.2",
-    "@types/ramda": "^0.28.0",
+    "@types/ramda": "^0.29.2",
     "@types/which": "^3.0.0"
   }
 }

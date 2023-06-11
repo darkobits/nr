@@ -244,7 +244,9 @@ export function printCommandInfo() {
 
   console.log(`${EOL}${log.chalk.bold('Available commands:')}${EOL}`);
 
-  R.forEach(command => {
+  // N.B. Ramda broke inference for array member types when using R.forEach in
+  // 0.29.0.
+  allCommands.forEach(command => {
     const segments: Array<string> = [];
     const executable = command.arguments[0];
     const argumentsString = unParseArguments(command.arguments, command.options?.preserveArgumentCasing).join(' ');
@@ -264,7 +266,7 @@ export function printCommandInfo() {
     segments.push(`${log.chalk.gray.dim('└─')} ${log.chalk.gray(executable)} ${log.chalk.gray(argumentsString)}`);
 
     console.log(segments.join(EOL));
-  }, allCommands);
+  });
 
   console.log('');
 }
