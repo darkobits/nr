@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import cli from '@darkobits/saffron';
+import * as cli from '@darkobits/saffron';
 
 import { printCommandInfo } from 'lib/commands';
 import loadConfig from 'lib/configuration';
