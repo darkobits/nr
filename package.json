@@ -29,9 +29,9 @@
     "help": "nr --scripts"
   },
   "dependencies": {
-    "@darkobits/interop-import-default": "^0.1.1",
+    "@darkobits/interop-import-default": "^1.0.0",
     "@darkobits/log": "^2.0.0-beta.15",
-    "@darkobits/saffron": "~0.31.1",
+    "@darkobits/saffron": "~0.32.0",
     "@types/is-ci": "^3.0.0",
     "@types/yargs-unparser": "^2.0.1",
     "callsites": "~3.1.0",
@@ -52,7 +52,7 @@
     "yargs-unparser": "^2.0.0"
   },
   "devDependencies": {
-    "@darkobits/ts": "~0.16.1",
+    "@darkobits/ts": "~0.16.2",
     "@types/micromatch": "^4.0.2",
     "@types/node-emoji": "^1.8.2",
     "@types/ramda": "^0.29.2",
