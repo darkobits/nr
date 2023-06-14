@@ -1,3 +1,10 @@
+## [0.14.39](https://github.com/darkobits/nr/compare/v0.14.38...v0.14.39) (2023-06-14)
+
+
+### 🛠 Refactoring
+
+* Update `cli.ts`. ([2412472](https://github.com/darkobits/nr/commit/24124728c63c074957f37dc0918a23889bebc034))
+
 ## [0.14.38](https://github.com/darkobits/nr/compare/v0.14.37...v0.14.38) (2023-06-14)
 
 
