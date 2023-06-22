@@ -1,3 +1,10 @@
+## [0.14.40-beta.1](https://github.com/darkobits/nr/compare/v0.14.39...v0.14.40-beta.1) (2023-06-22)
+
+
+### 🛠 Refactoring
+
+* Publish as ESM. ([5f56d4a](https://github.com/darkobits/nr/commit/5f56d4a6f327d905896153b394b008a372e5ffbb))
+
 ## [0.14.39](https://github.com/darkobits/nr/compare/v0.14.38...v0.14.39) (2023-06-14)
 
 
