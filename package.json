@@ -3,7 +3,8 @@
   "version": "0.14.39",
   "description": "A modern, type-safe task runner for JavaScript projects.",
   "author": "darkobits",
-  "license": "WTFPL",
+  "license": "Hippocratic",
+  "type": "module",
   "engines": {
     "node": ">=16"
   },
@@ -31,7 +32,7 @@
   "dependencies": {
     "@darkobits/interop-import-default": "^1.0.0",
     "@darkobits/log": "^2.0.0-beta.15",
-    "@darkobits/saffron": "~0.32.0",
+    "@darkobits/saffron": "0.32.2-beta.1",
     "@types/is-ci": "^3.0.0",
     "@types/yargs-unparser": "^2.0.1",
     "callsites": "~3.1.0",
@@ -41,7 +42,7 @@
     "is-ci": "^3.0.1",
     "kebabcase-keys": "^1.0.0",
     "micromatch": "^4.0.5",
-    "node-emoji": "^2.0.2",
+    "node-emoji": "^2.1.0",
     "npm-run-path": "~4.0.1",
     "ow": "~0.28.1",
     "p-all": "~3.0.0",
@@ -52,7 +53,7 @@
     "yargs-unparser": "^2.0.0"
   },
   "devDependencies": {
-    "@darkobits/ts": "~0.16.2",
+    "@darkobits/ts": "~0.16.4",
     "@types/micromatch": "^4.0.2",
     "@types/node-emoji": "^1.8.2",
     "@types/ramda": "^0.29.2",

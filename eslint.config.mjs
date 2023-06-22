@@ -13,7 +13,8 @@ export default [
       'unicorn/prefer-spread': 'off',
       'unicorn/import-style': 'off',
       // TODO: Disable this in eslint-plugin.
-      'unicorn/expiring-todo-comments': 'off'
+      'unicorn/expiring-todo-comments': 'off',
+      'import/namespace': 'off'
     }
   }
 ];

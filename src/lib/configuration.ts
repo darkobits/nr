@@ -13,7 +13,8 @@ import type { CLIArguments, ConfigurationFactory } from 'etc/types';
 
 /**
  * Responsible for interpreting command line arguments and Cosmiconfig results
- * to locate and parse the user's configuration file, then return the results.
+ * from Saffron to locate and parse the user's configuration file, then return
+ * the results.
  */
 export default async function loadConfig({ argv, config, configPath, configIsEmpty }: SaffronHandlerContext<CLIArguments, ConfigurationFactory>) {
   // If the --config option was used, load the file at the indicated path.
