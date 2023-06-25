@@ -1,7 +1,7 @@
 import { EOL } from 'os';
 
+import boxen from 'boxen';
 import callsites from 'callsites';
-import * as emoji from 'node-emoji';
 import ow from 'ow';
 import pAll from 'p-all';
 import pSeries from 'p-series';
@@ -180,7 +180,7 @@ export function printScriptInfo() {
   if (groupsUsed) {
     R.forEachObjIndexed((scriptConfigs, groupName) => {
       console.log('');
-      console.log(log.chalk.underline(groupName));
+      console.log(log.chalk.bold.underline(groupName));
       R.forEach(printScript, scriptConfigs);
     }, R.groupBy<ScriptDescriptor>(descriptor => descriptor.options.group ?? 'Other', allScripts));
   } else {
@@ -200,9 +200,23 @@ export function printScriptInfo() {
   console.log('');
 
   if (nrIsInPath) {
-    console.log(log.chalk.gray(`${emoji.get('sparkles')} ${log.chalk.white.bold('nr')} is in your PATH. You can run scripts using: ${log.chalk.white('nr <script name>')}`));
+    console.log(boxen(
+      log.chalk.gray(`🟩  ${log.chalk.white.bold('nr')} is in your PATH; you can run scripts using ${log.chalk.white('nr <script name>')} `),
+      {
+        padding: 1,
+        backgroundColor: '#1f1f1f',
+        borderStyle: 'none'
+      }
+    ));
   } else {
-    console.log(log.chalk.gray(`${emoji.get('exclamation')} ${log.chalk.white.bold('nr')} is ${log.chalk.red('not')} in your PATH. You must run scripts using: ${log.chalk.white('npx nr <script name>')}`));
+    console.log(boxen(
+      log.chalk.gray(`🟨  ${log.chalk.white.bold('nr')} is ${log.chalk.yellow.bold('not')} in your PATH; you must run scripts using ${log.chalk.white('npx nr <script name>')}`),
+      {
+        padding: 1,
+        backgroundColor: '#1f1f1f',
+        borderStyle: 'none'
+      }
+    ));
   }
 }
 
