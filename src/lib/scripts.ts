@@ -1,7 +1,7 @@
 import { EOL } from 'os';
 
-import { default as callsites } from 'callsites';
-// import emoji from 'node-emoji';
+import callsites from 'callsites';
+import emoji from 'node-emoji';
 import pAll from 'p-all';
 import pSeries from 'p-series';
 import * as R from 'ramda';
@@ -123,10 +123,7 @@ function resolveInstruction(value: Instruction): Thunk {
  * is in the users $PATH and can be invoked directly, or if the user needs to
  * use `npx`.
  */
-export async function printScriptInfo() {
-  // N.B. This package is ESM and we are not.
-  const emoji = await import('node-emoji');
-
+export function printScriptInfo() {
   const allScripts = Array.from(scripts.values());
 
   if (allScripts.length === 0) {
@@ -216,35 +213,16 @@ export async function printScriptInfo() {
  */
 export function matchScript(value?: string) {
   const scriptNames = [...scripts.keys()];
-
-  if (scriptNames.length === 0) {
-    throw new Error('No scripts have been registered.');
-  }
+  if (scriptNames.length === 0) throw new Error('No scripts have been registered.');
 
   const scriptName = matchSegmentedName(scriptNames, value);
-  const descriptor = scripts.get(scriptName ?? '');
 
-  if (!descriptor) {
-    throw new Error(`"${value}" did not match any scripts.`);
-  }
+  const descriptor = scripts.get(scriptName ?? '');
+  if (!descriptor) throw new Error(`"${value}" did not match any scripts.`);
 
   log.verbose(log.prefix('matchScript'), `Matched ${log.chalk.green(value)} to script ${log.chalk.green(scriptName)}.`);
 
   return descriptor;
-}
-
-
-/**
- * Provided a script descriptor, executes the script and any pre/post scripts
- * associated with it.
- */
-export async function executeScript(script: ScriptDescriptor) {
-  // const preScript = caseInsensitiveGet(`pre${script.name}`, scripts);
-  // const postScript = caseInsensitiveGet(`post${script.name}`, scripts);
-
-  // if (preScript) await preScript.thunk();
-  await script.thunk();
-  // if (postScript) await postScript.thunk();
 }
 
 
@@ -306,25 +284,17 @@ export function script(name: string, opts: ScriptOptions) {
 
       log.verbose(log.prefix('script'), 'exec:', log.chalk.green(name));
 
-      // Run each item in the command list in series. If an item is itself an
-      // array, all commands in that step will be run in parallel.
       const preScript = caseInsensitiveGet(`pre${name}`, scripts);
+      if (preScript) await preScript.thunk();
 
-      if (preScript) {
-        await preScript.thunk();
-      }
-
+      // Run each Instruction in series. If an Instruction is an Array, all
+      // commands in that Instruction will be run in parallel.
       await pSeries(resolvedInstructions);
 
       const postScript = caseInsensitiveGet(`post${name}`, scripts);
+      if (postScript) await postScript.thunk();
 
-      if (postScript) {
-        await postScript.thunk();
-      }
-
-      if (opts.timing) {
-        log.info(log.prefix(name), log.chalk.gray(`Done in ${runTime}.`));
-      }
+      if (opts.timing) log.info(log.prefix(name), log.chalk.gray(`Done in ${runTime}.`));
     };
 
     Object.defineProperties(scriptThunk, {

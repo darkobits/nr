@@ -7,7 +7,6 @@ import loadConfig from 'lib/configuration';
 import log from 'lib/log';
 import {
   matchScript,
-  executeScript,
   printScriptInfo
 } from 'lib/scripts';
 import { printTaskInfo } from 'lib/tasks';
@@ -76,15 +75,15 @@ cli.command<CLIArguments, ConfigurationFactory>({
       // information about the indicated instruction type, then bail.
       if (argv.commands) return printCommandInfo();
       if (argv.tasks) return printTaskInfo();
-      if (argv.scripts) return await printScriptInfo();
+      if (argv.scripts) return printScriptInfo();
 
       // Otherwise, ensure that a query was provided.
       if (!argv.query) {
         throw new Error('No query provided. Run "nr --scripts" to show available scripts.');
       }
 
-      // Match and execute the indicated script.
-      await executeScript(matchScript(argv.query));
+      const script = matchScript(argv.query);
+      if (script) await script.thunk();
     } catch (err: any) {
       const { message, stack } = parseError(err);
       log.error(log.chalk.red.bold(message));

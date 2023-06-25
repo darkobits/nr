@@ -2,8 +2,8 @@ import { EOL } from 'os';
 
 // @ts-expect-error - This package does not have type definitions.
 import errno from 'errno';
-import npmRunPath from 'npm-run-path';
-import readPkgUp from 'read-pkg-up';
+import { npmRunPath } from 'npm-run-path';
+import { readPackageUpSync } from 'read-pkg-up';
 import which from 'which';
 
 import type { CallSite } from 'callsites';
@@ -67,9 +67,9 @@ export function getPackageNameFromCallsite(callSite: CallSite | undefined, fallb
   const fileName = callSite.getFileName();
   if (!fileName) return fallback;
 
-  const localPackage = readPkgUp.sync();
+  const localPackage = readPackageUpSync();
 
-  const sourcePackage = readPkgUp.sync({ cwd: fileName });
+  const sourcePackage = readPackageUpSync({ cwd: fileName });
   if (!sourcePackage) return fallback;
 
   if (localPackage && localPackage.packageJson.name === sourcePackage.packageJson.name) {
@@ -106,6 +106,7 @@ export function resolveCommand(cmd: string, cwd = process.cwd()) {
   } catch {
     throw Object.assign(
       new Error(`ENOENT: no such file or directory: '${cmd}'`),
+      // Attache 'code', 'description', and 'errno' properties to the error.
       errno.code.ENOENT
     );
   }

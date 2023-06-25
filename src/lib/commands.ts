@@ -1,9 +1,13 @@
 import { EOL } from 'os';
 import path from 'path';
 
-import { default as callsites } from 'callsites';
+import callsites from 'callsites';
 import merge from 'deepmerge';
-import execa, { Options as ExecaOptions } from 'execa';
+import {
+  execa,
+  execaNode,
+  type Options as ExecaOptions
+} from 'execa';
 // @ts-expect-error - This package does not have type definitions.
 import kebabCaseKeys from 'kebabcase-keys';
 import * as R from 'ramda';
@@ -116,7 +120,7 @@ const executeCommand: CommandExecutor = (name, executableName, parsedArguments, 
  * See: https://github.com/sindresorhus/execa#execanodescriptpath-arguments-options
  */
 const executeNodeCommand: CommandExecutor = (name, scriptPath, parsedArguments, opts) => {
-  const cwd = opts?.execaOptions?.cwd ?? process.cwd();
+  const cwd = opts?.execaOptions?.cwd?.toString() ?? process.cwd();
 
   // N.B. This function uses `which`, which requires that the target file have
   // executable permissions set, which is not required here because we are
@@ -127,7 +131,7 @@ const executeNodeCommand: CommandExecutor = (name, scriptPath, parsedArguments, 
     ? scriptPath
     : path.resolve(cwd, scriptPath);
 
-  const cmd = execa.node(resolvedScriptPath, parsedArguments, merge(commonExecaOptions, opts?.execaOptions ?? {}));
+  const cmd = execaNode(resolvedScriptPath, parsedArguments, merge(commonExecaOptions, opts?.execaOptions ?? {}));
   const escapedCommand = getEscapedCommand(undefined, cmd.spawnargs);
   log.verbose(log.prefix(`cmd:${name}`), 'exec:', log.chalk.gray(escapedCommand));
   return cmd;

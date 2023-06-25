@@ -1,6 +1,6 @@
 import { EOL } from 'os';
 
-import { default as callsites } from 'callsites';
+import callsites from 'callsites';
 import * as R from 'ramda';
 
 import { IS_TASK_THUNK } from 'etc/constants';
