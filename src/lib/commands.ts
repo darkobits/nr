@@ -10,12 +10,12 @@ import {
 } from 'execa';
 // @ts-expect-error - This package does not have type definitions.
 import kebabCaseKeys from 'kebabcase-keys';
+import ow from 'ow';
 import * as R from 'ramda';
 import yargsUnparser from 'yargs-unparser';
 
 import { IS_COMMAND_THUNK } from 'etc/constants';
 import log, { LogPipe } from 'lib/log';
-import ow from 'lib/ow';
 import {
   getEscapedCommand,
   getPackageNameFromCallsite

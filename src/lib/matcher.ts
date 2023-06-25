@@ -1,6 +1,5 @@
 import micromatch from 'micromatch';
-
-import ow from 'lib/ow';
+import ow from 'ow';
 
 
 /**

@@ -1,7 +1,8 @@
 import { EOL } from 'os';
 
 import callsites from 'callsites';
-import emoji from 'node-emoji';
+import * as emoji from 'node-emoji';
+import ow from 'ow';
 import pAll from 'p-all';
 import pSeries from 'p-series';
 import * as R from 'ramda';
@@ -21,7 +22,6 @@ import {
 import { commands } from 'lib/commands';
 import log from 'lib/log';
 import matchSegmentedName from 'lib/matcher';
-import ow from 'lib/ow';
 import { tasks } from 'lib/tasks';
 import {
   caseInsensitiveGet,

@@ -1,11 +1,11 @@
 import { EOL } from 'os';
 
 import callsites from 'callsites';
+import ow from 'ow';
 import * as R from 'ramda';
 
 import { IS_TASK_THUNK } from 'etc/constants';
 import log from 'lib/log';
-import ow from 'lib/ow';
 import { getPackageNameFromCallsite } from 'lib/utils';
 
 import type {
@@ -62,8 +62,8 @@ export function printTaskInfo() {
 
 
 /**
- * Provided a name and a task function, registers the task and returns a thunk
- * that, when called, will invoke the task function.
+ * Provided a name and function, registers a new task and returns a thunk that,
+ * when invoked, will call the task function.
  */
 export function task(name: string, taskFn: TaskFn) {
   try {
