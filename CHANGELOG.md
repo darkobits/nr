@@ -1,3 +1,10 @@
+## [0.14.40-beta.3](https://github.com/darkobits/nr/compare/v0.14.40-beta.2...v0.14.40-beta.3) (2023-06-25)
+
+
+### 🛠 Refactoring
+
+* Update script info logging. ([1454f56](https://github.com/darkobits/nr/commit/1454f5648d8260bb5a076b0d4d40dec823043dec))
+
 ## [0.14.40-beta.2](https://github.com/darkobits/nr/compare/v0.14.40-beta.1...v0.14.40-beta.2) (2023-06-25)
 
 
