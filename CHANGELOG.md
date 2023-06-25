@@ -1,3 +1,13 @@
+## [0.14.40-beta.2](https://github.com/darkobits/nr/compare/v0.14.40-beta.1...v0.14.40-beta.2) (2023-06-25)
+
+
+### 🏗 Chores
+
+* **deps:** Update `ow`. ([bb5fddf](https://github.com/darkobits/nr/commit/bb5fddfc904c9355c6a86454f1f70bf4910a7a9b))
+* **deps:** Update dependencies. ([97a77f4](https://github.com/darkobits/nr/commit/97a77f4651ec26c4e65781fe398400b64ec90f36))
+* **deps:** Update dependencies. ([9905bcc](https://github.com/darkobits/nr/commit/9905bcc9f5453b203e4c05fd0ed0c4488197612f))
+* **deps:** Update dependencies. ([14f5124](https://github.com/darkobits/nr/commit/14f5124a740981d8428547fa78f1feeae792dbfd))
+
 ## [0.14.40-beta.1](https://github.com/darkobits/nr/compare/v0.14.39...v0.14.40-beta.1) (2023-06-22)
 
 
