@@ -1,4 +1,4 @@
-export type { CLIArguments } from './CliArguments.ts';
+export type { CLIArguments } from './CliArguments';
 
 export type { CommandArguments } from './CommandArguments';
 export type { CommandDescriptor } from './CommandDescriptor';
