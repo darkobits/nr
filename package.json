@@ -32,7 +32,7 @@
   "dependencies": {
     "@darkobits/interop-import-default": "^1.0.0",
     "@darkobits/log": "^2.0.0-beta.15",
-    "@darkobits/saffron": "0.32.2-beta.11",
+    "@darkobits/saffron": "~0.32.3",
     "@types/is-ci": "^3.0.0",
     "@types/yargs-unparser": "^2.0.1",
     "boxen": "^7.1.0",
@@ -58,5 +58,10 @@
     "@types/node-emoji": "^1.8.2",
     "@types/ramda": "^0.29.2",
     "@types/which": "^3.0.0"
+  },
+  "overrides": {
+    "@darkobits/ts": {
+      "@darkobits/nr": "0.14.40-beta.4"
+    }
   }
 }
