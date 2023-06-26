@@ -1,3 +1,25 @@
+## [0.14.40](https://github.com/darkobits/nr/compare/v0.14.39...v0.14.40) (2023-06-26)
+
+
+### 🏗 Chores
+
+* **deps:** Update `ow`. ([bb5fddf](https://github.com/darkobits/nr/commit/bb5fddfc904c9355c6a86454f1f70bf4910a7a9b))
+* **deps:** Update dependencies. ([ad6a0bf](https://github.com/darkobits/nr/commit/ad6a0bfe314054bf6b0cf0837cea8973abdf86f2))
+* **deps:** Update dependencies. ([c9c2fda](https://github.com/darkobits/nr/commit/c9c2fdae8dca6c00246679f6dd15d89a894ebbc2))
+* **deps:** Update dependencies. ([97a77f4](https://github.com/darkobits/nr/commit/97a77f4651ec26c4e65781fe398400b64ec90f36))
+* **deps:** Update dependencies. ([9905bcc](https://github.com/darkobits/nr/commit/9905bcc9f5453b203e4c05fd0ed0c4488197612f))
+* **deps:** Update dependencies. ([14f5124](https://github.com/darkobits/nr/commit/14f5124a740981d8428547fa78f1feeae792dbfd))
+* **release:** 0.14.40-beta.1 ([804ed01](https://github.com/darkobits/nr/commit/804ed016c31ea5f8c0ac1d932e2ed4319c04c0ac))
+* **release:** 0.14.40-beta.2 ([d26551b](https://github.com/darkobits/nr/commit/d26551b6c0fb11f3815698137a47f5e0ee74d0fe))
+* **release:** 0.14.40-beta.3 ([6d1b039](https://github.com/darkobits/nr/commit/6d1b0394736220c534b64e731610ba50626812b0))
+* **release:** 0.14.40-beta.4 ([424ed2b](https://github.com/darkobits/nr/commit/424ed2b88b7fd4ab78c22e1f8a2a2a45e294a3a2))
+
+
+### 🛠 Refactoring
+
+* Publish as ESM. ([5f56d4a](https://github.com/darkobits/nr/commit/5f56d4a6f327d905896153b394b008a372e5ffbb))
+* Update script info logging. ([1454f56](https://github.com/darkobits/nr/commit/1454f5648d8260bb5a076b0d4d40dec823043dec))
+
 ## [0.14.40-beta.4](https://github.com/darkobits/nr/compare/v0.14.40-beta.3...v0.14.40-beta.4) (2023-06-25)
 
 
