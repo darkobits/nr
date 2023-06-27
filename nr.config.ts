@@ -13,7 +13,5 @@ export default nr(({ command, script, isCI }) => {
     timing: true
   });
 
-  if (!isCI) {
-    script('postBuild', { run: ['script:test.smoke'] });
-  }
+  if (!isCI) script('postBuild', { run: ['script:test.smoke'] });
 });

@@ -6,9 +6,12 @@ import * as R from 'ramda';
 
 import { IS_TASK_THUNK } from 'etc/constants';
 import log from 'lib/log';
-import { getPackageNameFromCallsite } from 'lib/utils';
+import { getPackageNameFromCallsite, getPrefixedInstructionName } from 'lib/utils';
 
+import type { SaffronHandlerContext } from '@darkobits/saffron';
 import type {
+  CLIArguments,
+  ConfigurationFactory,
   TaskDescriptor,
   TaskFn,
   TaskThunk
@@ -24,11 +27,16 @@ export const tasks = new Map<string, TaskDescriptor>();
 /**
  * Prints all available tasks.
  */
-export function printTaskInfo() {
+export function printTaskInfo(context: SaffronHandlerContext<CLIArguments, ConfigurationFactory>) {
   const allTasks = Array.from(tasks.values());
 
   if (allTasks.length === 0) {
-    console.log('No tasks have been registered.');
+    log.info('No tasks are registered.');
+    if (context.configPath) {
+      log.info(`Configuration file: ${context.configPath}`);
+    } else {
+      log.warn('No configuration file found.');
+    }
     return;
   }
 
@@ -75,12 +83,15 @@ export function task(name: string, taskFn: TaskFn) {
     const sourcePackage = getPackageNameFromCallsite(callsites()[1]);
 
     const taskThunk = async () => {
-      log.verbose(log.prefix('task'), 'exec:', log.chalk.green(name));
+      const logPrefix = getPrefixedInstructionName('task', name);
 
       try {
+        log.verbose(log.prefix(logPrefix), ': start');
+        const runTime = log.createTimer();
         await taskFn();
+        log.verbose(log.prefix(logPrefix), `: done in ${runTime}`);
       } catch (err: any) {
-        throw new Error(`Task "${name}" failed: ${err.message}`);
+        throw new Error(`[${logPrefix}] failed : ${err.message}`, { cause: err });
       }
     };
 
@@ -97,8 +108,6 @@ export function task(name: string, taskFn: TaskFn) {
 
     return taskThunk as TaskThunk;
   } catch (err: any) {
-    console.log(err);
-    err.message = `Unable to create task "${name}": ${err.message}`;
-    throw err;
+    throw new Error(`Unable to create task "${name}": ${err.message}`, { cause: err });
   }
 }

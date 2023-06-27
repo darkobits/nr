@@ -10,15 +10,9 @@ import * as R from 'ramda';
 import {
   IS_COMMAND_THUNK,
   IS_TASK_THUNK,
-  IS_SCRIPT_THUNK
+  IS_SCRIPT_THUNK,
+  NR_RED
 } from 'etc/constants';
-import {
-  ScriptOptions,
-  Instruction,
-  ScriptDescriptor,
-  ScriptThunk,
-  Thunk
-} from 'etc/types';
 import { commands } from 'lib/commands';
 import log from 'lib/log';
 import matchSegmentedName from 'lib/matcher';
@@ -26,8 +20,20 @@ import { tasks } from 'lib/tasks';
 import {
   caseInsensitiveGet,
   getPackageNameFromCallsite,
+  getPrefixedInstructionName,
   resolveCommand
 } from 'lib/utils';
+
+import type { SaffronHandlerContext } from '@darkobits/saffron';
+import type {
+  CLIArguments,
+  ConfigurationFactory,
+  ScriptOptions,
+  Instruction,
+  ScriptDescriptor,
+  ScriptThunk,
+  Thunk
+} from 'etc/types';
 
 
 /**
@@ -75,7 +81,7 @@ function parseStringInstruction(value: string) {
  * Strings may begin with 'cmd:', 'task:', or 'script:' to indicate the type to
  * be resolved.
  */
-function resolveInstruction(value: Instruction): Thunk {
+function resolveInstructionToThunk(value: Instruction): Thunk {
   // If the user provided a thunk directly in a script, we don't need to look it
   // up in the registry.
   if (typeof value === 'function') {
@@ -87,7 +93,7 @@ function resolveInstruction(value: Instruction): Thunk {
       return value;
     }
 
-    throw new TypeError('Provided function is not a command, task, or script.');
+    throw new TypeError('[resolveInstructionToThunk] Provided function is not a command, task, or script.');
   }
 
   // If the user provided a string, parse it and look-up the indicated command,
@@ -97,24 +103,24 @@ function resolveInstruction(value: Instruction): Thunk {
 
     if (type === 'cmd') {
       const commandDescriptor = caseInsensitiveGet(name, commands);
-      if (!commandDescriptor) throw new Error(`Unknown command: "${name}"`);
+      if (!commandDescriptor) throw new Error(`[resolveInstructionToThunk] Unknown command: "${name}"`);
       return commandDescriptor.thunk;
     }
 
     if (type === 'task') {
       const taskDescriptor = caseInsensitiveGet(name, tasks);
-      if (!taskDescriptor) throw new Error(`Unknown task: "${name}"`);
+      if (!taskDescriptor) throw new Error(`[resolveInstructionToThunk] Unknown task: "${name}"`);
       return taskDescriptor.thunk;
     }
 
     if (type === 'script') {
       const scriptDescriptor = caseInsensitiveGet(name, scripts);
-      if (!scriptDescriptor) throw new Error(`Unknown script: "${name}"`);
+      if (!scriptDescriptor) throw new Error(`[resolveInstructionToThunk] Unknown script: "${name}"`);
       return scriptDescriptor.thunk;
     }
   }
 
-  throw new TypeError(`Expected instruction to be of type "string" or "function", got "${typeof value}".`);
+  throw new TypeError(`[resolveInstructionToThunk] Expected instruction to be of type "string" or "function", got "${typeof value}".`);
 }
 
 
@@ -123,11 +129,16 @@ function resolveInstruction(value: Instruction): Thunk {
  * is in the users $PATH and can be invoked directly, or if the user needs to
  * use `npx`.
  */
-export function printScriptInfo() {
+export function printScriptInfo(context: SaffronHandlerContext<CLIArguments, ConfigurationFactory>) {
   const allScripts = Array.from(scripts.values());
 
   if (allScripts.length === 0) {
-    console.log('No scripts have been registered.');
+    log.info('No scripts are registered.');
+    if (context.configPath) {
+      log.info(`Configuration file: ${context.configPath}`);
+    } else {
+      log.warn('No configuration file found.');
+    }
     return;
   }
 
@@ -142,14 +153,14 @@ export function printScriptInfo() {
     if (sourcePackage !== 'unknown') {
       title += sourcePackage === 'local'
         // Scripts from the local package.
-        ? ` ${log.chalk.cyan.dim('(local)')}`
+        ? ` ${log.chalk.green.dim('local')}`
         // Scripts from third-party packages.
-        : ` ${log.chalk.cyan.dim(`(from ${sourcePackage})`)}`;
+        : ` ${log.chalk.green.dim(`via ${sourcePackage}`)}`;
     }
 
     const finalDescription = description
       ? log.chalk.gray(description.trim())
-      : log.chalk.yellow.dim('No description provided.');
+      : log.chalk.cyan.dim('No description available.');
 
     console.log(boxen(finalDescription, {
       title,
@@ -164,14 +175,14 @@ export function printScriptInfo() {
     }));
   };
 
-  console.log(`${EOL}${log.chalk.bold('Available scripts:')}`);
+  console.log(`${EOL}${log.chalk.bold.hex(NR_RED)('nr')} : available scripts`);
 
   const groupsUsed = R.any(R.hasPath(['options', 'group']), allScripts);
 
   if (groupsUsed) {
     R.forEachObjIndexed((scriptConfigs, groupName) => {
       console.log('');
-      console.log(`${log.chalk.bold.underline(groupName)}\n`);
+      console.log(log.chalk.bold('group'), `: ${groupName}\n`);
       R.forEach(printScript, scriptConfigs);
     }, R.groupBy<ScriptDescriptor>(descriptor => descriptor.options.group ?? 'Other', allScripts));
   } else {
@@ -227,14 +238,14 @@ export function printScriptInfo() {
  */
 export function matchScript(value?: string) {
   const scriptNames = [...scripts.keys()];
-  if (scriptNames.length === 0) throw new Error('No scripts have been registered.');
+  if (scriptNames.length === 0) throw new Error(`[matchScript] Unable to match query ${log.chalk.green(value)}; no scripts have been registered.`);
 
   const scriptName = matchSegmentedName(scriptNames, value);
 
   const descriptor = scripts.get(scriptName ?? '');
-  if (!descriptor) throw new Error(`"${value}" did not match any scripts.`);
+  if (!descriptor) throw new Error(`[matchScript] "${value}" did not match any scripts.`);
 
-  log.verbose(log.prefix('matchScript'), `Matched ${log.chalk.green(value)} to script ${log.chalk.green(scriptName)}.`);
+  log.verbose(log.prefix('matchScript'), `Query ${log.chalk.green(value)} matched script ${log.chalk.green(scriptName)}.`);
 
   return descriptor;
 }
@@ -264,6 +275,8 @@ export function script(name: string, opts: ScriptOptions) {
       timing: ow.optional.boolean
     }));
 
+    const logPrefix = getPrefixedInstructionName('script', name);
+
     // Get the name of the package that defined this script.
     const sourcePackage = getPackageNameFromCallsite(callsites()[1]);
 
@@ -278,37 +291,43 @@ export function script(name: string, opts: ScriptOptions) {
       // that runs each entry in parallel.
       const resolvedInstructions = opts.run.map(value => {
         if (Array.isArray(value)) {
-          const resolvedInstructions = value.map(resolveInstruction);
+          const instructionThunks = value.map(resolveInstructionToThunk);
 
           return async () => {
-            await pAll(resolvedInstructions);
+            await pAll(instructionThunks);
           };
         }
 
-        return resolveInstruction(value);
+        return resolveInstructionToThunk(value);
       });
 
       // Instructions may be added to a script definition dynamically, meaning
       // it is possible that a script has zero instructions under certain
       // conditions. When this is the case, issue a warning and bail.
       if (resolvedInstructions.length === 0) {
-        log.warn(log.prefix('script'), log.chalk.yellow.bold(`Script "${name}" contains no instructions.`));
+        log.warn(log.prefix(logPrefix), log.chalk.yellow.bold(`Script "${name}" contains no instructions.`));
         return;
       }
 
-      log.verbose(log.prefix('script'), 'exec:', log.chalk.green(name));
+      log.verbose(log.prefix(logPrefix), ': start');
 
       const preScript = caseInsensitiveGet(`pre${name}`, scripts);
       if (preScript) await preScript.thunk();
 
       // Run each Instruction in series. If an Instruction is an Array, all
       // commands in that Instruction will be run in parallel.
-      await pSeries(resolvedInstructions);
+      try {
+        await pSeries(resolvedInstructions);
+      } catch (err: any) {
+        throw new Error(`[${logPrefix}] failed : ${err.message}`, { cause: err });
+      }
 
       const postScript = caseInsensitiveGet(`post${name}`, scripts);
       if (postScript) await postScript.thunk();
 
-      if (opts.timing) log.info(log.prefix(name), log.chalk.gray(`Done in ${runTime}.`));
+      if (!opts.timing && log.isLevelAtLeast('verbose')) {
+        log.verbose(log.prefix(logPrefix), ':', log.chalk.gray(`done in ${runTime}`));
+      }
     };
 
     Object.defineProperties(scriptThunk, {

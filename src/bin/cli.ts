@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+import { EOL } from 'os';
+
 import * as cli from '@darkobits/saffron';
 
 import { printCommandInfo } from 'lib/commands';
@@ -10,7 +12,7 @@ import {
   printScriptInfo
 } from 'lib/scripts';
 import { printTaskInfo } from 'lib/tasks';
-import { parseError } from 'lib/utils';
+import { parseError, heroLog } from 'lib/utils';
 
 import type { CLIArguments, ConfigurationFactory } from 'etc/types';
 
@@ -73,21 +75,41 @@ cli.command<CLIArguments, ConfigurationFactory>({
 
       // If the --commands, --tasks, or --scripts flags were used, print
       // information about the indicated instruction type, then bail.
-      if (argv.commands) return printCommandInfo();
-      if (argv.tasks) return printTaskInfo();
-      if (argv.scripts) return printScriptInfo();
+      if (argv.commands) return printCommandInfo(saffronContext);
+      if (argv.tasks) return printTaskInfo(saffronContext);
+      if (argv.scripts) return printScriptInfo(saffronContext);
 
       // Otherwise, ensure that a query was provided.
       if (!argv.query) {
-        throw new Error('No query provided. Run "nr --scripts" to show available scripts.');
+        log.error('Missing required positional argument "query".');
+        log.error(`Run ${log.chalk.white('nr --help')} for usage instructions.`);
+        log.error(`Run ${log.chalk.white('nr --scripts')} to show a list of known scripts.`);
+        return;
       }
 
       const script = matchScript(argv.query);
-      if (script) await script.thunk();
+
+      if (script) {
+        const runTime = log.createTimer();
+
+        heroLog(log.chalk.gray.dim(`• ${script.name}`));
+
+        await script.thunk();
+
+        if (script.options.timing) {
+          heroLog(log.chalk.gray.dim(`• ${script.name} • ${runTime}`));
+        }
+      }
+
     } catch (err: any) {
       const { message, stack } = parseError(err);
-      log.error(log.chalk.red.bold(message));
-      log.verbose(log.chalk.gray(stack));
+
+      heroLog(message.split(EOL).map(line => `${log.chalk.gray.dim('• error • ')}${log.chalk.red.bold(line)}`).join(EOL));
+
+      if (log.isLevelAtLeast('verbose')) {
+        heroLog(stack.split(EOL).map(line => `${log.chalk.gray.dim('• error • ')}${log.chalk.gray.dim(line)}`).join(EOL));
+      }
+
       process.exit(err?.exitCode ?? 1);
     }
   }

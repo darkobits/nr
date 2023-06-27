@@ -6,6 +6,9 @@ import { npmRunPath } from 'npm-run-path';
 import { readPackageUpSync } from 'read-pkg-up';
 import which from 'which';
 
+import { NR_RED } from 'etc/constants';
+import log from 'lib/log';
+
 import type { CallSite } from 'callsites';
 import type { ExecaError } from 'execa';
 
@@ -30,8 +33,14 @@ export function parseError<E extends Error>(err: E) {
     command = err.command?.split(' ')[0];
   }
 
-  const [message, ...stackLines] = err.message.split(EOL);
-  const stack = stackLines.join(EOL);
+  const stackLines = err.stack?.split(EOL);
+  if (!stackLines) throw new Error('[parseError] Unable to parse stack of error.', { cause: err });
+
+  const firstStackLine = err.stack?.split(EOL).findIndex(line => line.startsWith('    at'));
+  if (firstStackLine === undefined) throw new Error('[parseError] Unable to determine first stack line of error.', { cause: err });
+
+  const message = stackLines.slice(0, firstStackLine).join(EOL).replace(/Error: /, '');
+  const stack = stackLines.slice(firstStackLine).join(EOL);
 
   return {
     message,
@@ -110,4 +119,27 @@ export function resolveCommand(cmd: string, cwd = process.cwd()) {
       errno.code.ENOENT
     );
   }
+}
+
+
+/**
+ * Standard way for scripts, commands, and tasks to generate log prefixes for
+ * themselves based on the entity's name.
+ */
+export function getPrefixedInstructionName(prefix: string, name: string | undefined) {
+  if (typeof name !== 'string' || name === '') return `${prefix}:anonymous`;
+  return `${prefix}:${name}`;
+}
+
+
+/**
+ * Logs a message in the format:
+ *
+ * ┃ nr <message>
+ */
+export function heroLog(message: string) {
+  const lines = message.split(EOL);
+  // lines[0] = `${log.chalk.bold.hex(NR_RED)('nr')}${lines[0]}`;
+  const prefixedLines = lines.map(line => `${log.chalk.gray.dim('┃')} ${log.chalk.bold.hex(NR_RED)('nr')} ${line}`);
+  prefixedLines.forEach(line => console.log(line));
 }

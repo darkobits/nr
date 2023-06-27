@@ -1,3 +1,4 @@
+import os from 'os';
 import path from 'path';
 
 import isCI from 'is-ci';
@@ -26,7 +27,10 @@ export default async function loadConfig({ argv, config, configPath, configIsEmp
     throw new Error(`Configuration file at ${log.chalk.green(configPath)} is empty.`);
   } else if (!configPath) {
     // Otherwise, if Cosmiconfig did not find a configuration file, throw.
-    throw new Error('Unable to find an nr configuration file.');
+    throw new Error([
+      'Unable to find a configuration file.',
+      'Documentation: https://darkobits.gitbook.io/nr'
+    ].join(os.EOL));
   }
 
   // Handle ESM interop issues resulting in multiple nested "default" properties

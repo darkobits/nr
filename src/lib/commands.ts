@@ -18,10 +18,14 @@ import { IS_COMMAND_THUNK } from 'etc/constants';
 import log, { LogPipe } from 'lib/log';
 import {
   getEscapedCommand,
-  getPackageNameFromCallsite
+  getPackageNameFromCallsite,
+  getPrefixedInstructionName
 } from 'lib/utils';
 
+import type { SaffronHandlerContext } from '@darkobits/saffron';
 import type {
+  CLIArguments,
+  ConfigurationFactory,
   CommandDescriptor,
   CommandExecutor,
   CommandThunk,
@@ -105,9 +109,10 @@ function unParseArguments(args: CommandArguments, preserveArgumentCasing?: boole
  * Executes a command directly using Execa.
  */
 const executeCommand: CommandExecutor = (name, executableName, parsedArguments, opts) => {
+  const logPrefix = getPrefixedInstructionName('cmd', name);
   const cmd = execa(executableName, parsedArguments, merge(commonExecaOptions, opts?.execaOptions ?? {}));
   const escapedCommand = getEscapedCommand(undefined, cmd.spawnargs);
-  log.verbose(log.prefix(`cmd:${name}`), 'exec:', log.chalk.gray(escapedCommand));
+  log.verbose(log.prefix(logPrefix), ': exec :', log.chalk.gray(escapedCommand));
   return cmd;
 };
 
@@ -131,9 +136,10 @@ const executeNodeCommand: CommandExecutor = (name, scriptPath, parsedArguments, 
     ? scriptPath
     : path.resolve(cwd, scriptPath);
 
+  const logPrefix = getPrefixedInstructionName('cmd', name);
   const cmd = execaNode(resolvedScriptPath, parsedArguments, merge(commonExecaOptions, opts?.execaOptions ?? {}));
   const escapedCommand = getEscapedCommand(undefined, cmd.spawnargs);
-  log.verbose(log.prefix(`cmd:${name}`), 'exec:', log.chalk.gray(escapedCommand));
+  log.verbose(log.prefix(logPrefix), ': exec :', log.chalk.gray(escapedCommand));
   return cmd;
 };
 
@@ -175,6 +181,8 @@ function commandBuilder(builderOptions: CommandBuilderOptions): CommandThunk {
       preserveArgumentCasing: ow.optional.boolean
     }));
 
+    const logPrefix = getPrefixedInstructionName('cmd', name);
+
     const commandThunk = async () => {
       try {
         const runTime = log.createTimer();
@@ -199,13 +207,13 @@ function commandBuilder(builderOptions: CommandBuilderOptions): CommandThunk {
           if (code === 0 || opts?.execaOptions?.reject === false) {
             // If the command exited successfully or if we are ignoring failed
             // commands, log completion time.
-            log.verbose(log.prefix(`cmd:${name}`), log.chalk.gray(`Done in ${runTime}.`));
+            log.verbose(log.prefix(logPrefix), ':', log.chalk.gray(`done in ${runTime}`));
           }
         });
 
         await command;
       } catch (err: any) {
-        throw new Error(`Command "${name}" failed: ${err.message}`);
+        throw new Error(`[${logPrefix}] failed : ${err.message}`, { cause: err });
       }
     };
 
@@ -223,10 +231,8 @@ function commandBuilder(builderOptions: CommandBuilderOptions): CommandThunk {
     });
 
     return commandThunk as CommandThunk;
-  } catch (err: any) {
-    console.log(err);
-    err.message = `Unable to create command "${name}": ${err.message}`;
-    throw err;
+  } catch (cause: any) {
+    throw new Error(`Unable to create command "${name}": ${cause.message}`, { cause });
   }
 
 }
@@ -235,11 +241,16 @@ function commandBuilder(builderOptions: CommandBuilderOptions): CommandThunk {
 /**
  * Prints all available commands.
  */
-export function printCommandInfo() {
+export function printCommandInfo(context: SaffronHandlerContext<CLIArguments, ConfigurationFactory>) {
   const allCommands = Array.from(commands.values());
 
   if (allCommands.length === 0) {
-    console.log('No commands have been registered.');
+    log.info('No commands are registered.');
+    if (context.configPath) {
+      log.info(`Configuration file: ${context.configPath}`);
+    } else {
+      log.warn('No configuration file found.');
+    }
     return;
   }
 
