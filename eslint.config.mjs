@@ -14,7 +14,8 @@ export default [
       'unicorn/import-style': 'off',
       // TODO: Disable this in eslint-plugin.
       'unicorn/expiring-todo-comments': 'off',
-      'import/namespace': 'off'
+      'import/namespace': 'off',
+      'unicorn/no-process-exit': 'off'
     }
   }
 ];
