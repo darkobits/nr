@@ -19,6 +19,7 @@ import matchSegmentedName from 'lib/matcher';
 import { tasks } from 'lib/tasks';
 import {
   caseInsensitiveGet,
+  heroLog,
   getPackageNameFromCallsite,
   getPrefixedInstructionName,
   resolveCommand
@@ -275,7 +276,8 @@ export function script(name: string, opts: ScriptOptions) {
       timing: ow.optional.boolean
     }));
 
-    const logPrefix = getPrefixedInstructionName('script', name);
+    const canonicalName = name ?? 'anonymous';
+    const logPrefix = getPrefixedInstructionName('script', canonicalName);
 
     // Get the name of the package that defined this script.
     const sourcePackage = getPackageNameFromCallsite(callsites()[1]);
@@ -305,7 +307,7 @@ export function script(name: string, opts: ScriptOptions) {
       // it is possible that a script has zero instructions under certain
       // conditions. When this is the case, issue a warning and bail.
       if (resolvedInstructions.length === 0) {
-        log.warn(log.prefix(logPrefix), log.chalk.yellow.bold(`Script "${name}" contains no instructions.`));
+        log.warn(log.prefix(logPrefix), log.chalk.yellow.bold(`Script "${canonicalName}" contains no instructions.`));
         return;
       }
 
@@ -317,7 +319,15 @@ export function script(name: string, opts: ScriptOptions) {
       // Run each Instruction in series. If an Instruction is an Array, all
       // commands in that Instruction will be run in parallel.
       try {
+        if (opts.timing) {
+          heroLog(log.chalk.gray.dim(`• ${canonicalName}`));
+        }
+
         await pSeries(resolvedInstructions);
+
+        if (opts.timing) {
+          heroLog(log.chalk.gray.dim(`• ${canonicalName} • ${runTime}`));
+        }
       } catch (err: any) {
         throw new Error(`[${logPrefix}] failed : ${err.message}`, { cause: err });
       }

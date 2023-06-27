@@ -88,19 +88,7 @@ cli.command<CLIArguments, ConfigurationFactory>({
       }
 
       const script = matchScript(argv.query);
-
-      if (script) {
-        const runTime = log.createTimer();
-
-        heroLog(log.chalk.gray.dim(`• ${script.name}`));
-
-        await script.thunk();
-
-        if (script.options.timing) {
-          heroLog(log.chalk.gray.dim(`• ${script.name} • ${runTime}`));
-        }
-      }
-
+      if (script) await script.thunk();
     } catch (err: any) {
       const { message, stack } = parseError(err);
 
