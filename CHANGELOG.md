@@ -1,3 +1,10 @@
+## [0.14.42](https://github.com/darkobits/nr/compare/v0.14.41...v0.14.42) (2023-06-27)
+
+
+### 🛠 Refactoring
+
+* Improve logging. ([01def65](https://github.com/darkobits/nr/commit/01def65b2e41f11f503cbedbbb44104a20d3295f))
+
 ## [0.14.41](https://github.com/darkobits/nr/compare/v0.14.40...v0.14.41) (2023-06-27)
 
 
