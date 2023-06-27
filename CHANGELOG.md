@@ -1,3 +1,10 @@
+## [0.14.43](https://github.com/darkobits/nr/compare/v0.14.42...v0.14.43) (2023-06-27)
+
+
+### 🛠 Refactoring
+
+* Move logging to script thunks. ([3b335a5](https://github.com/darkobits/nr/commit/3b335a535038bf7fb7fd6b04f7b83361cbc56fa9))
+
 ## [0.14.42](https://github.com/darkobits/nr/compare/v0.14.41...v0.14.42) (2023-06-27)
 
 
