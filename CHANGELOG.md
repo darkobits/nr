@@ -1,3 +1,17 @@
+## [0.14.41](https://github.com/darkobits/nr/compare/v0.14.40...v0.14.41) (2023-06-27)
+
+
+### 🏗 Chores
+
+* **deps:** Update dependencies. ([437143d](https://github.com/darkobits/nr/commit/437143dc239df69703f13ae834784b10b5236869))
+* Update linting rules. ([6a9912c](https://github.com/darkobits/nr/commit/6a9912cfcd87e10d92ab193bf5a12e85571e2098))
+* Update package scripts. ([ebc5e1c](https://github.com/darkobits/nr/commit/ebc5e1ce9b7b1c67f67426b221ac389d37c2056c))
+
+
+### 🛠 Refactoring
+
+* Improve script info logging. ([528ef3c](https://github.com/darkobits/nr/commit/528ef3c014608bfd29a7134d9a912413fee1f19b))
+
 ## [0.14.40](https://github.com/darkobits/nr/compare/v0.14.39...v0.14.40) (2023-06-26)
 
 
