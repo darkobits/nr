@@ -131,62 +131,56 @@ export function printScriptInfo() {
     return;
   }
 
-  const groupsUsed = R.any(R.hasPath(['options', 'group']), allScripts);
-  const scriptSources = R.uniq(R.map(R.path(['sourcePackage']), allScripts));
-  const multipleSources = scriptSources.length > 1; // || !R.includes('local', scriptSources);
-  const onlyLocalSources = scriptSources.length === 1 && R.includes('local', scriptSources);
-
   const printScript = (descriptor: ScriptDescriptor) => {
+    // ----- Build Up Segments for Each Script ---------------------------------
+
     const { name, sourcePackage, options: { description } } = descriptor;
 
-    const segments: Array<string> = [];
+    let title = log.chalk.green.bold(name);
 
-    if (multipleSources) {
-      if (sourcePackage !== 'unknown') {
-        if (sourcePackage === 'local') {
-          // Scripts from the local package.
-          segments.push(`${log.chalk.green(name)} ${log.chalk.dim(`(${sourcePackage})`)}`);
-        } else {
-          // Scripts from third-party packages.
-          segments.push(`${log.chalk.green(name)} ${log.chalk.dim(`(from ${sourcePackage})`)}`);
-        }
-      } else {
-        // if the source is "unknown", only show the script's name.
-        segments.push(`${log.chalk.green(name)}`);
-      }
-    } else {
-      segments.push(log.chalk.green(name));
+    // Build script name, including package of origin.
+    if (sourcePackage !== 'unknown') {
+      title += sourcePackage === 'local'
+        // Scripts from the local package.
+        ? ` ${log.chalk.cyan.dim('(local)')}`
+        // Scripts from third-party packages.
+        : ` ${log.chalk.cyan.dim(`(from ${sourcePackage})`)}`;
     }
 
-    if (description) {
-      description.split(EOL).forEach((line, index) => {
-        if (index === 0) {
-          segments.push(`${log.chalk.gray.dim('└─')} ${log.chalk.gray(line)}`);
-        } else {
-          segments.push(`   ${log.chalk.gray(line)}`);
-        }
-      });
-    }
+    const finalDescription = description
+      ? log.chalk.gray(description.trim())
+      : log.chalk.yellow.dim('No description provided.');
 
-    console.log(segments.join(EOL));
+    console.log(boxen(finalDescription, {
+      title,
+      padding: {
+        top: 0,
+        left: 1,
+        right: 1,
+        bottom: 0
+      },
+      margin: 0,
+      borderColor: '#242424'
+    }));
   };
 
   console.log(`${EOL}${log.chalk.bold('Available scripts:')}`);
 
-  if (!onlyLocalSources && !multipleSources) {
-    console.log(`${log.chalk.dim(`└─ All scripts from ${scriptSources[0]}.`)}`);
-  }
+  const groupsUsed = R.any(R.hasPath(['options', 'group']), allScripts);
 
   if (groupsUsed) {
     R.forEachObjIndexed((scriptConfigs, groupName) => {
       console.log('');
-      console.log(log.chalk.bold.underline(groupName));
+      console.log(`${log.chalk.bold.underline(groupName)}\n`);
       R.forEach(printScript, scriptConfigs);
     }, R.groupBy<ScriptDescriptor>(descriptor => descriptor.options.group ?? 'Other', allScripts));
   } else {
     console.log('');
     R.forEach(printScript, allScripts);
   }
+
+
+  // ----- Determine if nr is in PATH ------------------------------------------
 
   let nrIsInPath = false;
 
@@ -200,23 +194,29 @@ export function printScriptInfo() {
   console.log('');
 
   if (nrIsInPath) {
-    console.log(boxen(
-      log.chalk.gray(`🟩  ${log.chalk.white.bold('nr')} is in your PATH; you can run scripts using ${log.chalk.white('nr <script name>')} `),
-      {
-        padding: 1,
-        backgroundColor: '#1f1f1f',
-        borderStyle: 'none'
-      }
-    ));
+    const contents = log.chalk.gray(`🟩 ${log.chalk.white.bold('nr')} is in your PATH; you can run scripts using ${log.chalk.white('nr <script name>')} `);
+
+    console.log(boxen(contents, {
+      padding: {
+        top: 0,
+        bottom: 0,
+        left: 1,
+        right: 1
+      },
+      borderColor: '#242424'
+    }));
   } else {
-    console.log(boxen(
-      log.chalk.gray(`🟨  ${log.chalk.white.bold('nr')} is ${log.chalk.yellow.bold('not')} in your PATH; you must run scripts using ${log.chalk.white('npx nr <script name>')}`),
-      {
-        padding: 1,
-        backgroundColor: '#1f1f1f',
-        borderStyle: 'none'
-      }
-    ));
+    const contents = log.chalk.gray(`🟨 ${log.chalk.white.bold('nr')} is ${log.chalk.yellow.bold('not')} in your PATH; you must run scripts using ${log.chalk.white('npx nr <script name>')}`);
+
+    console.log(boxen(contents, {
+      padding: {
+        top: 0,
+        bottom: 0,
+        left: 1,
+        right: 1
+      },
+      borderColor: '#242424'
+    }));
   }
 }
 
