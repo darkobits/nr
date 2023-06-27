@@ -12,7 +12,7 @@ async function main() {
 
 
 void main().then(() => {
-  log.info(log.prefix('cjs:dynamic-import'), log.chalk.green('success'));
+  log.verbose(log.prefix('cjs:dynamic-import'), log.chalk.green('success'));
 }).catch(err => {
   log.error(log.prefix('cjs:dynamic-import'), err);
   process.exit(1);

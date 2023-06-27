@@ -11,7 +11,7 @@ try {
   log.verbose(log.prefix('cjs:require'), log.chalk.green('success'));
 } catch (err) {
   if (err.message.includes('require() of ES Module')) {
-    log.info(log.prefix('cjs:require'), log.chalk.yellow.dim('require() of this package failed'));
+    log.verbose(log.prefix('cjs:require'), log.chalk.yellow.dim('require() of this package failed'));
   } else {
     log.error(log.prefix('cjs:require'), err);
     process.exit(1);

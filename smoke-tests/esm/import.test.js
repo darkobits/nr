@@ -8,5 +8,5 @@ if (typeof defaultExport !== 'function') {
   log.error(log.prefix('esm:import'), `Expected type of default export to be "function", got "${typeof defaultExport}".`);
   process.exit(1);
 } else {
-  log.info(log.prefix('esm:import'), log.chalk.green('success'));
+  log.verbose(log.prefix('esm:import'), log.chalk.green('success'));
 }
