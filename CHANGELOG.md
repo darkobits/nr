@@ -1,3 +1,20 @@
+## [0.14.44](https://github.com/darkobits/nr/compare/v0.14.43...v0.14.44) (2023-06-28)
+
+
+### 🐞 Bug Fixes
+
+* Show/hide script origin descriptors correctly. ([3021ec9](https://github.com/darkobits/nr/commit/3021ec9eaf82117002068e46557c25aebc927c28))
+
+
+### 🏗 Chores
+
+* **tests:** Update smoke test logging. ([d59a49d](https://github.com/darkobits/nr/commit/d59a49d369a6a3f695a9922bc16543d80c430949))
+
+
+### 🛠 Refactoring
+
+* Refactor logging. ([0dd88b1](https://github.com/darkobits/nr/commit/0dd88b19832c920fcf0098d8f0a38be3d00ef880))
+
 ## [0.14.43](https://github.com/darkobits/nr/compare/v0.14.42...v0.14.43) (2023-06-27)
 
 
