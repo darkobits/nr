@@ -86,12 +86,12 @@ export function task(name: string, taskFn: TaskFn) {
       const logPrefix = getPrefixedInstructionName('task', name);
 
       try {
-        log.verbose(log.prefix(logPrefix), ': start');
+        log.verbose(log.prefix(logPrefix), '•', log.chalk.cyan('start'));
         const runTime = log.createTimer();
         await taskFn();
-        log.verbose(log.prefix(logPrefix), `: done in ${runTime}`);
+        log.verbose(log.prefix(logPrefix), '•', log.chalk.cyan(runTime));
       } catch (err: any) {
-        throw new Error(`[${logPrefix}] failed : ${err.message}`, { cause: err });
+        throw new Error(`[${logPrefix}] failed • ${err.message}`, { cause: err });
       }
     };
 

@@ -92,10 +92,10 @@ cli.command<CLIArguments, ConfigurationFactory>({
     } catch (err: any) {
       const { message, stack } = parseError(err);
 
-      heroLog(message.split(EOL).map(line => `${log.chalk.gray.dim('• error • ')}${log.chalk.red.bold(line)}`).join(EOL));
+      heroLog(message.split(EOL).map(line => `${log.chalk.red('⏺')} ${log.chalk.gray.dim('error: ')}${log.chalk.red.bold(line)}`).join(EOL));
 
       if (log.isLevelAtLeast('verbose')) {
-        heroLog(stack.split(EOL).map(line => `${log.chalk.gray.dim('• error • ')}${log.chalk.gray.dim(line)}`).join(EOL));
+        heroLog(stack.split(EOL).map(line => `${log.chalk.gray.dim('error: ')}${log.chalk.gray.dim(line)}`).join(EOL));
       }
 
       process.exit(err?.exitCode ?? 1);

@@ -1,5 +1,3 @@
-import { EOL } from 'os';
-
 import boxen from 'boxen';
 import callsites from 'callsites';
 import ow from 'ow';
@@ -10,8 +8,7 @@ import * as R from 'ramda';
 import {
   IS_COMMAND_THUNK,
   IS_TASK_THUNK,
-  IS_SCRIPT_THUNK,
-  NR_RED
+  IS_SCRIPT_THUNK
 } from 'etc/constants';
 import { commands } from 'lib/commands';
 import log from 'lib/log';
@@ -59,18 +56,18 @@ export const scripts = new Map<string, ScriptDescriptor>();
  * Parses a string identifier for a script or command and returns an object
  * describing it.
  */
-function parseStringInstruction(value: string) {
+function parseStringInstruction(value: string): ParsedInstruction {
   if (!value.includes(':')) {
     throw new Error(`Invalid instruction identifier: "${value}"`);
   }
 
-  const [type, name] = value.split(':');
+  const [type, name] = value.split(':') as any;
 
   if (!['script', 'cmd', 'task'].includes(type)) {
-    throw new Error(`Invalid instruction type: ${type}`);
+    throw new Error(`Invalid type: "${type}" in instruction "${value}".`);
   }
 
-  return { type, name } as ParsedInstruction;
+  return { type, name };
 }
 
 
@@ -180,14 +177,15 @@ export function printScriptInfo(context: SaffronHandlerContext<CLIArguments, Con
     }));
   };
 
-  console.log(`${EOL}${log.chalk.bold.hex(NR_RED)('nr')} : available scripts`);
+  console.log('');
+  heroLog('• available scripts');
 
   const groupsUsed = R.any(R.hasPath(['options', 'group']), allScripts);
 
   if (groupsUsed) {
     R.forEachObjIndexed((scriptConfigs, groupName) => {
       console.log('');
-      console.log(log.chalk.bold('group'), `: ${groupName}\n`);
+      console.log(log.chalk.bold('group'), `• ${groupName}\n`);
       R.forEach(printScript, scriptConfigs);
     }, R.groupBy<ScriptDescriptor>(descriptor => descriptor.options.group ?? 'Other', allScripts));
   } else {
@@ -315,8 +313,6 @@ export function script(name: string, opts: ScriptOptions) {
         return;
       }
 
-      log.verbose(log.prefix(logPrefix), ': start');
-
       const preScript = caseInsensitiveGet(`pre${name}`, scripts);
       if (preScript) await preScript.thunk();
 
@@ -324,24 +320,24 @@ export function script(name: string, opts: ScriptOptions) {
       // commands in that Instruction will be run in parallel.
       try {
         if (opts.timing) {
-          heroLog(log.chalk.gray.dim(`• ${canonicalName}`));
+          heroLog(log.chalk.gray.dim(`○ ${canonicalName}`));
         }
+
+        log.verbose(log.prefix(logPrefix), '•', log.chalk.green('start'));
 
         await pSeries(resolvedInstructions);
 
+        log.verbose(log.prefix(logPrefix), '•', log.chalk.green(runTime));
+
         if (opts.timing) {
-          heroLog(log.chalk.gray.dim(`• ${canonicalName} • ${runTime}`));
+          heroLog(`${log.chalk.greenBright('⏺')} ${log.chalk.gray.dim(`${canonicalName} [${runTime}]`)}`);
         }
       } catch (err: any) {
-        throw new Error(`[${logPrefix}] failed : ${err.message}`, { cause: err });
+        throw new Error(`[${logPrefix}] failed • ${err.message}`, { cause: err });
       }
 
       const postScript = caseInsensitiveGet(`post${name}`, scripts);
       if (postScript) await postScript.thunk();
-
-      if (!opts.timing && log.isLevelAtLeast('verbose')) {
-        log.verbose(log.prefix(logPrefix), ':', log.chalk.gray(`done in ${runTime}`));
-      }
     };
 
     Object.defineProperties(scriptThunk, {

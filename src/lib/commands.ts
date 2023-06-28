@@ -112,7 +112,7 @@ const executeCommand: CommandExecutor = (name, executableName, parsedArguments, 
   const logPrefix = getPrefixedInstructionName('cmd', name);
   const cmd = execa(executableName, parsedArguments, merge(commonExecaOptions, opts?.execaOptions ?? {}));
   const escapedCommand = getEscapedCommand(undefined, cmd.spawnargs);
-  log.verbose(log.prefix(logPrefix), ': exec :', log.chalk.gray(escapedCommand));
+  log.verbose(log.prefix(logPrefix), '•', log.chalk.gray(escapedCommand));
   return cmd;
 };
 
@@ -139,7 +139,7 @@ const executeNodeCommand: CommandExecutor = (name, scriptPath, parsedArguments, 
   const logPrefix = getPrefixedInstructionName('cmd', name);
   const cmd = execaNode(resolvedScriptPath, parsedArguments, merge(commonExecaOptions, opts?.execaOptions ?? {}));
   const escapedCommand = getEscapedCommand(undefined, cmd.spawnargs);
-  log.verbose(log.prefix(logPrefix), ': exec :', log.chalk.gray(escapedCommand));
+  log.verbose(log.prefix(logPrefix), '•', log.chalk.gray(escapedCommand));
   return cmd;
 };
 
@@ -207,13 +207,13 @@ function commandBuilder(builderOptions: CommandBuilderOptions): CommandThunk {
           if (code === 0 || opts?.execaOptions?.reject === false) {
             // If the command exited successfully or if we are ignoring failed
             // commands, log completion time.
-            log.verbose(log.prefix(logPrefix), ':', log.chalk.gray(`done in ${runTime}`));
+            log.verbose(log.prefix(logPrefix), '•', log.chalk.gray(runTime));
           }
         });
 
         await command;
       } catch (err: any) {
-        throw new Error(`[${logPrefix}] failed : ${err.message}`, { cause: err });
+        throw new Error(`[${logPrefix}] failed • ${err.message}`, { cause: err });
       }
     };
 
