@@ -151,7 +151,11 @@ export function printScriptInfo(context: SaffronHandlerContext<CLIArguments, Con
     let title = log.chalk.green.bold(name);
 
     // Build script name, including package of origin.
-    if (sourcePackage !== 'unknown') {
+    const scriptSources = R.uniq(R.map(R.path(['sourcePackage']), allScripts));
+    // Hide origin descriptors if all packages are local.
+    const hideOriginDescriptors = scriptSources.length === 1 && scriptSources[0] === 'local';
+
+    if (!hideOriginDescriptors && sourcePackage !== 'unknown') {
       title += sourcePackage === 'local'
         // Scripts from the local package.
         ? ` ${log.chalk.green.dim('local')}`
