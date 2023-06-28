@@ -34,6 +34,9 @@ import type {
 } from 'etc/types';
 
 
+const chalk = log.chalk;
+
+
 /**
  * An `Instruction` in `string` form will be converted into an object of the
  * following shape.
@@ -141,11 +144,9 @@ export function printScriptInfo(context: SaffronHandlerContext<CLIArguments, Con
   }
 
   const printScript = (descriptor: ScriptDescriptor) => {
-    // ----- Build Up Segments for Each Script ---------------------------------
-
     const { name, sourcePackage, options: { description } } = descriptor;
 
-    let title = log.chalk.green.bold(name);
+    let title = chalk.green.bold(name);
 
     // Build script name, including package of origin.
     const scriptSources = R.uniq(R.map(R.path(['sourcePackage']), allScripts));
@@ -155,14 +156,14 @@ export function printScriptInfo(context: SaffronHandlerContext<CLIArguments, Con
     if (!hideOriginDescriptors && sourcePackage !== 'unknown') {
       title += sourcePackage === 'local'
         // Scripts from the local package.
-        ? ` ${log.chalk.green.dim('local')}`
+        ? ` ${chalk.green.dim('local')}`
         // Scripts from third-party packages.
-        : ` ${log.chalk.green.dim(`via ${sourcePackage}`)}`;
+        : ` ${chalk.green.dim(`via ${sourcePackage}`)}`;
     }
 
     const finalDescription = description
-      ? log.chalk.gray(description.trim())
-      : log.chalk.cyan.dim('No description available.');
+      ? chalk.gray(description.trim())
+      : chalk.cyan.dim('No description available.');
 
     console.log(boxen(finalDescription, {
       title,
@@ -185,13 +186,17 @@ export function printScriptInfo(context: SaffronHandlerContext<CLIArguments, Con
   if (groupsUsed) {
     R.forEachObjIndexed((scriptConfigs, groupName) => {
       console.log('');
-      console.log(log.chalk.bold('group'), `• ${groupName}\n`);
+      console.log(`${chalk.bold(groupName)}\n`);
       R.forEach(printScript, scriptConfigs);
     }, R.groupBy<ScriptDescriptor>(descriptor => descriptor.options.group ?? 'Other', allScripts));
   } else {
     console.log('');
     R.forEach(printScript, allScripts);
   }
+
+  console.log('');
+  heroLog(chalk.gray.dim(`• reference scripts from other scripts using ${chalk.bold('script:name')}.`));
+  heroLog(chalk.gray.dim('• see: https://darkobits.gitbook.io/nr/configuration-reference/script'));
 
 
   // ----- Determine if nr is in PATH ------------------------------------------
@@ -207,30 +212,36 @@ export function printScriptInfo(context: SaffronHandlerContext<CLIArguments, Con
 
   console.log('');
 
-  if (nrIsInPath) {
-    const contents = log.chalk.gray(`🟩 ${log.chalk.white.bold('nr')} is in your PATH; you can run scripts using ${log.chalk.white('nr <script name>')} `);
+  // 🟩 🟨
+  if (!nrIsInPath) {
+    const contents = chalk.gray(`• ${chalk.green(`${chalk.bold('nr')} is in your PATH`)}; you can use the CLI directly: ${chalk.bold('nr query')}.`);
+    heroLog(contents);
 
-    console.log(boxen(contents, {
-      padding: {
-        top: 0,
-        bottom: 0,
-        left: 1,
-        right: 1
-      },
-      borderColor: '#242424'
-    }));
+    // console.log(boxen(contents, {
+    //   padding: {
+    //     top: 0,
+    //     bottom: 0,
+    //     left: 1,
+    //     right: 1
+    //   },
+    //   borderColor: '#242424'
+    // }));
   } else {
-    const contents = log.chalk.gray(`🟨 ${log.chalk.white.bold('nr')} is ${log.chalk.yellow.bold('not')} in your PATH; you must run scripts using ${log.chalk.white('npx nr <script name>')}`);
+    const contents = chalk.gray(`• ${chalk.yellow.dim(`${chalk.bold('nr')} is not in your PATH`)}; you must use the CLI with npx: ${chalk.bold('npx nr query')}.`);
+    heroLog(contents);
 
-    console.log(boxen(contents, {
-      padding: {
-        top: 0,
-        bottom: 0,
-        left: 1,
-        right: 1
-      },
-      borderColor: '#242424'
-    }));
+    const pathDocs = chalk.gray.dim('• see: https://darkobits.gitbook.io/nr/getting-started/environment');
+    heroLog(pathDocs);
+
+    // console.log(boxen(contents, {
+    //   padding: {
+    //     top: 0,
+    //     bottom: 0,
+    //     left: 1,
+    //     right: 1
+    //   },
+    //   borderColor: '#242424'
+    // }));
   }
 }
 
@@ -241,14 +252,14 @@ export function printScriptInfo(context: SaffronHandlerContext<CLIArguments, Con
  */
 export function matchScript(value?: string) {
   const scriptNames = [...scripts.keys()];
-  if (scriptNames.length === 0) throw new Error(`[matchScript] Unable to match query ${log.chalk.green(value)}; no scripts have been registered.`);
+  if (scriptNames.length === 0) throw new Error(`[matchScript] Unable to match query ${chalk.green(value)}; no scripts have been registered.`);
 
   const scriptName = matchSegmentedName(scriptNames, value);
 
   const descriptor = scripts.get(scriptName ?? '');
   if (!descriptor) throw new Error(`[matchScript] "${value}" did not match any scripts.`);
 
-  log.verbose(log.prefix('matchScript'), `Query ${log.chalk.green(value)} matched script ${log.chalk.green(scriptName)}.`);
+  log.verbose(log.prefix('matchScript'), `Query ${chalk.green(value)} matched script ${chalk.green(scriptName)}.`);
 
   return descriptor;
 }
@@ -309,7 +320,7 @@ export function script(name: string, opts: ScriptOptions) {
       // it is possible that a script has zero instructions under certain
       // conditions. When this is the case, issue a warning and bail.
       if (resolvedInstructions.length === 0) {
-        log.warn(log.prefix(logPrefix), log.chalk.yellow.bold(`Script "${canonicalName}" contains no instructions.`));
+        log.warn(log.prefix(logPrefix), chalk.yellow.bold(`Script "${canonicalName}" contains no instructions.`));
         return;
       }
 
@@ -320,20 +331,20 @@ export function script(name: string, opts: ScriptOptions) {
       // commands in that Instruction will be run in parallel.
       try {
         if (opts.timing) {
-          heroLog(log.chalk.gray.dim(`○ ${canonicalName}`));
+          heroLog(chalk.gray.dim(`○ ${canonicalName}`));
         }
 
-        log.verbose(log.prefix(logPrefix), '•', log.chalk.green('start'));
+        log.verbose(log.prefix(logPrefix), '•', chalk.green('start'));
 
         await pSeries(resolvedInstructions);
 
-        log.verbose(log.prefix(logPrefix), '•', log.chalk.green(runTime));
+        log.verbose(log.prefix(logPrefix), '•', chalk.green(runTime));
 
         if (opts.timing) {
-          heroLog(`${log.chalk.greenBright('⏺')} ${log.chalk.gray.dim(`${canonicalName} [${runTime}]`)}`);
+          heroLog(`${chalk.greenBright('⏺')} ${chalk.gray.dim(`${canonicalName} • ${runTime}`)}`);
         }
       } catch (err: any) {
-        throw new Error(`[${logPrefix}] failed • ${err.message}`, { cause: err });
+        throw new Error(`${logPrefix} failed • ${err.message}`, { cause: err });
       }
 
       const postScript = caseInsensitiveGet(`post${name}`, scripts);

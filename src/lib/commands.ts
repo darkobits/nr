@@ -1,6 +1,6 @@
-import { EOL } from 'os';
 import path from 'path';
 
+import boxen from 'boxen';
 import callsites from 'callsites';
 import merge from 'deepmerge';
 import {
@@ -19,7 +19,8 @@ import log, { LogPipe } from 'lib/log';
 import {
   getEscapedCommand,
   getPackageNameFromCallsite,
-  getPrefixedInstructionName
+  getPrefixedInstructionName,
+  heroLog
 } from 'lib/utils';
 
 import type { SaffronHandlerContext } from '@darkobits/saffron';
@@ -33,6 +34,9 @@ import type {
   CommandOptions,
   CommandOptionsNode
 } from 'etc/types';
+
+
+const chalk = log.chalk;
 
 
 /**
@@ -112,7 +116,7 @@ const executeCommand: CommandExecutor = (name, executableName, parsedArguments, 
   const logPrefix = getPrefixedInstructionName('cmd', name);
   const cmd = execa(executableName, parsedArguments, merge(commonExecaOptions, opts?.execaOptions ?? {}));
   const escapedCommand = getEscapedCommand(undefined, cmd.spawnargs);
-  log.verbose(log.prefix(logPrefix), '•', log.chalk.gray(escapedCommand));
+  log.verbose(log.prefix(logPrefix), '•', chalk.gray(escapedCommand));
   return cmd;
 };
 
@@ -139,7 +143,7 @@ const executeNodeCommand: CommandExecutor = (name, scriptPath, parsedArguments, 
   const logPrefix = getPrefixedInstructionName('cmd', name);
   const cmd = execaNode(resolvedScriptPath, parsedArguments, merge(commonExecaOptions, opts?.execaOptions ?? {}));
   const escapedCommand = getEscapedCommand(undefined, cmd.spawnargs);
-  log.verbose(log.prefix(logPrefix), '•', log.chalk.gray(escapedCommand));
+  log.verbose(log.prefix(logPrefix), '•', chalk.gray(escapedCommand));
   return cmd;
 };
 
@@ -189,7 +193,7 @@ function commandBuilder(builderOptions: CommandBuilderOptions): CommandThunk {
         const command = executor(name, executableName, unParsedArguments, opts);
 
         // If the user provided a custom prefix function, generate it now.
-        const prefix = opts?.prefix ? opts.prefix(log.chalk) : '';
+        const prefix = opts?.prefix ? opts.prefix(chalk) : '';
 
         if (command.stdout) {
           command.stdout.pipe(new LogPipe((...args: Array<any>) => {
@@ -207,13 +211,13 @@ function commandBuilder(builderOptions: CommandBuilderOptions): CommandThunk {
           if (code === 0 || opts?.execaOptions?.reject === false) {
             // If the command exited successfully or if we are ignoring failed
             // commands, log completion time.
-            log.verbose(log.prefix(logPrefix), '•', log.chalk.gray(runTime));
+            log.verbose(log.prefix(logPrefix), '•', chalk.gray(runTime));
           }
         });
 
         await command;
       } catch (err: any) {
-        throw new Error(`[${logPrefix}] failed • ${err.message}`, { cause: err });
+        throw new Error(`${logPrefix} failed • ${err.message}`, { cause: err });
       }
     };
 
@@ -254,36 +258,48 @@ export function printCommandInfo(context: SaffronHandlerContext<CLIArguments, Co
     return;
   }
 
-  const commandSources = R.uniq(R.map(R.path(['sourcePackage']), allCommands));
-  const multipleSources = commandSources.length > 1 || !R.includes('local', commandSources);
+  const printCommand = (command: CommandDescriptor) => {
+    let title = chalk.green.bold(command.name);
 
-  console.log(`${EOL}${log.chalk.bold('Available commands:')}${EOL}`);
+    // Build script name, including package of origin.
+    const commandSources = R.uniq(R.map(R.path(['sourcePackage']), allCommands));
+    // Hide origin descriptors if all packages are local.
+    const hideOriginDescriptors = commandSources.length === 1 && commandSources[0] === 'local';
 
-  // N.B. Ramda broke inference for array member types when using R.forEach in
-  // 0.29.0.
-  allCommands.forEach(command => {
-    const segments: Array<string> = [];
-    const executable = command.arguments[0];
-    const argumentsString = unParseArguments(command.arguments, command.options?.preserveArgumentCasing).join(' ');
-
-    if (multipleSources) {
-      if (command.sourcePackage !== 'unknown') {
-        // includes "local", and other third-party packages.
-        segments.push(`${log.chalk.green(command.name)} ${log.chalk.gray.dim(`(${command.sourcePackage})`)}`);
-      } else {
-        // if the source is "unknown", only show the script's name.
-        segments.push(`${log.chalk.green(command.name)}`);
-      }
-    } else {
-      segments.push(log.chalk.green(command.name));
+    if (!hideOriginDescriptors && command.sourcePackage !== 'unknown') {
+      title += command.sourcePackage === 'local'
+        // Scripts from the local package.
+        ? ` ${chalk.green.dim('local')}`
+        // Scripts from third-party packages.
+        : ` ${chalk.green.dim(`via ${command.sourcePackage}`)}`;
     }
 
-    segments.push(`${log.chalk.gray.dim('└─')} ${log.chalk.gray(executable)} ${log.chalk.gray(argumentsString)}`);
+    const executable = command.arguments[0];
+    const argumentsString = unParseArguments(command.arguments, command.options?.preserveArgumentCasing).join(' ');
+    const finalDescription = `${chalk.gray.dim(executable)} ${chalk.gray.dim(argumentsString)}`;
 
-    console.log(segments.join(EOL));
-  });
+    console.log(boxen(finalDescription, {
+      title,
+      padding: {
+        top: 0,
+        left: 1,
+        right: 1,
+        bottom: 0
+      },
+      margin: 0,
+      borderColor: '#242424'
+    }));
+  };
 
   console.log('');
+  heroLog('• available commands');
+
+  console.log('');
+  R.forEach(printCommand, allCommands);
+
+  console.log('');
+  heroLog(chalk.gray.dim(`• reference commands in scripts using ${chalk.bold('cmd:name')}.`));
+  heroLog(chalk.gray.dim('• see: https://darkobits.gitbook.io/nr/configuration-reference/script'));
 }
 
 

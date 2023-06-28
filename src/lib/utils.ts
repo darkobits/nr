@@ -13,6 +13,9 @@ import type { CallSite } from 'callsites';
 import type { ExecaError } from 'execa';
 
 
+const chalk = log.chalk;
+
+
 /**
  * Use duck-typing to determine if the provided value is an ExecaError.
  */
@@ -139,7 +142,6 @@ export function getPrefixedInstructionName(prefix: string, name: string | undefi
  */
 export function heroLog(message: string) {
   const lines = message.split(EOL);
-  // lines[0] = `${log.chalk.bold.hex(NR_RED)('nr')}${lines[0]}`;
-  const prefixedLines = lines.map(line => `${log.chalk.gray.dim('┃')} ${log.chalk.bold.hex(NR_RED)('nr')} ${line}`);
+  const prefixedLines = lines.map(line => `${chalk.gray.dim('┃')} ${chalk.bold.hex(NR_RED)('nr')} ${line}`);
   prefixedLines.forEach(line => console.log(line));
 }

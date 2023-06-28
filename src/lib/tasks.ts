@@ -18,6 +18,9 @@ import type {
 } from 'etc/types';
 
 
+const chalk = log.chalk;
+
+
 /**
  * Map of registered task names to their corresponding descriptors.
  */
@@ -43,7 +46,7 @@ export function printTaskInfo(context: SaffronHandlerContext<CLIArguments, Confi
   const taskSources = R.uniq(R.map(R.path(['sourcePackage']), allTasks));
   const multipleSources = taskSources.length > 1 || !R.includes('local', taskSources);
 
-  console.log(`${EOL}${log.chalk.bold('Available tasks:')}${EOL}`);
+  console.log(`${EOL}${chalk.bold('Available tasks:')}${EOL}`);
 
   // N.B. Ramda broke inference for array member types when using R.forEach in
   // 0.29.0.
@@ -53,13 +56,13 @@ export function printTaskInfo(context: SaffronHandlerContext<CLIArguments, Confi
     if (multipleSources) {
       if (task.sourcePackage !== 'unknown') {
         // includes "local", and other third-party packages.
-        segments.push(`${log.chalk.green(task.name)} ${log.chalk.gray.dim(`(${task.sourcePackage})`)}`);
+        segments.push(`${chalk.green(task.name)} ${chalk.gray.dim(`(${task.sourcePackage})`)}`);
       } else {
         // if the source is "unknown", only show the script's name.
-        segments.push(`${log.chalk.green(task.name)}`);
+        segments.push(`${chalk.green(task.name)}`);
       }
     } else {
-      segments.push(log.chalk.green(task.name));
+      segments.push(chalk.green(task.name));
     }
 
     console.log(segments.join(EOL));
@@ -86,12 +89,12 @@ export function task(name: string, taskFn: TaskFn) {
       const logPrefix = getPrefixedInstructionName('task', name);
 
       try {
-        log.verbose(log.prefix(logPrefix), '•', log.chalk.cyan('start'));
+        log.verbose(log.prefix(logPrefix), '•', chalk.cyan('start'));
         const runTime = log.createTimer();
         await taskFn();
-        log.verbose(log.prefix(logPrefix), '•', log.chalk.cyan(runTime));
+        log.verbose(log.prefix(logPrefix), '•', chalk.cyan(runTime));
       } catch (err: any) {
-        throw new Error(`[${logPrefix}] failed • ${err.message}`, { cause: err });
+        throw new Error(`${logPrefix} failed • ${err.message}`, { cause: err });
       }
     };
 

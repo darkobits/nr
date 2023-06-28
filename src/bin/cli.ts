@@ -4,6 +4,7 @@ import { EOL } from 'os';
 
 import * as cli from '@darkobits/saffron';
 
+import { NR_RED } from 'etc/constants';
 import { printCommandInfo } from 'lib/commands';
 import loadConfig from 'lib/configuration';
 import log from 'lib/log';
@@ -16,6 +17,7 @@ import { parseError, heroLog } from 'lib/utils';
 
 import type { CLIArguments, ConfigurationFactory } from 'etc/types';
 
+const chalk = log.chalk;
 
 cli.command<CLIArguments, ConfigurationFactory>({
   command: '* [query]',
@@ -33,28 +35,28 @@ cli.command<CLIArguments, ConfigurationFactory>({
       conflicts: ['commands', 'tasks', 'scripts']
     });
 
-    command.option('commands', {
+    command.option('scripts', {
       group: 'Introspection:',
-      type: 'boolean',
+      // type: 'boolean',
       required: false,
-      description: 'Show all registered commands.',
-      conflicts: ['tasks', 'scripts']
+      description: 'Show all registered scripts.',
+      conflicts: ['commands', 'tasks']
     });
 
     command.option('tasks', {
       group: 'Introspection:',
-      type: 'boolean',
+      // type: 'boolean',
       required: false,
       description: 'Show all registered tasks.',
       conflicts: ['commands', 'scripts']
     });
 
-    command.option('scripts', {
+    command.option('commands', {
       group: 'Introspection:',
-      type: 'boolean',
+      // type: 'boolean',
       required: false,
-      description: 'Show all registered scripts.',
-      conflicts: ['commands', 'tasks']
+      description: 'Show all registered commands.',
+      conflicts: ['tasks', 'scripts']
     });
 
     command.option('config', {
@@ -63,7 +65,7 @@ cli.command<CLIArguments, ConfigurationFactory>({
       description: 'Provide an explicit path to a configuration file.'
     });
 
-    command.epilogue(log.chalk.gray('For full usage instructions, see https://github.com/darkobits/nr'));
+    command.epilogue(chalk.gray('For full usage instructions, see https://github.com/darkobits/nr'));
   },
   handler: async saffronContext => {
     try {
@@ -82,8 +84,8 @@ cli.command<CLIArguments, ConfigurationFactory>({
       // Otherwise, ensure that a query was provided.
       if (!argv.query) {
         log.error('Missing required positional argument "query".');
-        log.error(`Run ${log.chalk.white('nr --help')} for usage instructions.`);
-        log.error(`Run ${log.chalk.white('nr --scripts')} to show a list of known scripts.`);
+        log.error(`Run ${chalk.white('nr --help')} for usage instructions.`);
+        log.error(`Run ${chalk.white('nr --scripts')} to show a list of known scripts.`);
         return;
       }
 
@@ -92,11 +94,13 @@ cli.command<CLIArguments, ConfigurationFactory>({
     } catch (err: any) {
       const { message, stack } = parseError(err);
 
-      heroLog(message.split(EOL).map(line => `${log.chalk.red('⏺')} ${log.chalk.gray.dim('error: ')}${log.chalk.red.bold(line)}`).join(EOL));
+      const errLinePrefix = `${chalk.red('⏺')}`;
 
-      if (log.isLevelAtLeast('verbose')) {
-        heroLog(stack.split(EOL).map(line => `${log.chalk.gray.dim('error: ')}${log.chalk.gray.dim(line)}`).join(EOL));
-      }
+      heroLog(message.split(EOL).map(line => `${errLinePrefix} ${chalk.red.bold(line)}`).join(EOL));
+
+      // if (log.isLevelAtLeast('verbose')) {
+      heroLog(stack.split(EOL).map(line => `${errLinePrefix} ${chalk.gray.dim(line)}`).join(EOL));
+      // }
 
       process.exit(err?.exitCode ?? 1);
     }
@@ -104,4 +108,35 @@ cli.command<CLIArguments, ConfigurationFactory>({
 });
 
 
-cli.init();
+// cli.init();
+
+const replacers = {
+  'nr [query]': chalk.bold.hex(NR_RED),
+  'Positionals:': chalk.bold.hex(NR_RED),
+  'Introspection:': chalk.bold.hex(NR_RED),
+  'Options:': chalk.bold.hex(NR_RED),
+  'Examples:': chalk.bold.hex(NR_RED),
+  // '--scripts': chalk.bold,
+  // '--tasks': chalk.bold,
+  // '--commands': chalk.bold,
+  // '--config': chalk.bold,
+  // '-v': chalk.bold,
+  // '--version': chalk.bold,
+  // '-h': chalk.bold,
+  // '--help': chalk.bold,
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  '[boolean]': () => ''
+};
+
+
+function replaceText(sourceText: string) {
+  return Object.entries(replacers).reduce((curText, [searchText, replacer]) => {
+    return curText.replaceAll(searchText, replacer(searchText));
+  }, sourceText);
+}
+
+
+cli.init(() => (err, argv, output) => {
+  if (err) return console.error(err);
+  if (output) return console.error(replaceText(output));
+});

@@ -13,5 +13,8 @@ export default nr(({ command, script, isCI }) => {
     timing: true
   });
 
-  if (!isCI) script('postBuild', { run: ['script:test.smoke'] });
+  if (!isCI) script('postBuild', {
+    description: '[hook] If not in a CI environment, run smoke tests after building the project.',
+    run: ['script:test.smoke']
+  });
 });

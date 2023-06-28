@@ -12,6 +12,9 @@ import type { SaffronHandlerContext } from '@darkobits/saffron';
 import type { CLIArguments, ConfigurationFactory } from 'etc/types';
 
 
+const chalk = log.chalk;
+
+
 /**
  * Responsible for interpreting command line arguments and Cosmiconfig results
  * from Saffron to locate and parse the user's configuration file, then return
@@ -24,7 +27,7 @@ export default async function loadConfig({ argv, config, configPath, configIsEmp
     config = await import(configPath);
   } else if (configIsEmpty) {
     // Otherwise, if Cosmiconfig found an empty configuration file, throw.
-    throw new Error(`Configuration file at ${log.chalk.green(configPath)} is empty.`);
+    throw new Error(`Configuration file at ${chalk.green(configPath)} is empty.`);
   } else if (!configPath) {
     // Otherwise, if Cosmiconfig did not find a configuration file, throw.
     throw new Error([
@@ -44,7 +47,7 @@ export default async function loadConfig({ argv, config, configPath, configIsEmp
   // If the config file did not default-export a function, throw.
   if (typeof configFn !== 'function') {
     log.verbose(log.prefix('config'), configFn);
-    throw new TypeError(`Expected default export of configuration file at ${log.chalk.green(configPath)} to be of type "function", got "${typeof configFn}".`);
+    throw new TypeError(`Expected default export of configuration file at ${chalk.green(configPath)} to be of type "function", got "${typeof configFn}".`);
   }
 
   // Invoke the user's configuration function with the necessary context.
@@ -52,6 +55,6 @@ export default async function loadConfig({ argv, config, configPath, configIsEmp
 
   // Ensure that the user's configuration function actually did something.
   if (commands.size === 0 && tasks.size === 0 && scripts.size === 0) {
-    throw new Error(`Configuration file at ${log.chalk.green(configPath)} did not register any commands, tasks, or scripts.`);
+    throw new Error(`Configuration file at ${chalk.green(configPath)} did not register any commands, tasks, or scripts.`);
   }
 }
