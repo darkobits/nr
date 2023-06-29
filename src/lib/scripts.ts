@@ -309,11 +309,12 @@ export function matchScript(value?: string) {
 
 
 /**
- * Provided a script options object, returns a function that, when invoked, will
- * execute the script. This function is then added to the scripts registry.
+ * Provided a name, instruction set, and optional options object, returns a
+ * function that, when invoked, will execute the script. This function is then
+ * added to the scripts registry by name.
  */
-export function script(instructions: InstructionSet, options: ScriptOptions) {
-  const { name, timing } = options;
+export function script(name: string, instructions: InstructionSet, options: ScriptOptions = {}) {
+  const { timing } = options;
 
   try {
     // ----- [1] Validate Options ----------------------------------------------

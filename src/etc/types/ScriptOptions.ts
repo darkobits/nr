@@ -3,12 +3,6 @@
  */
 export interface ScriptOptions {
   /**
-   * Name to use for the script when looking it up from a query and for logging
-   * and debugging purposes.
-   */
-  name: string;
-
-  /**
    * Description of what the script does. Used when showing available scripts
    * with the --scripts flag.
    */

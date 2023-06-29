@@ -8,7 +8,7 @@ import {
   execaNode,
   type Options as ExecaOptions
 } from 'execa';
-// @ts-expect-error - This package does not have type definitions.
+// @ts-expect-error - This package has no type definitions.
 import kebabCaseKeys from 'kebabcase-keys';
 import ow from 'ow';
 import * as R from 'ramda';
