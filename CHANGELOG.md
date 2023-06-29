@@ -1,3 +1,21 @@
+## [0.14.46-beta.1](https://github.com/darkobits/nr/compare/v0.14.45...v0.14.46-beta.1) (2023-06-29)
+
+
+### ⚠ BREAKING CHANGES
+
+* - Script's instructions now filter-out falsy values automatically.
+- Commands, tasks, and scripts can now accept single instructions.
+- Major API refactoring. See docs.
+
+### 📖 Documentation
+
+* Update README. ([567dffb](https://github.com/darkobits/nr/commit/567dffb78f63bbb9d08df9837184660f3dac7f79))
+
+
+### 🛠 Refactoring
+
+* Refactor API, add various improvements. ([0efbd0b](https://github.com/darkobits/nr/commit/0efbd0b73df83c7280ae81c3efff69a127d6eab0))
+
 ## [0.14.45](https://github.com/darkobits/nr/compare/v0.14.44...v0.14.45) (2023-06-28)
 
 
