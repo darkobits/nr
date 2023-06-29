@@ -26,13 +26,15 @@ import {
 import type { SaffronHandlerContext } from '@darkobits/saffron';
 import type {
   CLIArguments,
-  ConfigurationFactory,
+  CommandArguments,
+  CommandBuilderOptions,
   CommandDescriptor,
   CommandExecutor,
-  CommandThunk,
-  CommandArguments,
+  CommandExecutorOptions,
   CommandOptions,
-  CommandOptionsNode
+  CommandOptionsNode,
+  CommandThunk,
+  ConfigurationFactory
 } from 'etc/types';
 
 
@@ -63,182 +65,57 @@ const commonExecaOptions: ExecaOptions = {
 };
 
 
+// ----- Utilities -------------------------------------------------------------
+
 /**
  * @private
  *
  * Provided a CommandArguments list, returns an array of strings representing
  * the "un-parsed" arguments.
  */
-function unParseArguments(args: CommandArguments, preserveArgumentCasing?: boolean) {
-  ow(args, 'command and arguments', ow.array.maxLength(3));
-  ow(args[0], 'command', ow.string);
+function unParseArguments(args: CommandArguments | undefined, preserveArgumentCasing?: boolean) {
+  if (!args) return [];
 
-  if (args.length === 1) {
-    return [];
+  const positionals: Array<string> = [];
+  const flags: Record<string, any> = {};
+
+  // Single string form, return without un-parsing, nested in an array.
+  if (typeof args === 'string') {
+    return [args];
   }
 
-  let positionals: CommandArguments['1'] = [];
-  let flags: CommandArguments['2'] = {};
+  // Single object form.
+  if (typeof args === 'object' && !Array.isArray(args)) {
+    return yargsUnparser(
+      preserveArgumentCasing ? args : kebabCaseKeys(args)
+    );
+  }
 
-  if (args.length === 2) {
-    if (Array.isArray(args[1])) {
-      // Got [command, positionals] form.
-      ow(args[1], 'positional arguments', ow.array.ofType(ow.string));
-      positionals = args[1];
-    } else {
-      // Got [command, flags] form.
-      ow(args[1], 'flags', ow.object);
-      flags = args[1];
+  // Array form.
+  args.forEach(arg => {
+    // Add string arguments to positionals array.
+    if (ow.isValid(arg, ow.string)) {
+      positionals.push(arg);
+      return;
     }
-  } else if (args.length === 3) {
-    // Got [command, positionals, flags] form.
-    ow(args[1], 'positional arguments', ow.array.ofType(ow.string));
-    positionals = args[1];
-    ow(args[2], 'flags', ow.object);
-    flags = args[2];
-  }
 
-  // Convert arguments object to an array of strings, first converting any
-  // flags to kebab-case, unless preserveKeys is truthy.
-  return yargsUnparser(Object.assign(
-    {_: positionals},
-    preserveArgumentCasing ? flags : kebabCaseKeys(flags)
-  ));
-}
+    if (ow.isValid(arg, ow.object.plain)) {
+      Object.entries(arg).forEach(([key, value]) => {
+        flags[key] = value;
+      });
 
+      return;
+    }
 
-/**
- * @private
- *
- * Executes a command directly using Execa.
- */
-const executeCommand: CommandExecutor = (name, executableName, parsedArguments, opts) => {
-  const logPrefix = getPrefixedInstructionName('cmd', name);
-  const cmd = execa(executableName, parsedArguments, merge(commonExecaOptions, opts?.execaOptions ?? {}));
-  const escapedCommand = getEscapedCommand(undefined, cmd.spawnargs);
-  log.verbose(log.prefix(logPrefix), '•', chalk.gray(escapedCommand));
-  return cmd;
-};
+    throw new TypeError(`Expected "argument" to be of type "string" or "object", got "${typeof arg}".`);
+  });
 
+  const reCasedFlags = preserveArgumentCasing ? flags : kebabCaseKeys(flags);
 
-/**
- * @private
- *
- * Executes a command using `execaNode`.
- *
- * See: https://github.com/sindresorhus/execa#execanodescriptpath-arguments-options
- */
-const executeNodeCommand: CommandExecutor = (name, scriptPath, parsedArguments, opts) => {
-  const cwd = opts?.execaOptions?.cwd?.toString() ?? process.cwd();
-
-  // N.B. This function uses `which`, which requires that the target file have
-  // executable permissions set, which is not required here because we are
-  // running the script with Node.
-  // const resolvedScriptPath = resolveCommand(scriptPath, cwd?.toString());
-
-  const resolvedScriptPath = path.isAbsolute(scriptPath)
-    ? scriptPath
-    : path.resolve(cwd, scriptPath);
-
-  const logPrefix = getPrefixedInstructionName('cmd', name);
-  const cmd = execaNode(resolvedScriptPath, parsedArguments, merge(commonExecaOptions, opts?.execaOptions ?? {}));
-  const escapedCommand = getEscapedCommand(undefined, cmd.spawnargs);
-  log.verbose(log.prefix(logPrefix), '•', chalk.gray(escapedCommand));
-  return cmd;
-};
-
-
-interface CommandBuilderOptions {
-  executor: CommandExecutor;
-  name: string;
-  args: CommandArguments;
-  opts: CommandOptions | undefined;
-  sourcePackage: string;
-}
-
-
-/**
- * @private
- *
- * Provided a CommandExecutor, returns a function that, provided a command
- * options object, returns a CommandThunk. The CommandThunk is also added to the
- * command registry.
- *
- * When invoked, the CommandThunk will execute the command using the provided
- * CommandExecutor strategy.
- */
-function commandBuilder(builderOptions: CommandBuilderOptions): CommandThunk {
-  const { executor, name, args, opts, sourcePackage } = builderOptions;
-
-  try {
-    // Validate name.
-    ow(name, 'command name', ow.string);
-
-    // Parse and validate command and arguments.
-    const unParsedArguments = unParseArguments(args, opts?.preserveArgumentCasing);
-    const [executableName] = args;
-
-    // Validate options.
-    ow<Required<CommandOptions>>(opts, ow.optional.object.exactShape({
-      prefix: ow.optional.function,
-      execaOptions: ow.optional.object,
-      preserveArgumentCasing: ow.optional.boolean
-    }));
-
-    const logPrefix = getPrefixedInstructionName('cmd', name);
-
-    const commandThunk = async () => {
-      try {
-        const runTime = log.createTimer();
-        const command = executor(name, executableName, unParsedArguments, opts);
-
-        // If the user provided a custom prefix function, generate it now.
-        const prefix = opts?.prefix ? opts.prefix(chalk) : '';
-
-        if (command.stdout) {
-          command.stdout.pipe(new LogPipe((...args: Array<any>) => {
-            console.log(...[prefix, ...args].filter(Boolean));
-          }));
-        }
-
-        if (command.stderr) {
-          command.stderr.pipe(new LogPipe((...args: Array<any>) => {
-            console.error(...[prefix, ...args].filter(Boolean));
-          }));
-        }
-
-        void command.on('exit', code => {
-          if (code === 0 || opts?.execaOptions?.reject === false) {
-            // If the command exited successfully or if we are ignoring failed
-            // commands, log completion time.
-            log.verbose(log.prefix(logPrefix), '•', chalk.gray(runTime));
-          }
-        });
-
-        await command;
-      } catch (err: any) {
-        throw new Error(`${logPrefix} failed • ${err.message}`, { cause: err });
-      }
-    };
-
-    Object.defineProperties(commandThunk, {
-      name: { value: name },
-      [IS_COMMAND_THUNK]: { value: true as const }
-    });
-
-    commands.set(name, {
-      name,
-      sourcePackage,
-      arguments: args,
-      options: opts,
-      thunk: commandThunk as CommandThunk
-    });
-
-    return commandThunk as CommandThunk;
-  } catch (cause: any) {
-    throw new Error(`Unable to create command "${name}": ${cause.message}`, { cause });
-  }
-
+  return yargsUnparser({
+    _: positionals,
+    ...reCasedFlags
+  });
 }
 
 
@@ -258,25 +135,27 @@ export function printCommandInfo(context: SaffronHandlerContext<CLIArguments, Co
     return;
   }
 
-  const printCommand = (command: CommandDescriptor) => {
-    let title = chalk.green.bold(command.name);
+  const printCommand = (commandDescriptor: CommandDescriptor) => {
+    const { executable, name, unParsedArguments, sourcePackage } = commandDescriptor;
+    let title = chalk.green.bold(name);
 
     // Build script name, including package of origin.
     const commandSources = R.uniq(R.map(R.path(['sourcePackage']), allCommands));
     // Hide origin descriptors if all packages are local.
     const hideOriginDescriptors = commandSources.length === 1 && commandSources[0] === 'local';
 
-    if (!hideOriginDescriptors && command.sourcePackage !== 'unknown') {
-      title += command.sourcePackage === 'local'
+    if (!hideOriginDescriptors && sourcePackage !== 'unknown') {
+      title += sourcePackage === 'local'
         // Scripts from the local package.
         ? ` ${chalk.green.dim('local')}`
         // Scripts from third-party packages.
-        : ` ${chalk.green.dim(`via ${command.sourcePackage}`)}`;
+        : ` ${chalk.green.dim(`via ${sourcePackage}`)}`;
     }
 
-    const executable = command.arguments[0];
-    const argumentsString = unParseArguments(command.arguments, command.options?.preserveArgumentCasing).join(' ');
-    const finalDescription = `${chalk.gray.dim(executable)} ${chalk.gray.dim(argumentsString)}`;
+    const finalDescription = log.chalk.gray.dim([
+      executable,
+      ...unParsedArguments ?? []
+    ].join(' '));
 
     console.log(boxen(finalDescription, {
       title,
@@ -304,34 +183,230 @@ export function printCommandInfo(context: SaffronHandlerContext<CLIArguments, Co
 
 
 /**
+ * @private
+ *
+ * Provided a CommandExecutor, returns a function that, provided a command
+ * options object, returns a CommandThunk. The CommandThunk is also added to the
+ * command registry.
+ *
+ * When invoked, the CommandThunk will execute the command using the provided
+ * CommandExecutor strategy.
+ */
+function commandBuilder(builderOptions: CommandBuilderOptions): CommandThunk {
+  const {
+    executable,
+    executor,
+    name,
+    args,
+    sourcePackage,
+    prefix,
+    preserveArgumentCasing,
+    reject
+  } = builderOptions;
+
+  try {
+    // Validate command.
+    ow(executable, 'executable', ow.string);
+    // Validate name.
+    ow(name, 'command name', ow.optional.string);
+
+    // Validate other options.
+    ow<Required<CommandBuilderOptions>>(builderOptions, ow.optional.object.partialShape({
+      executable: ow.string,
+      name: ow.optional.string,
+      args: ow.optional.any(
+        ow.string,
+        ow.object.plain,
+        ow.array.ofType(ow.any(
+          ow.string,
+          ow.object.plain
+        ))
+      ),
+      prefix: ow.optional.function,
+      preserveArgumentCasing: ow.optional.boolean,
+      // These options will be added by executors, the rest come from the user.
+      executor: ow.function,
+      sourcePackage: ow.string
+
+      // TODO: This will not validate any execa options, which are now part of
+      // this object. These will still cause type errors.
+    }));
+
+    // This defaults to the `name` provided or otherwise to the name of the
+    // executable itself.
+    const commandDisplayName = name ?? executable;
+    const prefixedName = getPrefixedInstructionName('cmd', commandDisplayName);
+
+    // Parse and validate command and arguments.
+    const unParsedArguments = unParseArguments(args, preserveArgumentCasing);
+
+    const commandExecutorOptions: CommandExecutorOptions = {
+      ...builderOptions,
+      unParsedArguments,
+      prefixedName
+    };
+
+    const commandThunk = async () => {
+      try {
+        const runTime = log.createTimer();
+        const childProcess = executor(commandExecutorOptions);
+
+        // If the user provided a custom prefix function, generate it now.
+        const commandPrefix = prefix ? prefix(chalk) : '';
+
+        if (childProcess.stdout) {
+          childProcess.stdout.pipe(new LogPipe((...args: Array<any>) => {
+            console.log(...[commandPrefix, ...args].filter(Boolean));
+          }));
+        }
+
+        if (childProcess.stderr) {
+          childProcess.stderr.pipe(new LogPipe((...args: Array<any>) => {
+            console.error(...[commandPrefix, ...args].filter(Boolean));
+          }));
+        }
+
+        void childProcess.on('exit', code => {
+          if (code === 0 || reject === false) {
+            // If the command exited successfully or if we are ignoring failed
+            // commands, log completion time.
+            log.verbose(log.prefix(prefixedName), '•', chalk.gray(runTime));
+          }
+        });
+
+        // log.verbose(
+        //   log.prefix(prefixedName),
+        //   '•',
+        //   chalk.gray(getEscapedCommand(executable, childProcess.spawnargs))
+        // );
+
+        await childProcess;
+      } catch (err: any) {
+        throw new Error(`${prefixedName} failed • ${err.message}`, { cause: err });
+      }
+    };
+
+    Object.defineProperties(commandThunk, {
+      name: { value: name },
+      [IS_COMMAND_THUNK]: { value: true as const }
+    });
+
+    const commandDescriptor: CommandDescriptor = {
+      ...builderOptions,
+      name: commandDisplayName,
+      sourcePackage,
+      unParsedArguments,
+      thunk: commandThunk as CommandThunk
+    };
+
+    commands.set(commandDisplayName, commandDescriptor);
+
+    return commandThunk as CommandThunk;
+  } catch (cause: any) {
+    throw new Error(`Unable to create command "${name}": ${cause.message}`, { cause });
+  }
+
+}
+
+
+// ----- Command Executors -----------------------------------------------------
+
+// These functions accept a `CommandExecutorOptions` and execute the described
+// command using different strategies.
+
+
+/**
+ * @private
+ *
+ * Executes a command directly using Execa.
+ */
+const executeCommand: CommandExecutor = (options: CommandExecutorOptions) => {
+  const { executable, prefixedName, unParsedArguments } = options;
+
+  // Print the exact command we are about to run.
+  log.verbose(
+    log.prefix(prefixedName),
+    '•',
+    chalk.gray(getEscapedCommand(executable, unParsedArguments))
+  );
+
+  return execa(executable, unParsedArguments, merge(commonExecaOptions, options ?? {}));
+};
+
+
+/**
+ * @private
+ *
+ * Executes a command using `execaNode`.
+ *
+ * See: https://github.com/sindresorhus/execa#execanodescriptpath-arguments-options
+ */
+const executeNodeCommand: CommandExecutor = (options: CommandExecutorOptions) => {
+  const { executable, prefixedName, unParsedArguments } = options;
+
+  const cwd = options?.cwd?.toString() ?? process.cwd();
+
+  // N.B. This function uses `which`, which requires that the target file have
+  // executable permissions set, which is not required here because we are
+  // running the script with Node.
+  // const resolvedScriptPath = resolveCommand(scriptPath, cwd?.toString());
+  const resolvedScriptPath = path.isAbsolute(executable)
+    ? executable
+    : path.resolve(cwd, executable);
+
+  // Print the exact command we are about to run.
+  log.verbose(
+    log.prefix(prefixedName),
+    '•',
+    chalk.gray('node'),
+    chalk.gray(getEscapedCommand(executable, unParsedArguments))
+  );
+
+  return execaNode(resolvedScriptPath, unParsedArguments, merge(commonExecaOptions, options ?? {}));
+};
+
+
+// ----- Command Types ---------------------------------------------------------
+
+// These functions gather all parameters for a command, including a
+// `CommandOptions` object, determine source package, and create a
+// `CommandBuilderOptions` object that is passed to `commandBuilder` where
+// further common validation logic and processing occurs.
+
+
+/**
  * Creates a `CommandThunk` that executes a command directly using `execa`.
  */
-export function command(name: string, args: CommandArguments, opts?: CommandOptions) {
+export function command(executable: string, opts: CommandOptions = {}) {
+  ow(executable, 'first argument', ow.string);
+
   // Get the name of the package that defined this command.
   const sourcePackage = getPackageNameFromCallsite(callsites()[1]);
 
   return commandBuilder({
+    executable,
     executor: executeCommand,
-    name,
-    args,
-    opts,
-    sourcePackage
+    sourcePackage,
+    ...opts
   });
 }
 
 
 /**
- * Creates a `CommandThunk` that executes a command using `execa.node()`.
+ * Creates a `CommandThunk` that executes a command using `execaNode()`.
+ *
+ * See: https://github.com/sindresorhus/execa#execanodescriptpath-arguments-options
  */
-command.node = (name: string, args: CommandArguments, opts?: CommandOptionsNode) => {
+command.node = (executable: string, opts: CommandOptionsNode = {}) => {
+  ow(executable, 'first argument', ow.string);
+
   // Get the name of the package that defined this command.
   const sourcePackage = getPackageNameFromCallsite(callsites()[1]);
 
   return commandBuilder({
+    executable,
     executor: executeNodeCommand,
-    name,
-    args,
-    opts,
-    sourcePackage
+    sourcePackage,
+    ...opts
   });
 };
