@@ -32,7 +32,7 @@
   "dependencies": {
     "@darkobits/interop-import-default": "^1.0.0",
     "@darkobits/log": "^2.0.0-beta.15",
-    "@darkobits/saffron": "~0.32.8",
+    "@darkobits/saffron": "~0.32.9",
     "@types/is-ci": "^3.0.0",
     "@types/yargs-unparser": "^2.0.1",
     "boxen": "^7.1.0",
@@ -41,6 +41,7 @@
     "errno": "^1.0.0",
     "execa": "~7.1.1",
     "is-ci": "^3.0.1",
+    "is-plain-object": "^5.0.0",
     "kebabcase-keys": "^1.0.0",
     "micromatch": "^4.0.5",
     "npm-run-path": "~5.1.0",

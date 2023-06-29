@@ -1,3 +1,5 @@
+import { EOL } from 'os';
+
 import boxen from 'boxen';
 import callsites from 'callsites';
 import ow from 'ow';
@@ -28,6 +30,7 @@ import type {
   ConfigurationFactory,
   ScriptOptions,
   Instruction,
+  InstructionSet,
   ScriptDescriptor,
   ScriptThunk,
   Thunk
@@ -61,7 +64,10 @@ export const scripts = new Map<string, ScriptDescriptor>();
  */
 function parseStringInstruction(value: string): ParsedInstruction {
   if (!value.includes(':')) {
-    throw new Error(`Invalid instruction identifier: "${value}"`);
+    throw new Error([
+      `Invalid instruction identifier: "${value}".`,
+      'Prefix commands with "cmd:", tasks with "task:", and scripts with "script:".'
+    ].join(EOL));
   }
 
   const [type, name] = value.split(':') as any;
@@ -77,6 +83,22 @@ function parseStringInstruction(value: string): ParsedInstruction {
 /**
  * @private
  *
+ * Returns `true` if the provided value is a script, command, or task thunk.
+ */
+function isThunk(value: any): value is Thunk {
+  if (
+    Reflect.has(value, IS_SCRIPT_THUNK) ||
+    Reflect.has(value, IS_COMMAND_THUNK) ||
+    Reflect.has(value, IS_TASK_THUNK)
+  ) return true;
+
+  return false;
+}
+
+
+/**
+ * @private
+ *
  * If provided a CommandThunk, TaskThunk, or ScriptThunk, returns the value
  * as-is. If provided a string, attempts to resolve it to one of the above.
  * Strings may begin with 'cmd:', 'task:', or 'script:' to indicate the type to
@@ -86,14 +108,7 @@ function resolveInstructionToThunk(value: Instruction): Thunk {
   // If the user provided a thunk directly in a script, we don't need to look it
   // up in the registry.
   if (typeof value === 'function') {
-    if (
-      Reflect.has(value, IS_SCRIPT_THUNK) ||
-      Reflect.has(value, IS_COMMAND_THUNK) ||
-      Reflect.has(value, IS_TASK_THUNK)
-    ) {
-      return value;
-    }
-
+    if (isThunk(value)) return value;
     throw new TypeError('[resolveInstructionToThunk] Provided function is not a command, task, or script.');
   }
 
@@ -122,6 +137,34 @@ function resolveInstructionToThunk(value: Instruction): Thunk {
   }
 
   throw new TypeError(`[resolveInstructionToThunk] Expected instruction to be of type "string" or "function", got "${typeof value}".`);
+}
+
+
+/**
+ * @private
+ *
+ * Provided the value of a script's `run` property, which should be either:
+ *
+ * 1. A single string.
+ * 2. A single Thunk for a Script, Command, or Task.
+ * 3. An Array of the above.
+ * - A nested array within (3) containing only items (1-2).
+ */
+function validateInstructionNesting(instructions: InstructionSet) {
+  // Falsy values are valid.
+  if (!instructions) return true;
+
+  // Single-value strings and thunks are valid.
+  if (typeof instructions === 'string' || isThunk(instructions)) return true;
+
+  // By now we can assume that `instructions` is an Array. Remove 1 level of
+  // nesting and check each member. If any is an Array, we have too many levels
+  // of nesting and the instructions are invalid.
+  for (const instruction of R.unnest(instructions)) {
+    if (Array.isArray(instruction)) return false;
+  }
+
+  return true;
 }
 
 
@@ -213,7 +256,7 @@ export function printScriptInfo(context: SaffronHandlerContext<CLIArguments, Con
   console.log('');
 
   // 🟩 🟨
-  if (!nrIsInPath) {
+  if (nrIsInPath) {
     const contents = chalk.gray(`• ${chalk.green(`${chalk.bold('nr')} is in your PATH`)}; you can use the CLI directly: ${chalk.bold('nr query')}.`);
     heroLog(contents);
 
@@ -269,84 +312,108 @@ export function matchScript(value?: string) {
  * Provided a script options object, returns a function that, when invoked, will
  * execute the script. This function is then added to the scripts registry.
  */
-export function script(name: string, opts: ScriptOptions) {
-  try {
-    // Validate name.
-    ow(name, 'script name', ow.string);
+export function script(instructions: InstructionSet, options: ScriptOptions) {
+  const { name, timing } = options;
 
-    // Validate options.
-    ow<Required<ScriptOptions>>(opts, ow.object.exactShape({
+  try {
+    // ----- [1] Validate Options ----------------------------------------------
+
+    ow<Required<ScriptOptions>>(options, ow.object.exactShape({
+      name: ow.optional.string,
       description: ow.optional.string,
       group: ow.optional.string,
-      run: ow.array.ofType(ow.any(
+      timing: ow.optional.boolean,
+      // @ts-expect-error - This is here for backwards compatibility during migration.
+      run: ow.any
+    }));
+
+    const scriptDisplayName = name ?? 'anonymous';
+    const logPrefix = getPrefixedInstructionName('script', scriptDisplayName);
+
+    const filteredInstructions = Array.isArray(instructions)
+    ? instructions.filter(Boolean)
+    : instructions
+      ? [instructions]
+      : [];
+
+    if (!validateInstructionNesting(filteredInstructions)) {
+      throw new Error(`Script ${scriptDisplayName} contains too many layers of nesting for instructions; max 2.`);
+    }
+
+    ow(filteredInstructions, 'script instructions', ow.any(
+      // Single instructions not wrapped in an array.
+      ow.string,
+      ow.function,
+      // Multiple instructions to be run in serial.
+      ow.array.ofType(ow.any(
         ow.string,
         ow.function,
+        // Nested instructions to be run in parallel.
         ow.array.ofType(ow.any(
           ow.string,
           ow.function
         ))
-      )),
-      timing: ow.optional.boolean
-    }));
+      ))
+    ));
 
-    const canonicalName = name ?? 'anonymous';
-    const logPrefix = getPrefixedInstructionName('script', canonicalName);
 
-    // Get the name of the package that defined this script.
-    const sourcePackage = getPackageNameFromCallsite(callsites()[1]);
+    // ----- [2] Create Script Thunk -------------------------------------------
 
-    // NB: This function does not catch errors. Failed commands will log
-    // appropriate error messages and then re-throw, propagating errors up to
-    // this function's caller.
     const scriptThunk = async () => {
       const runTime = log.createTimer();
 
       // Map each entry in the instruction sequence to its corresponding
       // command, task, or script. For nested arrays, map the array to a thunk
       // that runs each entry in parallel.
-      const resolvedInstructions = opts.run.map(value => {
-        if (Array.isArray(value)) {
-          const instructionThunks = value.map(resolveInstructionToThunk);
+      const resolvedInstructions = filteredInstructions.map(instruction => {
+        if (Array.isArray(instruction)) {
+          const instructionThunks = instruction.map(resolveInstructionToThunk);
 
           return async () => {
             await pAll(instructionThunks);
           };
         }
 
-        return resolveInstructionToThunk(value);
+        return resolveInstructionToThunk(instruction);
       });
 
       // Instructions may be added to a script definition dynamically, meaning
       // it is possible that a script has zero instructions under certain
       // conditions. When this is the case, issue a warning and bail.
       if (resolvedInstructions.length === 0) {
-        log.warn(log.prefix(logPrefix), chalk.yellow.bold(`Script "${canonicalName}" contains no instructions.`));
+        log.warn(log.prefix(logPrefix), chalk.yellow.bold(`Script "${scriptDisplayName}" contains no instructions.`));
         return;
       }
 
+      // Run any pre-script, if defined.
       const preScript = caseInsensitiveGet(`pre${name}`, scripts);
       if (preScript) await preScript.thunk();
 
       // Run each Instruction in series. If an Instruction is an Array, all
       // commands in that Instruction will be run in parallel.
       try {
-        if (opts.timing) {
-          heroLog(chalk.gray.dim(`○ ${canonicalName}`));
+        if (timing) {
+          heroLog(chalk.gray.dim(`○ ${scriptDisplayName}`));
+        } else {
+          log.verbose(log.prefix(logPrefix), '•', chalk.green('start'));
         }
-
-        log.verbose(log.prefix(logPrefix), '•', chalk.green('start'));
 
         await pSeries(resolvedInstructions);
 
-        log.verbose(log.prefix(logPrefix), '•', chalk.green(runTime));
-
-        if (opts.timing) {
-          heroLog(`${chalk.greenBright('⏺')} ${chalk.gray.dim(`${canonicalName} • ${runTime}`)}`);
+        if (timing) {
+          heroLog([
+            chalk.greenBright('⏺'),
+            chalk.gray.dim(`${scriptDisplayName} •`),
+            log.chalk.greenBright(runTime)
+          ].join(' '));
+        } else {
+          log.verbose(log.prefix(logPrefix), '•', chalk.green(runTime));
         }
       } catch (err: any) {
         throw new Error(`${logPrefix} failed • ${err.message}`, { cause: err });
       }
 
+      // Run post-script, if defined.
       const postScript = caseInsensitiveGet(`post${name}`, scripts);
       if (postScript) await postScript.thunk();
     };
@@ -356,10 +423,13 @@ export function script(name: string, opts: ScriptOptions) {
       [IS_SCRIPT_THUNK]: { value: true as const }
     });
 
-    scripts.set(name, {
+    // Get the name of the package that defined this script.
+    const sourcePackage = getPackageNameFromCallsite(callsites()[1]);
+
+    scripts.set(scriptDisplayName, {
       name,
       sourcePackage,
-      options: opts,
+      options,
       thunk: scriptThunk as ScriptThunk
     });
 

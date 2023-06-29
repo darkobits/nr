@@ -14,6 +14,7 @@ import type {
   ConfigurationFactory,
   TaskDescriptor,
   TaskFn,
+  TaskOptions,
   TaskThunk
 } from 'etc/types';
 
@@ -76,25 +77,28 @@ export function printTaskInfo(context: SaffronHandlerContext<CLIArguments, Confi
  * Provided a name and function, registers a new task and returns a thunk that,
  * when invoked, will call the task function.
  */
-export function task(name: string, taskFn: TaskFn) {
+export function task(taskFn: TaskFn, options: TaskOptions = {}) {
+  const { name } = options;
+
   try {
     // Validate parameters.
-    ow(name, 'task name', ow.string);
+    ow(name, 'task name', ow.optional.string);
     ow(taskFn, 'task function', ow.function);
+
+    const taskDisplayName = name ?? taskFn.name;
+    const prefixedName = getPrefixedInstructionName('task', taskDisplayName);
 
     // Get the name of the package that defined this task.
     const sourcePackage = getPackageNameFromCallsite(callsites()[1]);
 
     const taskThunk = async () => {
-      const logPrefix = getPrefixedInstructionName('task', name);
-
       try {
-        log.verbose(log.prefix(logPrefix), '•', chalk.cyan('start'));
         const runTime = log.createTimer();
+        log.verbose(log.prefix(prefixedName), '•', chalk.cyan('start'));
         await taskFn();
-        log.verbose(log.prefix(logPrefix), '•', chalk.cyan(runTime));
+        log.verbose(log.prefix(prefixedName), '•', chalk.cyan(runTime));
       } catch (err: any) {
-        throw new Error(`${logPrefix} failed • ${err.message}`, { cause: err });
+        throw new Error(`${prefixedName} failed • ${err.message}`, { cause: err });
       }
     };
 
@@ -103,11 +107,13 @@ export function task(name: string, taskFn: TaskFn) {
       [IS_TASK_THUNK]: { value: true as const }
     });
 
-    tasks.set(name, {
-      name,
+    const taskDescriptor: TaskDescriptor = {
+      name: prefixedName,
       sourcePackage,
       thunk: taskThunk as TaskThunk
-    });
+    };
+
+    tasks.set(prefixedName, taskDescriptor);
 
     return taskThunk as TaskThunk;
   } catch (err: any) {

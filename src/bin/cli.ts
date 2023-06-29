@@ -24,6 +24,7 @@ cli.command<CLIArguments, ConfigurationFactory>({
   description: 'Run the script matched by the provided query.',
   config: {
     auto: false
+    // fileName: 'nr'
   },
   builder: ({ command }) => {
     command.example('$0 test', 'Runs the script named "test".');
