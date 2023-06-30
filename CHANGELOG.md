@@ -1,3 +1,33 @@
+## [0.14.46](https://github.com/darkobits/nr/compare/v0.14.45...v0.14.46) (2023-06-30)
+
+
+### ⚠ BREAKING CHANGES
+
+* - Script's instructions now filter-out falsy values automatically.
+- Commands, tasks, and scripts can now accept single instructions.
+- Major API refactoring. See docs.
+
+### 🏗 Chores
+
+* **deps:** Update dependencies. ([8db86dc](https://github.com/darkobits/nr/commit/8db86dcaf8fae36e47a273fe3f5f74782c88b273))
+* **deps:** Update dependencies. ([870f6ca](https://github.com/darkobits/nr/commit/870f6ca705b7cfd14f825251a230cfec20f1efe4))
+* **deps:** Update dependencies. ([e032396](https://github.com/darkobits/nr/commit/e032396e99787cda93c09f32ce4b6bcd9faee8f7))
+* Misc cleanup. ([ea02900](https://github.com/darkobits/nr/commit/ea0290010e36b99b756ea550b16e23c7c05d7274))
+* **release:** 0.14.46 ([d6019a2](https://github.com/darkobits/nr/commit/d6019a2e50af5b2b674fd4ee80f14d5ae394086f))
+* **release:** 0.14.46-beta.1 ([bd12b39](https://github.com/darkobits/nr/commit/bd12b3925e6f841e697ce09444fb768bf44ec656))
+* **release:** 0.14.46-beta.2 ([5083553](https://github.com/darkobits/nr/commit/5083553edf79628f557cda02cfedc1f26aac90ac))
+
+
+### 📖 Documentation
+
+* Update README. ([567dffb](https://github.com/darkobits/nr/commit/567dffb78f63bbb9d08df9837184660f3dac7f79))
+
+
+### 🛠 Refactoring
+
+* Move script name to first argument. ([81b8b63](https://github.com/darkobits/nr/commit/81b8b6348831562fbad0f994d63cca34c8ac8fea))
+* Refactor API, add various improvements. ([0efbd0b](https://github.com/darkobits/nr/commit/0efbd0b73df83c7280ae81c3efff69a127d6eab0))
+
 # Changelog
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
