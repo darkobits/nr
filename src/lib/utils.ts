@@ -111,6 +111,8 @@ export function caseInsensitiveGet<M extends Map<string, any>>(key: string, map:
 /**
  * Uses `which` to attempt to resolve the absolute path to the provided command.
  * Throws an ENOENT system error if the command cannot be found.
+ *
+ * Note: This is currently only used to check if `nr` is in the user's PATH.
  */
 export function resolveCommand(cmd: string, cwd = process.cwd()) {
   try {

@@ -28,7 +28,7 @@ export type Instruction = string | Thunk | false | undefined;
  * commands in parallel followed by the 'cleanup' command, we would express
  * that thusly:
  *
- * run: [
+ * [
  *   ['cmd:babel', 'cmd:lint', 'cmd:type-check'],
  *   'cmd:cleanup'
  * ]
@@ -36,7 +36,7 @@ export type Instruction = string | Thunk | false | undefined;
  * Note: If a script should run a single group of Instructions in parallel,
  * a nested array is still required to indicate parallelization:
  *
- * run: [
+ * [
  *   ['cmd:build', 'cmd:lint', 'cmd:test']
  * ]
  */

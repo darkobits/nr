@@ -320,12 +320,9 @@ export function script(name: string, instructions: InstructionSet, options: Scri
     // ----- [1] Validate Options ----------------------------------------------
 
     ow<Required<ScriptOptions>>(options, ow.object.exactShape({
-      name: ow.optional.string,
       description: ow.optional.string,
       group: ow.optional.string,
-      timing: ow.optional.boolean,
-      // @ts-expect-error - This is here for backwards compatibility during migration.
-      run: ow.any
+      timing: ow.optional.boolean
     }));
 
     const scriptDisplayName = name ?? 'anonymous';
