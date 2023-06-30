@@ -135,25 +135,24 @@ export default nr({ command, task, script }) => {
   const babelCmd = command('babel', { args: ['src', { outDir: 'dist' }] });
 
   script('build', [
-      // We can reference commands, tasks, and scripts by their return value:
-      babelCmd,
-      // Or, using a string with the 'cmd:' prefix followed by the command's
-      // name. For tasks, use 'task:' and for scripts, use 'script:'.
-      'cmd:babel'
-    ], {
+    // We can reference commands, tasks, and scripts by their return value:
+    babelCmd,
+    // Or, using a string with the 'cmd:' prefix followed by the command's
+    // name. For tasks, use 'task:' and for scripts, use 'script:'.
+    'cmd:babel'
+  ], {
     group: 'Build Scripts',
     description: 'Transpile the project with Babel.'
-    run:
   });
 
   // Or, inline the command. This can be helpful if the command is not likely to
   // be re-used by other scripts.
   script('build', [
-      command('babel', { args: ['src', { outDir: 'dist' }] }),
-      // Or, using a string with the 'cmd:' prefix followed by the command's
-      // name. For tasks, use 'task:' and for scripts, use 'script:'.
-      'cmd:babel'
-    ], {
+    command('babel', { args: ['src', { outDir: 'dist' }] }),
+    // Or, using a string with the 'cmd:' prefix followed by the command's
+    // name. For tasks, use 'task:' and for scripts, use 'script:'.
+    'cmd:babel'
+  ], {
     group: 'Build Scripts',
     description: 'Transpile the project with Babel.'
     run:
@@ -202,7 +201,8 @@ export default nr({ command, script }) => {
   command('eslint', { args: ['src', { ext: '.ts,.tsx,.js,.jsx' }] });
 
   // Type-check and emit type declarations for the project.
-  command('tsc', { emitDeclarationOnly: true }, {
+  command('tsc', {
+    args: { emitDeclarationOnly: true },
     // Do not convert flags to kebab-case.
     preserveArgumentCasing: true
   });
@@ -292,12 +292,17 @@ complex parallelization, write separate, smaller scripts and compose them.
 import nr from '@darkobits/nr';
 
 export default nr({ command, task, script }) => {
-  command('babel', { args: ['src', { outDir: 'dist' }] });
+  command('babel', {
+    args: ['src', { outDir: 'dist' }]
+  });
 
-  // If a command only has 1 argument, it need not be wrapped in an array.
-  command('eslint', { args: 'src' });
+  // If a command only has 1 argument or 1 objects declaring its flags, it need
+  // not be wrapped in an array.
+  command('eslint', {
+    args: 'src'
+  });
 
-  command('jest');
+  command('vitest');
 
   const done = task(() => { console.log('Done!'); });
 
@@ -317,7 +322,9 @@ export default nr({ command, task, script }) => {
   script('test.coverage', [
     // In such cases, the command's "name" is still significant; it is used
     // for error-reporting, and should therefore be descriptive.
-    command('jest', { args: { coverage: true } });
+    command('vitest', {
+      args: ['run', { coverage: true }]
+    });
   ], {
     description: 'Test the project and generate a coverage report.'
   });
