@@ -1,3 +1,15 @@
+## [0.14.47](https://github.com/darkobits/nr/compare/v0.14.46...v0.14.47) (2023-06-30)
+
+
+### 🏗 Chores
+
+* Parallelize smoke tests. ([79be474](https://github.com/darkobits/nr/commit/79be474223f1b85476919209444150a9174691c2))
+
+
+### 📖 Documentation
+
+* Update README. ([549addc](https://github.com/darkobits/nr/commit/549addc488ce3a61f5097368335d6523d083217d))
+
 ## [0.14.46](https://github.com/darkobits/nr/compare/v0.14.45...v0.14.46) (2023-06-30)
 
 
