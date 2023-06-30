@@ -54,7 +54,7 @@
     "yargs-unparser": "^2.0.0"
   },
   "devDependencies": {
-    "@darkobits/ts": "0.17.4-beta.0",
+    "@darkobits/ts": "0.17.4-beta.1",
     "@types/micromatch": "^4.0.2",
     "@types/node-emoji": "^1.8.2",
     "@types/ramda": "^0.29.2",
