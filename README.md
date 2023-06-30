@@ -126,22 +126,37 @@ following keys:
 
 **Example:**
 
-> `nr.config.js`
+> `nr.config.ts`
 
-```js
-export default ({ command, task, script }) => {
-  const babelCmd = command('babel', ['babel', ['src'], { outDir: 'dist' }]);
+```ts
+import nr from '@darkobits/nr';
 
-  script('build', {
-    group: 'Build Scripts',
-    description: 'Transpile the project with Babel.'
-    run: [
+export default nr({ command, task, script }) => {
+  const babelCmd = command('babel', { args: ['src', { outDir: 'dist' }] });
+
+  script('build', [
       // We can reference commands, tasks, and scripts by their return value:
       babelCmd,
       // Or, using a string with the 'cmd:' prefix followed by the command's
       // name. For tasks, use 'task:' and for scripts, use 'script:'.
       'cmd:babel'
-    ]
+    ], {
+    group: 'Build Scripts',
+    description: 'Transpile the project with Babel.'
+    run:
+  });
+
+  // Or, inline the command. This can be helpful if the command is not likely to
+  // be re-used by other scripts.
+  script('build', [
+      command('babel', { args: ['src', { outDir: 'dist' }] }),
+      // Or, using a string with the 'cmd:' prefix followed by the command's
+      // name. For tasks, use 'task:' and for scripts, use 'script:'.
+      'cmd:babel'
+    ], {
+    group: 'Build Scripts',
+    description: 'Transpile the project with Babel.'
+    run:
   });
 };
 ```
@@ -154,11 +169,11 @@ nr build
 
 ### `command`
 
-| Parameter  | Type                                                    | Description               |
-|------------|---------------------------------------------------------|---------------------------|
-| `name`     | `string`                                                | Name of the command.      |
-| `args`     | [`CommandArguments`](src/etc/types/CommandArguments.ts) | Executable and arguments. |
-| `options?` | [`CommandOptions`](src/etc/types/CommandOptions.ts)     | Optional configuration.   |
+| Parameter  | Type                                                    | Description                        |
+|----------------|---------------------------------------------------------|--------------------------------|
+| `executable`   | `string`                                                | Name of the executable to run. |
+| `options?`     | [`CommandOptions`](src/etc/types/CommandOptions.ts)     | Optional configuration.        |
+| `options.args` | [`CommandArguments`](src/etc/types/CommandArguments.ts) | Executable and arguments.      |
 
 | Return Type                                     | Description                                                |
 |-------------------------------------------------|------------------------------------------------------------|
@@ -171,28 +186,23 @@ the return value from `command` directly or a string in the format `cmd:name`. C
 using [`execa`](https://github.com/sindresorhus/execa).
 
 [`CommandArguments`](src/etc/types/CommandArguments.ts) may take one of four forms:
-* `[executable]` of type `[string]`
-* `[executable, positionals]` of type `[string, Array<string>]`
-* `[executable, flags]` of type `[string, Record<string, any>]`
-* `[executable, positionals, flags]` of type `[string, Array<string>, Record<string, any>]`
+* `string` for singular positional arguments or to list all arguments as a single string
+* `Record<string, any>` to list all arguments as flags
+* `Array<string | Record<string, any>>` to mix positionals and flags.
 
 **Example:**
 
-> `nr.config.js`
+> `nr.config.ts`
 
-```js
-export default ({ command, script }) => {
-  // Lint the project.
-  command('eslint', [
-    // Executable + positional arguments + flags.
-    'eslint', ['src'], { ext: '.ts,.tsx,.js,.jsx' }
-  ]);
+```ts
+import nr from '@darkobits/nr';
+
+export default nr({ command, script }) => {
+  // Lint the project using ESLint.
+  command('eslint', { args: ['src', { ext: '.ts,.tsx,.js,.jsx' }] });
 
   // Type-check and emit type declarations for the project.
-  command('tsc.emit', [
-    // Executable + flags.
-    'tsc', { emitDeclarationOnly: true }
-  ], {
+  command('tsc', { emitDeclarationOnly: true }, {
     // Do not convert flags to kebab-case.
     preserveArgumentCasing: true
   });
@@ -208,10 +218,10 @@ current version of Node. This variant uses [`execaNode`](https://github.com/sind
 
 ### `task`
 
-| Parameter | Type                                | Description          |
-|-----------|-------------------------------------|----------------------|
-| `name`    | `string`                            | Name of the task.    |
-| `taskFn`  | [`TaskFn`](src/etc/types/TaskFn.ts) | Function to execute. |
+| Parameter | Type                                          | Description          |
+|-----------|-----------------------------------------------|----------------------|
+| `taskFn`  | [`TaskFn`](src/etc/types/TaskFn.ts)           | Function to execute. |
+| options   | [`TaskOptions`](src/etc/types/TaskOptions.ts) | Task options.        |
 
 | Return Type                               | Description                                             |
 |-------------------------------------------|---------------------------------------------------------|
@@ -223,21 +233,23 @@ return value from `task` directly or a string in the format `task:name`.
 
 **Example:**
 
-> `nr.config.js`
+> `nr.config.ts`
 
-```js
-export default ({ task, script }) => {
-  const foo = task('foo', () => {
+```ts
+import nr from '@darkobits/nr';
+
+export default nr({ task, script }) => {
+  const myAwesomeTask = task(() => {
     console.log('bar');
+  }, {
+    name: 'myAwesomeTask'
   });
 
-  script('foo', {
-    run: [
-      foo,
-      // Or
-      'task:foo'
-    ]
-  });
+  // If a script only references a single instruction, an array is not needed:
+  script('foo', myAwesomeTask);
+
+  // This is also functionally equivalent:
+  script('foo', 'task:myAwesomeTask')'
 };
 ```
 
@@ -274,38 +286,40 @@ complex parallelization, write separate, smaller scripts and compose them.
 
 **Example:**
 
-> `nr.config.js`
+> `nr.config.ts`
 
-```js
-export default ({ command, task, script }) => {
-  command('build', ['babel', ['src'], { outDir: 'dist' }]);
-  command('lint', ['eslint', ['src']]);
-  command('test', ['jest']);
-  task('done', () => {
-    console.log('Excelsior!');
-  });
+```ts
+import nr from '@darkobits/nr';
 
-  script('prepare', {
-    description: 'Build and lint in parallel, then run unit tests.',
-    run: [
-      // Run these instructions in parallel.
-      ['cmd:build', 'cmd:lint']
-      // Then run this instruction.
-      'cmd:test',
-      // Then run this task.
-      'task:done'
-    ]
+export default nr({ command, task, script }) => {
+  command('babel', { args: ['src', { outDir: 'dist' }] });
+
+  // If a command only has 1 argument, it need not be wrapped in an array.
+  command('eslint', { args: 'src' });
+
+  command('jest');
+
+  const done = task(() => { console.log('Done!'); });
+
+  script('prepare', [
+    // Run these instructions in parallel.
+    ['cmd:build', 'cmd:lint']
+    // Then run this instruction.
+    'cmd:test',
+    // Then run this task.
+    done
+  ], {
+    description: 'Build and lint in parallel, then run unit tests.'
   });
 
   // Instructions (commands, tasks, and other scripts) can be referenced by
   // value, so they can be defined inline as well:
-  script('test.coverage', {
-    description: 'Test the project and generate a coverage report.',
-    run: [
-      // In such cases, the command's "name" is still significant; it is used
-      // for error-reporting, and should therefore be descriptive.
-      command('jest-coverage', ['jest', { coverage: true }]);
-    ]
+  script('test.coverage', [
+    // In such cases, the command's "name" is still significant; it is used
+    // for error-reporting, and should therefore be descriptive.
+    command('jest', { args: { coverage: true } });
+  ], {
+    description: 'Test the project and generate a coverage report.'
   });
 };
 ```
@@ -335,8 +349,20 @@ export default ({ command, task, script }) => {
 };
 ```
 
-Alternatively, `nr` exports a helper which provides type-safety and IntelliSense without requiring a
-JSDoc annotation:
+Or, you can use the `satisfies` keyword:
+
+> `nr.config.ts`
+
+```ts
+import type { ConfigurationFactory } from '@darkobits/nr';
+
+export default (({ command, task, script }) => {
+  // empty
+}) satisfies ConfigurationFactory;
+```
+
+Or, `nr` exports a helper which provides type-safety and IntelliSense without requiring a
+JSDoc or explicit type annotation:
 
 > `nr.config.js`
 
@@ -344,16 +370,13 @@ JSDoc annotation:
 import nr from '@darkobits/nr';
 
 export default nr(({ command, task, script }) => {
-
+  // Type-safe creation of commands, tasks, and scripts.
 });
 ```
 
-`nr` also supports TypeScript configuration files. Name your configuration file `nr.config.ts` and use
-the helper for a fully type-safe experience.
-
 # Use
 
-Once you have created an `nr.config.js` file in your project and registered commands, tasks, and
+Once you have created an `nr.config.(ts|js)` file in your project and registered commands, tasks, and
 scripts, you may invoke a registered script using the `nr` CLI:
 
 ```
