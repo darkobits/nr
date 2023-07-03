@@ -143,26 +143,48 @@ function resolveInstructionToThunk(value: Instruction): Thunk {
 /**
  * @private
  *
- * Provided the value of a script's `run` property, which should be either:
+ * Provided the value of a script's instruction(s), ensures that its values are
+ * valid and that nesting (indicating parallelization of instructions) is
+ * specified correctly.
  *
- * 1. A single string.
- * 2. A single Thunk for a Script, Command, or Task.
+ * Valid values for a script's instruction(s) may be:
+ *
+ * 1. A single string, indicating a reference to another Script, Command, or
+ *    Task by name.
+ * 2. A single ScriptThunk, CommandThunk, or TaskThunk.
  * 3. An Array of the above.
- * - A nested array within (3) containing only items (1-2).
+ * 4. A nested Array within (3) containing only items (1-2).
  */
-function validateInstructionNesting(instructions: InstructionSet) {
+function validateInstructions(instructions: InstructionSet) {
   // Falsy values are valid.
   if (!instructions) return true;
 
-  // Single-value strings and thunks are valid.
+  // Single-value strings and single-value thunks are valid.
   if (typeof instructions === 'string' || isThunk(instructions)) return true;
 
-  // By now we can assume that `instructions` is an Array. Remove 1 level of
-  // nesting and check each member. If any is an Array, we have too many levels
-  // of nesting and the instructions are invalid.
+  // By now we can assume that the scripts instructions are an Array. Remove 1
+  // level of nesting and check each member. If any is an Array, we have too
+  // many levels of nesting and the instructions are invalid.
   for (const instruction of R.unnest(instructions)) {
     if (Array.isArray(instruction)) return false;
   }
+
+  // Finally, validate instructions using ow.
+  ow(instructions, 'script instructions', ow.any(
+    // Single instructions not wrapped in an array.
+    ow.string,
+    ow.function,
+    // Multiple instructions to be run in serial.
+    ow.array.ofType(ow.any(
+      ow.string,
+      ow.function,
+      // Nested instructions to be run in parallel.
+      ow.array.ofType(ow.any(
+        ow.string,
+        ow.function
+      ))
+    ))
+  ));
 
   return true;
 }
@@ -329,30 +351,14 @@ export function script(name: string, instructions: InstructionSet, options: Scri
     const logPrefix = getPrefixedInstructionName('script', scriptDisplayName);
 
     const filteredInstructions = Array.isArray(instructions)
-    ? instructions.filter(Boolean)
-    : instructions
-      ? [instructions]
-      : [];
+      ? instructions.filter(Boolean)
+      : instructions
+        ? [instructions]
+        : [];
 
-    if (!validateInstructionNesting(filteredInstructions)) {
+    if (!validateInstructions(filteredInstructions)) {
       throw new Error(`Script ${scriptDisplayName} contains too many layers of nesting for instructions; max 2.`);
     }
-
-    ow(filteredInstructions, 'script instructions', ow.any(
-      // Single instructions not wrapped in an array.
-      ow.string,
-      ow.function,
-      // Multiple instructions to be run in serial.
-      ow.array.ofType(ow.any(
-        ow.string,
-        ow.function,
-        // Nested instructions to be run in parallel.
-        ow.array.ofType(ow.any(
-          ow.string,
-          ow.function
-        ))
-      ))
-    ));
 
 
     // ----- [2] Create Script Thunk -------------------------------------------

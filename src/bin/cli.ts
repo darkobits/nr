@@ -4,14 +4,10 @@ import { EOL } from 'os';
 
 import * as cli from '@darkobits/saffron';
 
-import { NR_RED } from 'etc/constants';
 import { printCommandInfo } from 'lib/commands';
 import loadConfig from 'lib/configuration';
 import log from 'lib/log';
-import {
-  matchScript,
-  printScriptInfo
-} from 'lib/scripts';
+import { matchScript, printScriptInfo } from 'lib/scripts';
 import { printTaskInfo } from 'lib/tasks';
 import { parseError, heroLog } from 'lib/utils';
 
@@ -23,11 +19,11 @@ cli.command<CLIArguments, ConfigurationFactory>({
   command: '* [query]',
   description: 'Run the script matched by the provided query.',
   config: {
-    auto: false
-    // fileName: 'nr'
+    auto: false,
+    fileName: 'nr'
   },
   builder: ({ command }) => {
-    command.example('$0 test', 'Runs the script named "test".');
+    command.example('$0 test', 'Runs the script that most closely matches "test".');
     command.example('$0 --scripts', 'Lists available scripts.');
 
     command.positional('query', {
@@ -109,35 +105,4 @@ cli.command<CLIArguments, ConfigurationFactory>({
 });
 
 
-// cli.init();
-
-const replacers = {
-  'nr [query]': chalk.bold.hex(NR_RED),
-  'Positionals:': chalk.bold.hex(NR_RED),
-  'Introspection:': chalk.bold.hex(NR_RED),
-  'Options:': chalk.bold.hex(NR_RED),
-  'Examples:': chalk.bold.hex(NR_RED),
-  // '--scripts': chalk.bold,
-  // '--tasks': chalk.bold,
-  // '--commands': chalk.bold,
-  // '--config': chalk.bold,
-  // '-v': chalk.bold,
-  // '--version': chalk.bold,
-  // '-h': chalk.bold,
-  // '--help': chalk.bold,
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  '[boolean]': () => ''
-};
-
-
-function replaceText(sourceText: string) {
-  return Object.entries(replacers).reduce((curText, [searchText, replacer]) => {
-    return curText.replaceAll(searchText, replacer(searchText));
-  }, sourceText);
-}
-
-
-cli.init(() => (err, argv, output) => {
-  if (err) return console.error(err);
-  if (output) return console.error(replaceText(output));
-});
+cli.init();

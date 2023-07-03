@@ -1,6 +1,4 @@
 {
-  // Note: Vitest requires an explicit path to tsconfig.json. Otherwise, it will
-  // try to read index.js at the indicated package root.
   "extends": "@darkobits/ts/tsconfig.json",
   "compilerOptions": {
     "baseUrl": "src",

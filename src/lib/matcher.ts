@@ -59,7 +59,7 @@ export default function match(haystack: Array<string>, needle: string | undefine
     formattedResults[formattedResults.length - 1] = `and ${formattedResults.at(-1)}`;
 
     // Otherwise, throw.
-    throw new Error(`Multiple scripts matched "${needle}": ${formattedResults.join(', ')}. Use more characters to disambiguate.`);
+    throw new Error(`Multiple scripts matched query "${needle}": ${formattedResults.join(', ')}. To disambiguate, use a more specific query.`);
   }
 
   // Otherwise, we only have 1 result; return it.

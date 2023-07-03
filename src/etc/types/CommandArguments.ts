@@ -20,13 +20,3 @@ export type CommandArguments =
   Record<string, any> |
   // Mixed positional arguments and flags.
   Array<string | Record<string, any>>;
-
-// export type CommandArguments =
-//   // Command only.
-//   [string] |
-//   // Command and positional arguments.
-//   [string, Array<string>] |
-//   // Command and flags.
-//   [string, Record<string, any>] |
-//   // Command, positional arguments, and flags.
-//   [string, Array<string>, Record<string, any>];
