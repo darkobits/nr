@@ -1,7 +1,7 @@
-import { nr } from '@darkobits/ts';
+import { withDefaultPackageScripts } from '@darkobits/ts';
 
 
-export default nr(({ command, script, isCI }) => {
+export default withDefaultPackageScripts(({ command, script, isCI }) => {
   script('test.smoke', [[
     command.node('import.test.js', { cwd: './tests/fixtures/esm/' }),
     command.node('dynamic-import.test.js', { cwd: './tests/fixtures/cjs' }),
