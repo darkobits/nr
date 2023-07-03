@@ -3,9 +3,9 @@ import { nr } from '@darkobits/ts';
 
 export default nr(({ command, script, isCI }) => {
   script('test.smoke', [[
-    command.node('import.test.js', { cwd: './smoke-tests/esm/' }),
-    command.node('dynamic-import.test.js', { cwd: './smoke-tests/cjs' }),
-    command.node('require.test.js', { cwd: './smoke-tests/cjs' })
+    command.node('import.test.js', { cwd: './tests/fixtures/esm/' }),
+    command.node('dynamic-import.test.js', { cwd: './tests/fixtures/cjs' }),
+    command.node('require.test.js', { cwd: './tests/fixtures/cjs' })
   ]], {
     group: 'Test',
     description: 'Run smoke tests.',

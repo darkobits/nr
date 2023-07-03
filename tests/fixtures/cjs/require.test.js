@@ -6,7 +6,7 @@ const log = LogFactory({ heading: 'smokeTest' });
 // as ESM. If we get an ERR_REQUIRE_ESM, the test will still pass. Any other
 // error will result in a failure.
 try {
-  const nr = require('../../dist');
+  const nr = require('../../../dist');
   if (typeof nr !== 'function') throw new Error('[fixtures:cjs] "require" failed.');
   log.verbose(log.prefix('cjs:require'), log.chalk.green('success'));
 } catch (err) {
