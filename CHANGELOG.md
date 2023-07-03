@@ -1,3 +1,25 @@
+## [0.14.47](https://github.com/darkobits/nr/compare/v0.14.46...v0.14.47) (2023-07-03)
+
+
+### 🏗 Chores
+
+* **deps:** Update dependencies. ([74ef24e](https://github.com/darkobits/nr/commit/74ef24eee185c2ca8f9ccc8be69183d9727e4ef1))
+* Parallelize smoke tests. ([a448c6f](https://github.com/darkobits/nr/commit/a448c6f8f11133c12aefce975566d0c6ed711d11))
+* Re-enable smoke tests. ([9d9fb7e](https://github.com/darkobits/nr/commit/9d9fb7ef93cbbf3628f8fcedb2be24c16b993f16))
+* **release:** 0.14.47 ([d529b70](https://github.com/darkobits/nr/commit/d529b7025eeb11430a795ba94a7f3f4e6b4aa111))
+* Reorganize tests. ([d64601d](https://github.com/darkobits/nr/commit/d64601d2383db6619966f561e87ba0b3b0d70618))
+
+
+### 📖 Documentation
+
+* Update README. ([29fa2fc](https://github.com/darkobits/nr/commit/29fa2fcb8cc2211b62262c1d75f5c80388eef489))
+* Update README. ([549addc](https://github.com/darkobits/nr/commit/549addc488ce3a61f5097368335d6523d083217d))
+
+
+### 🛠 Refactoring
+
+* Misc. cleanup. ([2f25c83](https://github.com/darkobits/nr/commit/2f25c839298fa29f043c3807eb715c688afdcba3))
+
 ## [0.14.47](https://github.com/darkobits/nr/compare/v0.14.46...v0.14.47) (2023-06-30)
 
 
