@@ -168,25 +168,30 @@ nr build
 
 ### `command`
 
-| Parameter  | Type                                                    | Description                        |
-|----------------|---------------------------------------------------------|--------------------------------|
-| `executable`   | `string`                                                | Name of the executable to run. |
-| `options?`     | [`CommandOptions`](src/etc/types/CommandOptions.ts)     | Optional configuration.        |
-| `options.args` | [`CommandArguments`](src/etc/types/CommandArguments.ts) | Executable and arguments.      |
+| Parameter       | Type                                                    | Description                          |
+|-----------------|---------------------------------------------------------|--------------------------------------|
+| `executable`    | `string`                                                | Name of the executable to run.       |
+| `options?`      | [`CommandOptions`](src/etc/types/CommandOptions.ts)     | Optional configuration.              |
+| `options.args?` | [`CommandArguments`](src/etc/types/CommandArguments.ts) | Arguments to supply to `executable`. |
 
 | Return Type                                     | Description                                                |
 |-------------------------------------------------|------------------------------------------------------------|
 | [`CommandThunk`](src/etc/types/CommandThunk.ts) | Value that may be provided to `script` to run the command. |
 
-This function accepts a name, an array indicating the executable and its arguments, [`CommandArguments`](src/etc/types/CommandArguments.ts),
-and an optional options object, [`CommandOptions`](src/etc/types/CommandOptions.ts). It will register
-the command using the provided `name` and return a value. To reference a command in a script, use either
-the return value from `command` directly or a string in the format `cmd:name`. Commands are executed
-using [`execa`](https://github.com/sindresorhus/execa).
+This function accepts an executable name and an options object. The object's `args` property may be used
+to specify any [`CommandArguments`](src/etc/types/CommandArguments.ts) to pass to the executable. [`CommandOptions`](src/etc/types/CommandOptions.ts).
+Also supports a variety of other ways to customize the invocation of a command.
+
+To reference a command in a script, use either the return value from `command` directly or a string in
+the format `cmd:name`. Note that in order for this latter method to work, the command must have defined
+`options.name` when it was created.
+
+Commands are executed using [`execa`](https://github.com/sindresorhus/execa), any all Execa options are
+supported here.
 
 [`CommandArguments`](src/etc/types/CommandArguments.ts) may take one of four forms:
-* `string` for singular positional arguments or to list all arguments as a single string
-* `Record<string, any>` to list all arguments as flags
+* `string` for singular positional argument or to list all arguments as a single string
+* `Record<string, any>` to list all arguments as flags (key/value pairs)
 * `Array<string | Record<string, any>>` to mix positionals and flags.
 
 **Example:**
@@ -198,12 +203,14 @@ import nr from '@darkobits/nr';
 
 export default nr({ command, script }) => {
   // Lint the project using ESLint.
-  command('eslint', { args: ['src', { ext: '.ts,.tsx,.js,.jsx' }] });
+  command('eslint', {
+    args: ['src', { ext: '.ts,.tsx,.js,.jsx' }]
+  });
 
   // Type-check and emit type declarations for the project.
   command('tsc', {
     args: { emitDeclarationOnly: true },
-    // Do not convert flags to kebab-case.
+    // Do not convert flags to kebab-case, which is the default behavior.
     preserveArgumentCasing: true
   });
 };
@@ -221,7 +228,7 @@ current version of Node. This variant uses [`execaNode`](https://github.com/sind
 | Parameter | Type                                          | Description          |
 |-----------|-----------------------------------------------|----------------------|
 | `taskFn`  | [`TaskFn`](src/etc/types/TaskFn.ts)           | Function to execute. |
-| options   | [`TaskOptions`](src/etc/types/TaskOptions.ts) | Task options.        |
+| `options` | [`TaskOptions`](src/etc/types/TaskOptions.ts) | Task options.        |
 
 | Return Type                               | Description                                             |
 |-------------------------------------------|---------------------------------------------------------|
@@ -240,7 +247,7 @@ import nr from '@darkobits/nr';
 
 export default nr({ task, script }) => {
   const myAwesomeTask = task(() => {
-    console.log('bar');
+    console.log('');
   }, {
     name: 'myAwesomeTask'
   });
@@ -257,21 +264,22 @@ export default nr({ task, script }) => {
 
 ### `script`
 
-| Parameter | Type                                              | Description           |
-|-----------|---------------------------------------------------|-----------------------|
-| `name`    | `string`                                          | Name of the command.  |
-| `options` | [`ScriptOptions`](src/etc/types/ScriptOptions.ts) | Script configuration. |
+| Parameter | Type                                                     | Description                                          |
+|-----------|----------------------------------------------------------|------------------------------------------------------|
+| `name`         | `string`                                            | Name of the script.                                  |
+| `instructions` | [`InstructionSet`](src/etc/types/InstructionSet.ts) | List of other commands, tasks, or script to execute. |
+| `options?`     | [`ScriptOptions`](src/etc/types/ScriptOptions.ts)   | Script configuration.                                |
 
 | Return Type                                   | Description                                               |
 |-----------------------------------------------|-----------------------------------------------------------|
 | [`ScriptThunk`](src/etc/types/ScriptThunk.ts) | Value that may be provided to `script` to run the script. |
 
-This function accepts a name and an options object, [`ScriptOptions`](src/etc/types/ScriptOptions.ts).
+This function accepts a name, an instruction set, and an options object, [`ScriptOptions`](src/etc/types/ScriptOptions.ts).
 It will register the script using the provided `name` and return a value. To reference a script in
 another script, use either the return value from `script` directly or a string in the format
 `script:name`.
 
-The `run` option must be an array of [`Instruction`](src/etc/types/Instruction.ts) which may be:
+The second argument must be an array of [`Instruction`](src/etc/types/Instruction.ts) which may be:
 
 * A reference to a command by name using a `string` in the format `cmd:name` or by value using the value
   returned by `command`.
@@ -284,6 +292,9 @@ To indicate that a group of [`Instructions`](src/etc/types/Instruction.ts) shoul
 wrap them in an array. However, no more than one level of array nesting is allowed. If you need more
 complex parallelization, write separate, smaller scripts and compose them.
 
+If a script only needs to execute a single instruction, it is not necessary to wrap it in an array; it
+may be passed directly as the second argument to `script`.
+
 **Example:**
 
 > `nr.config.ts`
@@ -293,38 +304,37 @@ import nr from '@darkobits/nr';
 
 export default nr({ command, task, script }) => {
   command('babel', {
+    name: 'babel',
     args: ['src', { outDir: 'dist' }]
   });
 
   // If a command only has 1 argument or 1 objects declaring its flags, it need
   // not be wrapped in an array.
-  command('eslint', {
-    args: 'src'
-  });
+  command('eslint', { args: 'src', name: 'lint' });
 
-  command('vitest');
+  // The same is true for scripts that only need to execute a single instruction.
+  script('test', command('vitest'), {
+    description: 'Run unit tests with Vitest.'
+  });
 
   const done = task(() => { console.log('Done!'); });
 
   script('prepare', [
-    // Run these instructions in parallel.
-    ['cmd:build', 'cmd:lint']
-    // Then run this instruction.
-    'cmd:test',
+    // Run these scripts in parallel.
+    ['cmd:babel', 'cmd:lint']
+    // Then run this script.
+    'script:test',
     // Then run this task.
     done
+    // Don't try to get fancier than that; you probably don't need to be.
   ], {
     description: 'Build and lint in parallel, then run unit tests.'
   });
 
-  // Instructions (commands, tasks, and other scripts) can be referenced by
-  // value, so they can be defined inline as well:
   script('test.coverage', [
     // In such cases, the command's "name" is still significant; it is used
     // for error-reporting, and should therefore be descriptive.
-    command('vitest', {
-      args: ['run', { coverage: true }]
-    });
+    command('vitest', { args: ['run', { coverage: true }], name: 'vitest-coverage' })
   ], {
     description: 'Test the project and generate a coverage report.'
   });
