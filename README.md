@@ -109,13 +109,14 @@ A configuration file is responsible for creating **commands**, **tasks**, and **
 - **Commands** describe the invocation of a single executable and any arguments provided to it, as well
   as any configuration related to how the command will run, such as environment variables and how STDIN
   and STDOUT will be handled.
-- **Tasks** are functions that may execute arbitrary code. They may be synchronous or asynchronous.
-  Tasks can be used to interface with another program's Node API, for example.
-- **Scripts** compose commands, tasks, and other scripts that may run sequentially, in parallel, or a
-  combination of both.
+- **Tasks** are JavaScript functions that may execute arbitrary code. They may be synchronous or
+  asynchronous. Tasks can be used to interface with another program's Node API, or to perform any
+  in-process work that does not rely on the invocation of an external CLI.
+- **Scripts** contain a set of instructions that are made of up commands, tasks, and other scripts.
+  These instructions may be run in serial, in parallel, or a combination of both.
 
-A configuration file should export a function that will be passed a context object that contains the
-following keys:
+A configuration file must default-export a function that will be passed a context object that contains
+the following keys:
 
 | Key                   | Type       | Description                                                                |
 |-----------------------|------------|----------------------------------------------------------------------------|
@@ -132,31 +133,35 @@ following keys:
 import nr from '@darkobits/nr';
 
 export default nr({ command, task, script }) => {
-  const babelCmd = command('babel', { args: ['src', { outDir: 'dist' }] });
+  const babelCmd = command('babel', {
+    // This property is optional, but will be needed if we want to reference
+    // this command using a string (see below).
+    name: 'babel',
+    args: ['src', { outDir: 'dist' }]
+  });
 
+  // We can then reference this command in a script in several different ways:
+
+  // 1. By reference; use the value returned by command directly:
   script('build', [
-    // We can reference commands, tasks, and scripts by their return value:
     babelCmd,
-    // Or, using a string with the 'cmd:' prefix followed by the command's
-    // name. For tasks, use 'task:' and for scripts, use 'script:'.
-    'cmd:babel'
-  ], {
-    group: 'Build Scripts',
-    description: 'Transpile the project with Babel.'
-  });
+  ]);
 
-  // Or, inline the command. This can be helpful if the command is not likely to
-  // be re-used by other scripts.
+  // 2. If the command has defined a name, it can be referenced in a script
+  // using a string with the prefix 'cmd:'. To reference a task, use 'task:',
+  // and to reference another script, use 'script:'.
   script('build', [
-    command('babel', { args: ['src', { outDir: 'dist' }] }),
-    // Or, using a string with the 'cmd:' prefix followed by the command's
-    // name. For tasks, use 'task:' and for scripts, use 'script:'.
     'cmd:babel'
-  ], {
-    group: 'Build Scripts',
-    description: 'Transpile the project with Babel.'
-    run:
-  });
+  ]);
+
+  // 3. Because commands, tasks, and scripts can be passed by value, it is
+  // also possible to define them inline in a script's instructions. This
+  // approach may be useful when a command will only be used by a single script.
+  script('build', [
+    command('babel', {
+      args: ['src', { outDir: 'dist' }]
+    }),
+  ]);
 };
 ```
 
@@ -179,8 +184,9 @@ nr build
 | [`CommandThunk`](src/etc/types/CommandThunk.ts) | Value that may be provided to `script` to run the command. |
 
 This function accepts an executable name and an options object. The object's `args` property may be used
-to specify any [`CommandArguments`](src/etc/types/CommandArguments.ts) to pass to the executable. [`CommandOptions`](src/etc/types/CommandOptions.ts).
-Also supports a variety of other ways to customize the invocation of a command.
+to specify any [`CommandArguments`](src/etc/types/CommandArguments.ts) to pass to the executable.
+[`CommandOptions`](src/etc/types/CommandOptions.ts) also supports a variety of other ways to customize
+the invocation of a command.
 
 To reference a command in a script, use either the return value from `command` directly or a string in
 the format `cmd:name`. Note that in order for this latter method to work, the command must have defined
@@ -234,9 +240,10 @@ current version of Node. This variant uses [`execaNode`](https://github.com/sind
 |-------------------------------------------|---------------------------------------------------------|
 | [`TaskThunk`](src/etc/types/TaskThunk.ts) | Value that may be provided to `script` to run the task. |
 
-This function accepts a name and a function, [`TaskFn`](src/etc/types/TaskFn.ts), It will register the
-task using the provided `name` and return a value. To reference a task in a script, use either the
-return value from `task` directly or a string in the format `task:name`.
+This function accepts a function, [`TaskFn`](src/etc/types/TaskFn.ts), and an optional `options` object.
+To reference a task in a script, use either the return value from `task` directly or a string in the
+format `task:name`. Note that in order for this latter method to work, the task must have defined
+`options.name` when it was created.
 
 **Example:**
 
@@ -247,7 +254,7 @@ import nr from '@darkobits/nr';
 
 export default nr({ task, script }) => {
   const myAwesomeTask = task(() => {
-    console.log('');
+    console.log('Hello world!');
   }, {
     name: 'myAwesomeTask'
   });
@@ -264,8 +271,8 @@ export default nr({ task, script }) => {
 
 ### `script`
 
-| Parameter | Type                                                     | Description                                          |
-|-----------|----------------------------------------------------------|------------------------------------------------------|
+| Parameter      | Type                                                | Description                                          |
+|----------------|-----------------------------------------------------|------------------------------------------------------|
 | `name`         | `string`                                            | Name of the script.                                  |
 | `instructions` | [`InstructionSet`](src/etc/types/InstructionSet.ts) | List of other commands, tasks, or script to execute. |
 | `options?`     | [`ScriptOptions`](src/etc/types/ScriptOptions.ts)   | Script configuration.                                |
@@ -310,7 +317,9 @@ export default nr({ command, task, script }) => {
 
   // If a command only has 1 argument or 1 objects declaring its flags, it need
   // not be wrapped in an array.
-  command('eslint', { args: 'src', name: 'lint' });
+  command('eslint', {
+    args: 'src', name: 'lint'
+  });
 
   // The same is true for scripts that only need to execute a single instruction.
   script('test', command('vitest'), {
@@ -320,13 +329,12 @@ export default nr({ command, task, script }) => {
   const done = task(() => { console.log('Done!'); });
 
   script('prepare', [
-    // Run these scripts in parallel.
+    // Run these commands in parallel.
     ['cmd:babel', 'cmd:lint']
-    // Then run this script.
+    // Then, run this script.
     'script:test',
-    // Then run this task.
+    // Then, run this task.
     done
-    // Don't try to get fancier than that; you probably don't need to be.
   ], {
     description: 'Build and lint in parallel, then run unit tests.'
   });
@@ -334,7 +342,10 @@ export default nr({ command, task, script }) => {
   script('test.coverage', [
     // In such cases, the command's "name" is still significant; it is used
     // for error-reporting, and should therefore be descriptive.
-    command('vitest', { args: ['run', { coverage: true }], name: 'vitest-coverage' })
+    command('vitest', {
+      name: 'vitest-coverage',
+      args: ['run', { coverage: true }]
+    })
   ], {
     description: 'Test the project and generate a coverage report.'
   });
@@ -355,39 +366,39 @@ export default nr({ command, task, script }) => {
 ## Type-safe Configuration & IntelliSense
 
 For users who want to ensure their configuration file is type-safe, or who want IntelliSense, you may
-use a JSDoc annotation:
+use a JSDoc annotation in a JavaScript configuration file:
 
 > `nr.config.js`
 
-```js
-/** @type {import('@darkobits/nr').ConfigurationFactory} */
+```ts
+/** @type {import('@darkobits/nr').UserConfigurationFn} */
 export default ({ command, task, script }) => {
 
 };
 ```
 
-Or, you can use the `satisfies` keyword:
+If using a TypeScript configuration file, you can use the `satisfies` operator:
 
 > `nr.config.ts`
 
 ```ts
-import type { ConfigurationFactory } from '@darkobits/nr';
+import type { UserConfigurationFn } from '@darkobits/nr';
 
 export default (({ command, task, script }) => {
-  // empty
-}) satisfies ConfigurationFactory;
+  // Define configuration here.
+}) satisfies UserConfigurationFn;
 ```
 
-Or, `nr` exports a helper which provides type-safety and IntelliSense without requiring a
-JSDoc or explicit type annotation:
+Or, `nr` exports a helper which provides type-safety and IntelliSense without requiring a JSDoc or
+explicit type annotation. This method will provide IntelliSense in
 
 > `nr.config.js`
 
-```js
+```ts
 import nr from '@darkobits/nr';
 
 export default nr(({ command, task, script }) => {
-  // Type-safe creation of commands, tasks, and scripts.
+  // Define configuration here.
 });
 ```
 
@@ -406,23 +417,29 @@ Or, using a shorthand:
 nr t.c
 ```
 
-More on this below.
+More on using shorthands below.
 
 ## Script Name Matching
 
 `nr` supports a matching feature that allows the user to pass a shorthand for the desired script name.
-Script names may be segmented using a dot, and the matcher will match each segment individually. The
-minimum number of characters you will need to provide to invoke a particular script will vary based on
-how many scripts you have defined with similar names.
+Script names may be segmented using a dot, and the matcher will match each segment individually.
 
-For example, if we wanted to execute a script named `build.watch`, we could call:
+For example, if we wanted to execute a script named `build.watch`, we could use any of the following:
 
 ```
+nr build.w
+nr bu.wa
 nr b.w
 ```
 
 Additionally, script name matching is case insensitive, so if we had a script named `testScript`, the
 query `testscript` would successfully match it.
+
+> 💡 **Protip**
+>
+> If a provided shorthand matches more than 1 script, `nr` will ask you to disambiguate by providing
+> more characters. What shorthands you will be able to use is therefore dependent on how similarly-named
+> your scripts are.
 
 ## Pre and Post Scripts
 
@@ -459,7 +476,9 @@ project's `package.json`:
 ```
 
 `npm run help` will now print instructions on how to interact with `nr`, what scripts are available, and
-(hopefully) what each does.
+(hopefully) what each does. Here's an example:
+
+![package-scripts](https://github.com/darkobits/nr/assets/441546/8f43ee46-ac90-47b6-9ac2-ee4330353fb8)
 
 ## Providing an Explicit Configuration File
 
