@@ -249,11 +249,15 @@ export function printScriptInfo(context: SaffronHandlerContext<CLIArguments, Use
   const groupsUsed = R.any(R.hasPath(['options', 'group']), allScripts);
 
   if (groupsUsed) {
+    const groupedScripts = R.groupBy<ScriptDescriptor>(descriptor => descriptor.options.group ?? 'Other', allScripts);
+
     R.forEachObjIndexed((scriptConfigs, groupName) => {
+      if (!scriptConfigs) return;
+
       console.log('');
       console.log(`${chalk.bold(groupName)}\n`);
       R.forEach(printScript, scriptConfigs);
-    }, R.groupBy<ScriptDescriptor>(descriptor => descriptor.options.group ?? 'Other', allScripts));
+    }, groupedScripts);
   } else {
     console.log('');
     R.forEach(printScript, allScripts);
