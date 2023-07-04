@@ -1,3 +1,24 @@
+# Changelog
+
+All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+## [0.15.0](https://github.com/darkobits/nr/compare/v0.14.17...v0.15.0) (2023-07-04)
+
+
+### 🏗 Chores
+
+* **release:** 0.14.47 ([644613c](https://github.com/darkobits/nr/commit/644613c1bc14e570b0f32c382b8cb5733b1b86b6))
+
+
+### 📖 Documentation
+
+* Update README. ([94ce80c](https://github.com/darkobits/nr/commit/94ce80cc74d3624a2c4ab09bc7a304465d00a621))
+
+
+### 🛠 Refactoring
+
+* Rename `ConfigurationFactory` to `UserConfigurationFn`. ([a7b4a5c](https://github.com/darkobits/nr/commit/a7b4a5c8f5c2b842377a3648cb67b2a06b98333a))
+
 ## [0.14.47](https://github.com/darkobits/nr/compare/v0.14.46...v0.14.47) (2023-07-04)
 
 
