@@ -27,7 +27,7 @@ import {
 import type { SaffronHandlerContext } from '@darkobits/saffron';
 import type {
   CLIArguments,
-  ConfigurationFactory,
+  UserConfigurationFn,
   ScriptOptions,
   Instruction,
   InstructionSet,
@@ -195,7 +195,7 @@ function validateInstructions(instructions: InstructionSet) {
  * is in the users $PATH and can be invoked directly, or if the user needs to
  * use `npx`.
  */
-export function printScriptInfo(context: SaffronHandlerContext<CLIArguments, ConfigurationFactory>) {
+export function printScriptInfo(context: SaffronHandlerContext<CLIArguments, UserConfigurationFn>) {
   const allScripts = Array.from(scripts.values());
 
   if (allScripts.length === 0) {

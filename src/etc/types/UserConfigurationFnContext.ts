@@ -6,7 +6,7 @@ import type { task } from 'lib/tasks';
 /**
  * Context passed to user configuration functions.
  */
-export interface ConfigurationFactoryContext {
+export interface UserConfigurationFnContext {
   /**
    * Provided a name and a command configuration, registers the command and
    * returns a `CommandThunk`.

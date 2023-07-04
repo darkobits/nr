@@ -11,11 +11,11 @@ import { matchScript, printScriptInfo } from 'lib/scripts';
 import { printTaskInfo } from 'lib/tasks';
 import { parseError, heroLog } from 'lib/utils';
 
-import type { CLIArguments, ConfigurationFactory } from 'etc/types';
+import type { CLIArguments, UserConfigurationFn } from 'etc/types';
 
 const chalk = log.chalk;
 
-cli.command<CLIArguments, ConfigurationFactory>({
+cli.command<CLIArguments, UserConfigurationFn>({
   command: '* [query]',
   description: 'Run the script matched by the provided query.',
   config: {

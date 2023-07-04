@@ -11,7 +11,7 @@ import { getPackageNameFromCallsite, getPrefixedInstructionName } from 'lib/util
 import type { SaffronHandlerContext } from '@darkobits/saffron';
 import type {
   CLIArguments,
-  ConfigurationFactory,
+  UserConfigurationFn,
   TaskDescriptor,
   TaskFn,
   TaskOptions,
@@ -31,7 +31,7 @@ export const tasks = new Map<string, TaskDescriptor>();
 /**
  * Prints all available tasks.
  */
-export function printTaskInfo(context: SaffronHandlerContext<CLIArguments, ConfigurationFactory>) {
+export function printTaskInfo(context: SaffronHandlerContext<CLIArguments, UserConfigurationFn>) {
   const allTasks = Array.from(tasks.values());
 
   if (allTasks.length === 0) {

@@ -7,8 +7,8 @@ export type { CommandExecutor, CommandExecutorOptions } from './CommandExecutor'
 export type { CommandOptions, CommandOptionsNode } from './CommandOptions';
 export type { CommandThunk } from './CommandThunk';
 
-export type { ConfigurationFactory } from './ConfigurationFactory';
-export type { ConfigurationFactoryContext } from './ConfigurationFactoryContext';
+export type { UserConfigurationFn } from './UserConfigurationFn';
+export type { UserConfigurationFnContext } from './UserConfigurationFnContext';
 
 export type { Instruction, InstructionSet } from './Instruction';
 export type { Thunk } from './Thunk';

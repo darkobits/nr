@@ -34,7 +34,7 @@ import type {
   CommandOptions,
   CommandOptionsNode,
   CommandThunk,
-  ConfigurationFactory
+  UserConfigurationFn
 } from 'etc/types';
 
 
@@ -122,7 +122,7 @@ function unParseArguments(args: CommandArguments | undefined, preserveArgumentCa
 /**
  * Prints all available commands.
  */
-export function printCommandInfo(context: SaffronHandlerContext<CLIArguments, ConfigurationFactory>) {
+export function printCommandInfo(context: SaffronHandlerContext<CLIArguments, UserConfigurationFn>) {
   const allCommands = Array.from(commands.values());
 
   if (allCommands.length === 0) {

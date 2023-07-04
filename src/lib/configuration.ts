@@ -9,7 +9,7 @@ import { script, scripts } from 'lib/scripts';
 import { task, tasks } from 'lib/tasks';
 
 import type { SaffronHandlerContext } from '@darkobits/saffron';
-import type { CLIArguments, ConfigurationFactory } from 'etc/types';
+import type { CLIArguments, UserConfigurationFn } from 'etc/types';
 
 
 const chalk = log.chalk;
@@ -20,7 +20,7 @@ const chalk = log.chalk;
  * from Saffron to locate and parse the user's configuration file, then return
  * the results.
  */
-export default async function loadConfig({ argv, config, configPath, configIsEmpty }: SaffronHandlerContext<CLIArguments, ConfigurationFactory>) {
+export default async function loadConfig({ argv, config, configPath, configIsEmpty }: SaffronHandlerContext<CLIArguments, UserConfigurationFn>) {
   // If the --config option was used, load the file at the indicated path.
   if (argv.config) {
     configPath = path.resolve(argv.config);
