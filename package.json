@@ -36,7 +36,7 @@
     "@darkobits/saffron": "~0.32.11",
     "@types/is-ci": "^3.0.0",
     "@types/yargs-unparser": "^2.0.1",
-    "boxen": "^7.1.0",
+    "boxen": "^7.1.1",
     "callsites": "~4.0.0",
     "deepmerge": "^4.3.1",
     "errno": "^1.0.0",
@@ -50,12 +50,12 @@
     "p-all": "~5.0.0",
     "p-series": "~3.0.0",
     "ramda": "^0.29.0",
-    "read-pkg-up": "~9.1.0",
+    "read-pkg-up": "~10.0.0",
     "which": "^3.0.1",
     "yargs-unparser": "^2.0.0"
   },
   "devDependencies": {
-    "@darkobits/ts": "~0.17.6",
+    "@darkobits/ts": "~0.18.1",
     "@types/micromatch": "^4.0.2",
     "@types/node-emoji": "^1.8.2",
     "@types/ramda": "^0.29.3",
