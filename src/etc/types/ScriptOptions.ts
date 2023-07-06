@@ -20,4 +20,11 @@ export interface ScriptOptions {
    * @default false
    */
   timing?: boolean;
+
+  /**
+   * If `true`, the script will not appear in the --scripts output.
+   *
+   * @default false
+   */
+  hidden?: boolean;
 }

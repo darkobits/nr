@@ -209,7 +209,9 @@ export function printScriptInfo(context: SaffronHandlerContext<CLIArguments, Use
   }
 
   const printScript = (descriptor: ScriptDescriptor) => {
-    const { name, sourcePackage, options: { description } } = descriptor;
+    const { name, sourcePackage, options: { description, hidden } } = descriptor;
+
+    if (hidden) return;
 
     let title = chalk.green.bold(name);
 
@@ -348,7 +350,8 @@ export function script(name: string, instructions: InstructionSet, options: Scri
     ow<Required<ScriptOptions>>(options, ow.object.exactShape({
       description: ow.optional.string,
       group: ow.optional.string,
-      timing: ow.optional.boolean
+      timing: ow.optional.boolean,
+      hidden: ow.optional.boolean
     }));
 
     const scriptDisplayName = name ?? 'anonymous';
