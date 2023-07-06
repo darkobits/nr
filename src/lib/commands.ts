@@ -240,11 +240,19 @@ function commandBuilder(builderOptions: CommandBuilderOptions): CommandThunk {
     // Parse and validate command and arguments.
     const unParsedArguments = unParseArguments(args, preserveArgumentCasing);
 
-    const commandExecutorOptions: CommandExecutorOptions = {
+    // Merge provided options onto default Execa options.
+    const commandExecutorOptions = merge(commonExecaOptions, {
       ...builderOptions,
       unParsedArguments,
       prefixedName
-    };
+    });
+
+    // If the user provided any of `stdin`, `stdout`, or `stderr` options,
+    // remove our default `stdio` option. Failing to do so will cause Execa to
+    // fail.
+    if (!R.isEmpty(R.intersection(['stdin', 'stdout', 'stderr'], R.keys(commandExecutorOptions)))) {
+      Reflect.deleteProperty(commandExecutorOptions, 'stdio');
+    }
 
     const commandThunk = async () => {
       try {
@@ -330,7 +338,7 @@ const executeCommand: CommandExecutor = (options: CommandExecutorOptions) => {
     chalk.gray(getEscapedCommand(executable, unParsedArguments))
   );
 
-  return execa(executable, unParsedArguments, merge(commonExecaOptions, options ?? {}));
+  return execa(executable, unParsedArguments, options);
 };
 
 
@@ -362,7 +370,7 @@ const executeNodeCommand: CommandExecutor = (options: CommandExecutorOptions) =>
     chalk.gray(getEscapedCommand(executable, unParsedArguments))
   );
 
-  return execaNode(resolvedScriptPath, unParsedArguments, merge(commonExecaOptions, options ?? {}));
+  return execaNode(resolvedScriptPath, unParsedArguments, options);
 };
 
 
@@ -397,14 +405,14 @@ export function command(executable: string, opts: CommandOptions = {}) {
  *
  * See: https://github.com/sindresorhus/execa#execanodescriptpath-arguments-options
  */
-command.node = (executable: string, opts: CommandOptionsNode = {}) => {
-  ow(executable, 'first argument', ow.string);
+command.node = (nodeScript: string, opts: CommandOptionsNode = {}) => {
+  ow(nodeScript, 'node script', ow.string);
 
   // Get the name of the package that defined this command.
   const sourcePackage = getPackageNameFromCallsite(callsites()[1]);
 
   return commandBuilder({
-    executable,
+    executable: nodeScript,
     executor: executeNodeCommand,
     sourcePackage,
     ...opts
