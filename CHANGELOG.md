@@ -1,3 +1,20 @@
+## [0.16.0](https://github.com/darkobits/nr/compare/v0.15.2...v0.16.0) (2023-07-06)
+
+
+### ✨ Features
+
+* Add `hidden` option for scripts. ([d2b3cba](https://github.com/darkobits/nr/commit/d2b3cba4004c1d6106ed41c94cdd9aecc22e2590))
+
+
+### 🐞 Bug Fixes
+
+* Remove `stdio` option if user provided custom IO options. ([b1af9c7](https://github.com/darkobits/nr/commit/b1af9c796150c9536b22b3e3a2ce6d6179c3a943))
+
+
+### 🏗 Chores
+
+* **deps:** Update dependencies. ([82ac174](https://github.com/darkobits/nr/commit/82ac174bee68d261778cd41e33cce08b3f43b4a3))
+
 ## [0.15.2](https://github.com/darkobits/nr/compare/v0.15.1...v0.15.2) (2023-07-06)
 
 
