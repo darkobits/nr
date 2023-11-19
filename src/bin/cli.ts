@@ -37,7 +37,6 @@ cli.command<CLIArguments, UserConfigurationFn>({
 
     command.option('scripts', {
       group: 'Introspection:',
-      // type: 'boolean',
       required: false,
       description: 'Show all registered scripts.',
       conflicts: ['commands', 'tasks']
@@ -45,7 +44,6 @@ cli.command<CLIArguments, UserConfigurationFn>({
 
     command.option('tasks', {
       group: 'Introspection:',
-      // type: 'boolean',
       required: false,
       description: 'Show all registered tasks.',
       conflicts: ['commands', 'scripts']
@@ -53,7 +51,6 @@ cli.command<CLIArguments, UserConfigurationFn>({
 
     command.option('commands', {
       group: 'Introspection:',
-      // type: 'boolean',
       required: false,
       description: 'Show all registered commands.',
       conflicts: ['tasks', 'scripts']
@@ -71,16 +68,13 @@ cli.command<CLIArguments, UserConfigurationFn>({
     const { argv, config, configIsEmpty, configPath } = saffronContext;
 
     try {
-      // If Saffron did not find a configuration file, bail.
       if (!configPath) throw new Error([
         'Unable to find a configuration file.',
         'Documentation: https://darkobits.gitbook.io/nr'
       ].join(EOL));
 
-      // If Saffron found an empty configuration file, bail.
-      if (configIsEmpty) throw new Error(
-        `Configuration file at ${chalk.green(configPath)} is empty.`
-      );
+      if (configIsEmpty)
+        throw new Error(`Configuration file at ${chalk.green(configPath)} is empty.`);
 
       // If the configuration file did not default-export a function, bail.
       if (typeof config !== 'function') throw new TypeError(
