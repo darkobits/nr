@@ -1,3 +1,15 @@
+## [0.16.3](https://github.com/darkobits/nr/compare/v0.16.2...v0.16.3) (2023-11-19)
+
+
+### 🏗 Chores
+
+* **deps:** Update dependencies. ([77c63ff](https://github.com/darkobits/nr/commit/77c63ff10e7570ccae3dd4af11d5e13639b5c065))
+
+
+### 🛠 Refactoring
+
+* Remove types from various options. ([872f78c](https://github.com/darkobits/nr/commit/872f78c3f4564811508af5daf3f006e1f82f278b))
+
 ## [0.16.2](https://github.com/darkobits/nr/compare/v0.16.1...v0.16.2) (2023-07-12)
 
 
