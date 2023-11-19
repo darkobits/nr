@@ -33,11 +33,11 @@
   "dependencies": {
     "@darkobits/interop-import-default": "^1.0.0",
     "@darkobits/log": "^2.0.0-beta.15",
-    "@darkobits/saffron": "~0.32.15",
-    "@types/is-ci": "^3.0.0",
-    "@types/yargs-unparser": "^2.0.1",
+    "@darkobits/saffron": "~0.32.17",
+    "@types/is-ci": "^3.0.4",
+    "@types/yargs-unparser": "^2.0.3",
     "boxen": "^7.1.1",
-    "callsites": "~4.0.0",
+    "callsites": "~4.1.0",
     "deepmerge": "^4.3.1",
     "errno": "^1.0.0",
     "execa": "~7.1.1",
@@ -49,16 +49,16 @@
     "ow": "~1.1.1",
     "p-all": "~5.0.0",
     "p-series": "~3.0.0",
-    "ramda": "^0.29.0",
-    "read-pkg-up": "~10.0.0",
+    "ramda": "^0.29.1",
+    "read-pkg-up": "~10.1.0",
     "which": "^3.0.1",
     "yargs-unparser": "^2.0.0"
   },
   "devDependencies": {
-    "@darkobits/ts": "~0.18.8",
-    "@types/micromatch": "^4.0.2",
+    "@darkobits/ts": "~0.19.2",
+    "@types/micromatch": "^4.0.5",
     "@types/node-emoji": "^1.8.2",
-    "@types/ramda": "^0.29.3",
-    "@types/which": "^3.0.0"
+    "@types/ramda": "^0.29.9",
+    "@types/which": "^3.0.2"
   }
 }
