@@ -40,7 +40,7 @@
     "callsites": "~4.1.0",
     "deepmerge": "^4.3.1",
     "errno": "^1.0.0",
-    "execa": "~7.1.1",
+    "execa": "~8.0.1",
     "is-ci": "^3.0.1",
     "is-plain-object": "^5.0.0",
     "kebabcase-keys": "^1.0.0",
@@ -51,14 +51,14 @@
     "p-series": "~3.0.0",
     "ramda": "^0.29.1",
     "read-pkg-up": "~10.1.0",
-    "which": "^3.0.1",
+    "which": "^4.0.0",
     "yargs-unparser": "^2.0.0"
   },
   "devDependencies": {
-    "@darkobits/ts": "~0.19.2",
-    "@types/micromatch": "^4.0.5",
+    "@darkobits/ts": "~0.20.2",
+    "@types/micromatch": "^4.0.6",
     "@types/node-emoji": "^1.8.2",
     "@types/ramda": "^0.29.9",
-    "@types/which": "^3.0.2"
+    "@types/which": "^3.0.3"
   }
 }

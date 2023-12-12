@@ -354,10 +354,6 @@ const executeNodeCommand: CommandExecutor = (options: CommandExecutorOptions) =>
 
   const cwd = options?.cwd?.toString() ?? process.cwd();
 
-  // N.B. This function uses `which`, which requires that the target file have
-  // executable permissions set, which is not required here because we are
-  // running the script with Node.
-  // const resolvedScriptPath = resolveCommand(scriptPath, cwd?.toString());
   const resolvedScriptPath = path.isAbsolute(executable)
     ? executable
     : path.resolve(cwd, executable);
