@@ -29,13 +29,10 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 20
           cache: npm
       - name: Install Dependencies
-        run: |
-          npm clean-install --ignore-scripts
-          npx nr --version
-          npx nr --scripts
+        run: npm clean-install
       - name: Build Project
         run: npx nr build
       - name: Run Tests
@@ -44,7 +41,4 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          npx nr --version
-
-          npx nr release
+        run: npx nr release
