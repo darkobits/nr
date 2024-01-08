@@ -1,3 +1,10 @@
+## [0.17.0-beta.1](https://github.com/darkobits/nr/compare/v0.16.5...v0.17.0-beta.1) (2024-01-08)
+
+
+### ✨ Features
+
+* Configuration files may export arrays. ([06319d8](https://github.com/darkobits/nr/commit/06319d89a9bf3265f26f1df0a4b4a5f504fc2538))
+
 ## [0.16.5](https://github.com/darkobits/nr/compare/v0.16.4...v0.16.5) (2024-01-08)
 
 
