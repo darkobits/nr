@@ -382,7 +382,7 @@ const executeNodeCommand: CommandExecutor = (options: CommandExecutorOptions) =>
  * Creates a `CommandThunk` that executes a command directly using `execa`.
  */
 export function command(executable: string, opts: CommandOptions = {}) {
-  ow(executable, 'first argument', ow.string);
+  ow(executable, 'executable', ow.string);
 
   // Get the name of the package that defined this command.
   const sourcePackage = getPackageNameFromCallsite(callsites()[1]);
@@ -402,7 +402,7 @@ export function command(executable: string, opts: CommandOptions = {}) {
  * See: https://github.com/sindresorhus/execa#execanodescriptpath-arguments-options
  */
 command.node = (nodeScript: string, opts: CommandOptionsNode = {}) => {
-  ow(nodeScript, 'node script', ow.string);
+  ow(nodeScript, 'nodeScript', ow.string);
 
   // Get the name of the package that defined this command.
   const sourcePackage = getPackageNameFromCallsite(callsites()[1]);
