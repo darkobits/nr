@@ -1,6 +1,38 @@
+## [0.17.0-beta.2](https://github.com/darkobits/nr/compare/v0.17.0-beta.1...v0.17.0-beta.2) (2024-01-11)
+
+
+### ✨ Features
+
+* `defineConfig` handles arrays. ([1fb6276](https://github.com/darkobits/nr/commit/1fb6276c59d6f5d75812acc7f47d7ed96473308f))
+
+
+### 🏗 Chores
+
+* Fix errors in `package.json`. ([dd12a37](https://github.com/darkobits/nr/commit/dd12a371bc4b284657841d31067311310d65a2d1))
+* **release:** 0.17.0-beta.2 ([669db51](https://github.com/darkobits/nr/commit/669db514bf6e34894bf67b8e7fd05037f289893c))
+* **release:** 0.17.0-beta.3 ([b38dd60](https://github.com/darkobits/nr/commit/b38dd6021a785f9659400a8ba3b3e2ca1f4f0ba8))
+
+
+### 📖 Documentation
+
+* Update `README`. ([3896c17](https://github.com/darkobits/nr/commit/3896c1738ca81803c0299dfa3d94c5861cbd8235))
+* Update README. ([6288329](https://github.com/darkobits/nr/commit/6288329251d8ac516e0ec8373594471d29d7ca9d))
+
 # Changelog
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+## [0.17.0-beta.3](https://github.com/darkobits/nr/compare/v0.17.0-beta.2...v0.17.0-beta.3) (2024-01-08)
+
+
+### 🏗 Chores
+
+* Fix errors in `package.json`. ([dd12a37](https://github.com/darkobits/nr/commit/dd12a371bc4b284657841d31067311310d65a2d1))
+
+
+### 📖 Documentation
+
+* Update `README`. ([3896c17](https://github.com/darkobits/nr/commit/3896c1738ca81803c0299dfa3d94c5861cbd8235))
 
 ## [0.17.0-beta.2](https://github.com/darkobits/nr/compare/v0.17.0-beta.1...v0.17.0-beta.2) (2024-01-08)
 
