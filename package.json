@@ -45,7 +45,7 @@
     "is-plain-object": "^5.0.0",
     "kebabcase-keys": "^1.0.0",
     "micromatch": "^4.0.5",
-    "npm-run-path": "~5.1.0",
+    "npm-run-path": "~5.2.0",
     "ow": "~1.1.1",
     "p-all": "~5.0.0",
     "p-series": "~3.0.0",
