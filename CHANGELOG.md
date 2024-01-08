@@ -1,3 +1,14 @@
+# Changelog
+
+All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+## [0.17.0-beta.2](https://github.com/darkobits/nr/compare/v0.17.0-beta.1...v0.17.0-beta.2) (2024-01-08)
+
+
+### ✨ Features
+
+* `defineConfig` handles arrays. ([1fb6276](https://github.com/darkobits/nr/commit/1fb6276c59d6f5d75812acc7f47d7ed96473308f))
+
 ## [0.17.0-beta.1](https://github.com/darkobits/nr/compare/v0.16.5...v0.17.0-beta.1) (2024-01-08)
 
 
