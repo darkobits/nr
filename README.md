@@ -399,7 +399,7 @@ use a JSDoc annotation in a JavaScript configuration file:
 > `nr.config.js`
 
 ```ts
-/** @type {import('@darkobits/nr').UserConfigurationFn} */
+/** @type { import('@darkobits/nr').UserConfigurationExport } */
 export default ({ command, task, script }) => {
 
 };
@@ -410,11 +410,11 @@ If using a TypeScript configuration file, you can use the `satisfies` operator:
 > `nr.config.ts`
 
 ```ts
-import type { UserConfigurationFn } from '@darkobits/nr';
+import type { UserConfigurationExport } from '@darkobits/nr';
 
 export default (({ command, task, script }) => {
   // Define configuration here.
-}) satisfies UserConfigurationFn;
+}) satisfies UserConfigurationExport;
 ```
 
 Or, `nr` exports a helper which provides type-safety and IntelliSense without requiring a JSDoc or
