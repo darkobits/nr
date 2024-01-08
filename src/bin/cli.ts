@@ -11,13 +11,13 @@ import { script, scripts, matchScript, printScriptInfo } from 'lib/scripts';
 import { task, tasks, printTaskInfo } from 'lib/tasks';
 import { parseError, heroLog } from 'lib/utils';
 
-import type { CLIArguments, UserConfigurationFn } from 'etc/types';
+import type { CLIArguments, UserConfigurationExport } from 'etc/types';
 
 
 const chalk = log.chalk;
 
 
-cli.command<CLIArguments, UserConfigurationFn>({
+cli.command<CLIArguments, UserConfigurationExport>({
   command: '* [query]',
   description: 'Run the script matched by the provided query.',
   config: {
@@ -65,7 +65,7 @@ cli.command<CLIArguments, UserConfigurationFn>({
     command.epilogue(chalk.gray('For full usage instructions, see https://github.com/darkobits/nr'));
   },
   handler: async saffronContext => {
-    const { argv, config, configIsEmpty, configPath } = saffronContext;
+    const { argv, config: userConfigExport, configIsEmpty, configPath } = saffronContext;
 
     try {
       if (!configPath) throw new Error([
@@ -77,15 +77,21 @@ cli.command<CLIArguments, UserConfigurationFn>({
         throw new Error(`Configuration file at ${chalk.green(configPath)} is empty.`);
 
       // If the configuration file did not default-export a function, bail.
-      if (typeof config !== 'function') throw new TypeError(
-        `Expected default export of file at ${chalk.green(configPath)} to be of type "function", got "${typeof config}".`
+      if (typeof userConfigExport !== 'function' && !Array.isArray(userConfigExport)) throw new TypeError(
+        `Expected default export of file at ${chalk.green(configPath)} to be of type "function" or "Array", got "${typeof userConfigExport}".`
       );
 
-      // Invoke the user's configuration function with the necessary context.
-      // This function should create at least 1 command, task, or script.
-      await config({ command, script, task, isCI });
+      // Invoke the user's configuration function(s) with the necessary context.
+      // The result should create at least 1 non-empty script.
+      if (typeof userConfigExport === 'function') {
+        await userConfigExport({ command, script, task, isCI });
+      } else if (Array.isArray(userConfigExport)) {
+        for await (const userConfigFn of userConfigExport) {
+          await userConfigFn({ command, script, task, isCI });
+        }
+      }
 
-      // If the user's configuration function did not register anything, this is
+      // If the user's configuration file did not register anything, this is
       // likely an error; bail.
       if (commands.size === 0 && tasks.size === 0 && scripts.size === 0) throw new Error(
         `Configuration file ${chalk.green(configPath)} did not register any commands, tasks, or scripts.`

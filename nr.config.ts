@@ -1,6 +1,5 @@
 import { withDefaultPackageScripts } from '@darkobits/ts';
 
-
 export default withDefaultPackageScripts(({ command, script, isCI }) => {
   script('test.smoke', [[
     command.node('import.test.js', { cwd: './tests/fixtures/esm/' }),

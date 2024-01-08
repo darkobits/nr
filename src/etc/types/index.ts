@@ -9,6 +9,7 @@ export type { CommandThunk } from './CommandThunk';
 
 export type { UserConfigurationFn } from './UserConfigurationFn';
 export type { UserConfigurationFnContext } from './UserConfigurationFnContext';
+export type { UserConfigurationExport } from './UserConfigurationExport';
 
 export type { Instruction, InstructionSet } from './Instruction';
 export type { Thunk } from './Thunk';
