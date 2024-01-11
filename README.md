@@ -129,46 +129,15 @@ the following keys:
 > `nr.config.ts`
 
 ```ts
-// Using this helper function is optional, but easily enables type-safety and IntelliSense in your
-// configuration file.
-import defineConfig from '@darkobits/nr';
-
-export default defineConfig({ command, task, script }) => {
-  // The first argument to `command` must be the name of the executable to run.
-  // The second argument is
-  const babelCmd = command('babel', {
-    // Arguments are defined as an array of strings and objects. The below
-    // will be parsed into `src --out-dir "dist"`.
-    args: ['src', { outDir: 'dist' }],
-    // This property is optional, but will be needed if we want to reference
-    // this command using a string (see below).
-    name: 'babel'
-  });
-
-  // The first argument to `script` must be the name of the script. We can then
-  // reference commands in a script in several different ways:
-
-  // 1. By reference: use the value returned by command directly.
+export default ({ command, task, script }) => {
   script('build', [
-    babelCmd,
+    command('babel', {
+      args: ['src', { outDir: 'dist' }]
+    }),
+    command('eslint', {
+      args: ['src']
+    })
   ]);
-
-  // 2. By name: If the command has defined a name in its options, it can be
-  // referenced in a script using a string with the prefix 'cmd:'. To reference
-  // a task, use 'task:', and to reference another script, use 'script:'.
-  script('build', [
-    'cmd:babel'
-  ]);
-
-  // 3. Because commands, tasks, and scripts can be passed by value, it is
-  // also possible to define them inline in a script's instructions. This
-  // approach may be useful when an instruction will only be used by a single
-  // script. Furthermore, when a script only contains a single instruction, you
-  // do not need to wrap that instruction in an array. This allows simple
-  // scripts to become very terse:
-  script('build', command('babel', {
-    args: ['src', { outDir: 'dist' }]
-  }));
 };
 ```
 
@@ -191,8 +160,8 @@ nr build
 
 This function accepts an executable name and an options object. The object's `args` property may be used
 to specify any [`CommandArguments`](src/etc/types/CommandArguments.ts) to pass to the executable.
-[`CommandOptions`](src/etc/types/CommandOptions.ts) also supports a variety of other ways to customize
-the invocation of a command.
+[`CommandOptions`](src/etc/types/CommandOptions.ts) also supports a variety of ways to customize the
+invocation of a command.
 
 To reference a command in a script, use either the return value from `command` directly or a string in
 the format `cmd:name` where name is the value provided in `options.name`.
@@ -228,7 +197,7 @@ export default nr({ command, script }) => {
   // Type-check and emit type declarations for the project.
   command('tsc', {
     args: { emitDeclarationOnly: true },
-    // Do not convert flags to kebab-case, which is the default behavior.
+    // Do not convert flags to kebab-case.
     preserveArgumentCasing: true
   });
 };
@@ -237,25 +206,23 @@ export default nr({ command, script }) => {
 #### `command.node`
 
 This function has the same signature as `command`. It can be used to execute a Node script using the
-current version of Node. This variant uses [`execaNode`](https://github.com/sindresorhus/execa#execanodescriptpath-arguments-options)
+current version of Node installed on the system. This variant uses [`execaNode`](https://github.com/sindresorhus/execa#execanodescriptpath-arguments-options)
 and the options argument supports all `execaNode` options.
 
 ---
 
 ### `task`
 
-| Parameter | Type                                          | Description          |
-|-----------|-----------------------------------------------|----------------------|
-| `taskFn`  | [`TaskFn`](src/etc/types/TaskFn.ts)           | Function to execute. |
-| `options` | [`TaskOptions`](src/etc/types/TaskOptions.ts) | Task options.        |
+| Parameter  | Type                                          | Description          |
+|------------|-----------------------------------------------|----------------------|
+| `taskFn`   | [`TaskFn`](src/etc/types/TaskFn.ts)           | Function to execute. |
+| `options?` | [`TaskOptions`](src/etc/types/TaskOptions.ts) | Task options.        |
 
 | Return Type                               | Description                                             |
 |-------------------------------------------|---------------------------------------------------------|
 | [`TaskThunk`](src/etc/types/TaskThunk.ts) | Value that may be provided to `script` to run the task. |
 
 This function accepts a function, [`TaskFn`](src/etc/types/TaskFn.ts), and an optional `options` object.
-To reference a task in a script, use either the return value from `task` directly or a string in the
-format `task:name`.
 
 To reference a task in a script, use either the return value from `task` directly or a string in
 the format `task:name` where name is the value provided in `options.name`.
@@ -292,7 +259,7 @@ export default nr({ task, script }) => {
   script('myAwesomeScript', [
     'task:helloWorld',
     'task:done'
-  ])'
+  ]);
 };
 ```
 
@@ -311,11 +278,10 @@ export default nr({ task, script }) => {
 | [`ScriptThunk`](src/etc/types/ScriptThunk.ts) | Value that may be provided to `script` to run the script. |
 
 This function accepts a name, an instruction set, and an options object, [`ScriptOptions`](src/etc/types/ScriptOptions.ts).
-It will register the script using the provided `name` and return a value. To reference a script in
-another script, use either the return value from `script` directly or a string in the format
-`script:name`.
+It will register the script using the provided `name` and return a value.
 
-If a script contains a single instruction, it does not need to be wrapped in an array.
+To reference a script in another script, use either the return value from `script` directly or a string
+in the format `script:name`.
 
 The second argument must be an array of [`Instruction`](src/etc/types/Instruction.ts) which may be:
 
@@ -325,6 +291,8 @@ The second argument must be an array of [`Instruction`](src/etc/types/Instructio
   returned by `task`.
 * A reference to another script by name using a `string` in the format `script:name` or by value using
   the value returned by `script`.
+
+However, if a script contains only a single instruction, it does not need to be wrapped in an array.
 
 #### Parallelization
 
@@ -354,7 +322,7 @@ export default nr({ command, task, script }) => {
     description: 'Run unit tests with Vitest.'
   });
 
-  const doneTask = task(() => { console.log('Done!'); });
+  const doneTask = task(() => console.log('Done!'));
 
   script('prepare', [
     // 1. Run these two commands in parallel.
@@ -368,14 +336,11 @@ export default nr({ command, task, script }) => {
   });
 
   script('test.coverage', [
-    // In such cases, the command's "name" is still significant; it is used
-    // for error-reporting, and should therefore be descriptive.
     command('vitest', {
-      name: 'vitest-coverage',
       args: ['run', { coverage: true }]
     })
   ], {
-    description: 'Test the project and generate a coverage report.'
+    description: 'Run unit tests and generate a coverage report.'
   });
 };
 ```
