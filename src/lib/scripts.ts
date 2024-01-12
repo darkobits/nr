@@ -1,4 +1,4 @@
-import { EOL } from 'os';
+import { EOL } from 'node:os';
 
 import boxen from 'boxen';
 import callsites from 'callsites';
@@ -266,8 +266,7 @@ export function printScriptInfo(context: SaffronHandlerContext<CLIArguments, Use
   }
 
   console.log('');
-  heroLog(chalk.gray.dim(`• reference scripts from other scripts using ${chalk.bold('script:name')}.`));
-  heroLog(chalk.gray.dim('• see: https://darkobits.gitbook.io/nr/configuration-reference/script'));
+  heroLog(chalk.gray.dim('• see: https://github.com/darkobits/nr for documentation'));
 
 
   // ----- Determine if nr is in PATH ------------------------------------------

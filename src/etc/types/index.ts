@@ -1,10 +1,9 @@
 export type { CLIArguments } from './CliArguments';
 
-export type { CommandArguments } from './CommandArguments';
 export type { CommandBuilderOptions } from './CommandBuilderOptions';
 export type { CommandDescriptor } from './CommandDescriptor';
 export type { CommandExecutor, CommandExecutorOptions } from './CommandExecutor';
-export type { CommandOptions, CommandOptionsNode } from './CommandOptions';
+export type { CommandOptions, CommandOptionsNode, CommandArguments } from './CommandOptions';
 export type { CommandThunk } from './CommandThunk';
 
 export type { UserConfigurationFn } from './UserConfigurationFn';

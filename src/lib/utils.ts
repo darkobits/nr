@@ -1,4 +1,4 @@
-import { EOL } from 'os';
+import { EOL } from 'node:os';
 
 // @ts-expect-error - This package does not have type definitions.
 import errno from 'errno';

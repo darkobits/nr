@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { EOL } from 'os';
+import { EOL } from 'node:os';
 
 import * as cli from '@darkobits/saffron';
 
@@ -83,10 +83,10 @@ cli.command<CLIArguments, UserConfigurationExport>({
       // Invoke the user's configuration function(s) with the necessary context.
       // The result should create at least 1 non-empty script.
       if (typeof userConfigExport === 'function') {
-        await userConfigExport({ command, script, task, isCI });
+        await userConfigExport({ command, script, task });
       } else if (Array.isArray(userConfigExport)) {
         for await (const userConfigFn of userConfigExport) {
-          await userConfigFn({ command, script, task, isCI });
+          await userConfigFn({ command, script, task });
         }
       }
 

@@ -159,7 +159,7 @@ nr build
 | [`CommandThunk`](src/etc/types/CommandThunk.ts) | Value that may be provided to `script` to run the command. |
 
 This function accepts an executable name and an options object. The object's `args` property may be used
-to specify any [`CommandArguments`](src/etc/types/CommandArguments.ts) to pass to the executable.
+to specify any [`CommandArguments`](src/etc/types/CommandOptions.ts) to pass to the executable.
 [`CommandOptions`](src/etc/types/CommandOptions.ts) also supports a variety of ways to customize the
 invocation of a command.
 
@@ -169,7 +169,7 @@ the format `cmd:name` where name is the value provided in `options.name`.
 Commands are executed using [`execa`](https://github.com/sindresorhus/execa), and `CommandOptions`
 supports all valid Execa options.
 
-[`CommandArguments`](src/etc/types/CommandArguments.ts) may take one of four forms:
+[`CommandArguments`](src/etc/types/CommandOptions.ts) may take one of four forms:
 * `string` for singular positional argument or to list all arguments as a single string
 * `Record<string, any>` to list all arguments as flags (key/value pairs)
 * `Array<string | Record<string, any>>` to mix positionals and flags.
@@ -267,11 +267,11 @@ export default nr({ task, script }) => {
 
 ### `script`
 
-| Parameter      | Type                                                | Description                                           |
-|----------------|-----------------------------------------------------|-------------------------------------------------------|
-| `name`         | `string`                                            | Name of the script.                                   |
-| `instructions` | [`InstructionSet`](src/etc/types/InstructionSet.ts) | List of other commands, tasks, or scripts to execute. |
-| `options?`     | [`ScriptOptions`](src/etc/types/ScriptOptions.ts)   | Optional script configuration.                        |
+| Parameter      | Type                                              | Description                                           |
+|----------------|---------------------------------------------------|-------------------------------------------------------|
+| `name`         | `string`                                          | Name of the script.                                   |
+| `instructions` | [`InstructionSet`](src/etc/types/Instruction.ts)  | List of other commands, tasks, or scripts to execute. |
+| `options?`     | [`ScriptOptions`](src/etc/types/ScriptOptions.ts) | Optional script configuration.                        |
 
 | Return Type                                   | Description                                               |
 |-----------------------------------------------|-----------------------------------------------------------|
@@ -283,7 +283,8 @@ It will register the script using the provided `name` and return a value.
 To reference a script in another script, use either the return value from `script` directly or a string
 in the format `script:name`.
 
-The second argument must be an array of [`Instruction`](src/etc/types/Instruction.ts) which may be:
+The second argument may be an array of [`Instruction`](src/etc/types/Instruction.ts) whose elements may
+consist of:
 
 * A reference to a command by name using a `string` in the format `cmd:name` or by value using the value
   returned by `command`.

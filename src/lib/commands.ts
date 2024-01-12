@@ -1,4 +1,4 @@
-import path from 'path';
+import path from 'node:path';
 
 import boxen from 'boxen';
 import callsites from 'callsites';
@@ -85,9 +85,10 @@ function unParseArguments(args: CommandArguments | undefined, preserveArgumentCa
 
   // Single object form.
   if (typeof args === 'object' && !Array.isArray(args)) {
-    return yargsUnparser(
-      preserveArgumentCasing ? args : kebabCaseKeys(args)
-    );
+    // @ts-expect-error - We are intentionally omitting the "_" key here.
+    return yargsUnparser({
+      ...preserveArgumentCasing ? args : kebabCaseKeys(args)
+    });
   }
 
   // Array form.

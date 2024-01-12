@@ -1,4 +1,4 @@
-import { EOL } from 'os';
+import { EOL } from 'node:os';
 
 import callsites from 'callsites';
 import ow from 'ow';
