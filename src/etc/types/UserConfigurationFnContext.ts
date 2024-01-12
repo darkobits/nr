@@ -24,11 +24,4 @@ export interface UserConfigurationFnContext {
    * returns a `ScriptThunk`.
    */
   script: typeof script;
-
-  /**
-   * True if a CI environment has been detected.
-   *
-   * See: https://github.com/watson/is-ci
-   */
-  isCI: boolean;
 }

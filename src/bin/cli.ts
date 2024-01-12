@@ -3,7 +3,6 @@
 import { EOL } from 'os';
 
 import * as cli from '@darkobits/saffron';
-import isCI from 'is-ci';
 
 import { command, commands, printCommandInfo } from 'lib/commands';
 import log from 'lib/log';
