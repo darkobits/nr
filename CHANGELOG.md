@@ -1,3 +1,34 @@
+## [0.17.0-beta.4](https://github.com/darkobits/nr/compare/v0.17.0-beta.2...v0.17.0-beta.4) (2024-01-12)
+
+
+### ⚠ BREAKING CHANGES
+
+* `is-ci` is no longer passed to user configuration functions. This dependency may be installed by the user if needed.
+
+### ✨ Features
+
+* `defineConfig` handles arrays. ([1fb6276](https://github.com/darkobits/nr/commit/1fb6276c59d6f5d75812acc7f47d7ed96473308f))
+
+
+### 🏗 Chores
+
+* **deps:** Update dependencies. ([6c36d15](https://github.com/darkobits/nr/commit/6c36d15bbb3c13fae758c9c714f7db8ebc5522bc))
+* Fix errors in `package.json`. ([dd12a37](https://github.com/darkobits/nr/commit/dd12a371bc4b284657841d31067311310d65a2d1))
+* Misc. refactoring. ([7fa40d3](https://github.com/darkobits/nr/commit/7fa40d3ebdf9d2ec2476ab6b3ea8530f4511fc35))
+* **release:** 0.17.0-beta.2 ([669db51](https://github.com/darkobits/nr/commit/669db514bf6e34894bf67b8e7fd05037f289893c))
+* **release:** 0.17.0-beta.3 ([7d1c6a5](https://github.com/darkobits/nr/commit/7d1c6a5126259544e43e5e49ec7fd986bd6380ec))
+
+
+### 📖 Documentation
+
+* Update `README`. ([3896c17](https://github.com/darkobits/nr/commit/3896c1738ca81803c0299dfa3d94c5861cbd8235))
+* Update README. ([fa249ce](https://github.com/darkobits/nr/commit/fa249ce115913354847389140e26a064d6a9d619))
+
+
+### 🛠 Refactoring
+
+* Remove `is-ci`. ([bbf224f](https://github.com/darkobits/nr/commit/bbf224f9c60a5bfe27c7d9c9cd33e1b83d064442))
+
 ## [0.17.0-beta.2](https://github.com/darkobits/nr/compare/v0.17.0-beta.1...v0.17.0-beta.2) (2024-01-11)
 
 
