@@ -1,18 +1,24 @@
-import { withDefaultPackageScripts } from '@darkobits/ts';
+import { defaultPackageScripts } from '@darkobits/ts';
+import IS_CI from 'is-ci';
 
-export default withDefaultPackageScripts(({ command, script, isCI }) => {
-  script('test.smoke', [[
-    command.node('import.test.js', { cwd: './tests/fixtures/esm/' }),
-    command.node('dynamic-import.test.js', { cwd: './tests/fixtures/cjs' }),
-    command.node('require.test.js', { cwd: './tests/fixtures/cjs' })
-  ]], {
-    group: 'Test',
-    description: 'Run smoke tests.',
-    timing: true
-  });
+import type { UserConfigurationExport } from '@darkobits/nr';
 
-  if (!isCI) script('postBuild', 'script:test.smoke', {
-    group: 'Lifecycle',
-    description: '[hook] If not in a CI environment, run smoke tests after building the project.'
-  });
-});
+export default [
+  defaultPackageScripts,
+  ({ command, script }) => {
+    script('test.smoke', [[
+      command.node('import.test.js', { cwd: './tests/fixtures/esm/' }),
+      command.node('dynamic-import.test.js', { cwd: './tests/fixtures/cjs' }),
+      command.node('require.test.js', { cwd: './tests/fixtures/cjs' })
+    ]], {
+      group: 'Test',
+      description: 'Run smoke tests.',
+      timing: true
+    });
+
+    if (!IS_CI) script('postBuild', 'script:test.smoke', {
+      group: 'Lifecycle',
+      description: '[hook] If not in a CI environment, run smoke tests after building the project.'
+    });
+  }
+] satisfies UserConfigurationExport;

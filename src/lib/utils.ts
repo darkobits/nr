@@ -3,7 +3,7 @@ import { EOL } from 'node:os';
 // @ts-expect-error - This package does not have type definitions.
 import errno from 'errno';
 import { npmRunPath } from 'npm-run-path';
-import { readPackageUpSync } from 'read-pkg-up';
+import { readPackageUpSync } from 'read-package-up';
 import which from 'which';
 
 import { NR_RED } from 'etc/constants';
@@ -81,7 +81,10 @@ export function getPackageNameFromCallsite(callSite: CallSite | undefined, fallb
 
   const localPackage = readPackageUpSync();
 
-  const sourcePackage = readPackageUpSync({ cwd: fileName });
+  // getFileName returns a string in the format file://, so we either need to
+  // strip this from the beginning of the string or use it to create an actual
+  // URL instance to provide to readPackageUp. The latter seems less error-prone
+  const sourcePackage = readPackageUpSync({ cwd: new URL(fileName) });
   if (!sourcePackage) return fallback;
 
   if (localPackage && localPackage.packageJson.name === sourcePackage.packageJson.name) {
