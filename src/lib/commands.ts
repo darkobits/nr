@@ -69,52 +69,55 @@ const commonExecaOptions: ExecaOptions = {
 /**
  * @private
  *
- * Provided a CommandArguments list, returns an array of strings representing
- * the "un-parsed" arguments.
+ * Provided a CommandArguments value, returns an array of strings representing
+ * the "un-parsed" arguments to be passed to an executable.
  */
-function unParseArguments(args: CommandArguments | undefined, preserveArgumentCasing?: boolean) {
+function unParseArguments(args: CommandArguments | undefined, preserveArgumentCasing?: boolean): Array<string> {
   if (!args) return [];
 
-  const positionals: Array<string> = [];
-  const flags: Record<string, any> = {};
+  const positionalArguments: Array<string> = [];
+  const namedArguments: Record<string, any> = {};
 
-  // Single string form, return without un-parsing, nested in an array.
-  if (typeof args === 'string') {
-    return [args];
+  // Single primitive form, cast the primitive as a string and nest in an array.
+  if (typeof args === 'string' || typeof args === 'number' || typeof args === 'boolean') {
+    return [String(args)];
   }
 
   // Single object form.
   if (typeof args === 'object' && !Array.isArray(args)) {
-    // @ts-expect-error - We are intentionally omitting the "_" key here.
-    return yargsUnparser({
-      ...preserveArgumentCasing ? args : kebabCaseKeys(args)
+    Object.entries(args).forEach(([key, value]) => {
+      namedArguments[key] = value;
     });
   }
 
   // Array form.
-  args.forEach(arg => {
-    // Add string arguments to positionals array.
-    if (ow.isValid(arg, ow.string)) {
-      positionals.push(arg);
-      return;
-    }
+  if (Array.isArray(args)) {
+    args.forEach(arg => {
+      // Current item is a primitive, cast to string and add to positionals.
+      if (ow.isValid(arg, ow.any(ow.string, ow.number, ow.boolean))) {
+        positionalArguments.push(String(arg));
+        return;
+      }
 
-    if (ow.isValid(arg, ow.object.plain)) {
-      Object.entries(arg).forEach(([key, value]) => {
-        flags[key] = value;
-      });
+      // Current item is an object representing one or more named arguments. Add
+      // each to the
+      if (ow.isValid(arg, ow.object.plain)) {
+        Object.entries(arg).forEach(([key, value]) => {
+          namedArguments[key] = value;
+        });
 
-      return;
-    }
+        return;
+      }
 
-    throw new TypeError(`Expected "argument" to be of type "string" or "object", got "${typeof arg}".`);
-  });
+      throw new TypeError(`Expected "argument" to be of type "string" or "object", got "${typeof arg}".`);
+    });
+  }
 
-  const reCasedFlags = preserveArgumentCasing ? flags : kebabCaseKeys(flags);
+  const reCasedNamedArguments = preserveArgumentCasing ? namedArguments : kebabCaseKeys(namedArguments);
 
   return yargsUnparser({
-    _: positionals,
-    ...reCasedFlags
+    _: positionalArguments,
+    ...reCasedNamedArguments
   });
 }
 
@@ -215,11 +218,28 @@ function commandBuilder(builderOptions: CommandBuilderOptions): CommandThunk {
       executable: ow.string,
       name: ow.optional.string,
       args: ow.optional.any(
+        //
         ow.string,
-        ow.object.plain,
+        ow.number,
+        ow.boolean,
+        ow.object.valuesOfType(
+          ow.any(
+            ow.string,
+            ow.number,
+            ow.boolean
+          )
+        ),
         ow.array.ofType(ow.any(
           ow.string,
-          ow.object.plain
+          ow.number,
+          ow.boolean,
+          ow.object.valuesOfType(
+            ow.any(
+              ow.string,
+              ow.number,
+              ow.boolean
+            )
+          )
         ))
       ),
       prefix: ow.optional.function,

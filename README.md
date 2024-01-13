@@ -131,12 +131,8 @@ the following keys:
 ```ts
 export default ({ command, task, script }) => {
   script('build', [
-    command('babel', {
-      args: ['src', { outDir: 'dist' }]
-    }),
-    command('eslint', {
-      args: ['src']
-    })
+    command('babel', { args: ['src', { outDir: 'dist' }] }),
+    command('eslint', { args: 'src' })
   ]);
 };
 ```
@@ -146,6 +142,8 @@ We can then invoke the `build` script thusly:
 ```
 nr build
 ```
+
+The next sections detail how to create and compose commands, tasks, and scripts.
 
 ### `command`
 
@@ -163,16 +161,20 @@ to specify any [`CommandArguments`](src/etc/types/CommandOptions.ts) to pass to 
 [`CommandOptions`](src/etc/types/CommandOptions.ts) also supports a variety of ways to customize the
 invocation of a command.
 
-To reference a command in a script, use either the return value from `command` directly or a string in
-the format `cmd:name` where name is the value provided in `options.name`.
-
 Commands are executed using [`execa`](https://github.com/sindresorhus/execa), and `CommandOptions`
 supports all valid Execa options.
 
-[`CommandArguments`](src/etc/types/CommandOptions.ts) may take one of four forms:
-* `string` for singular positional argument or to list all arguments as a single string
-* `Record<string, any>` to list all arguments as flags (key/value pairs)
-* `Array<string | Record<string, any>>` to mix positionals and flags.
+To reference a command in a script, use either the return value from `command` or a string in the
+format `cmd:name` where name is the value provided in `options.name`.
+
+Assuming the type `Primitive` refers to the union of `string | number | boolean`, [`CommandArguments`](src/etc/types/CommandOptions.ts)
+may take one the following three forms:
+
+* `Primitive` to pass a singular positional argument or to list all arguments as a string.
+* `Record<string, Primitive>` to provide named arguments only
+* `Array<Primitive | Record<string, Primitive>>` to mix positional and named arguments
+
+Each of these forms is documented in the example below.
 
 #### Argument Casing
 
@@ -186,21 +188,32 @@ such cases, set the `preserveArgumentCasing` option to `true` in the commands' o
 > `nr.config.ts`
 
 ```ts
-import nr from '@darkobits/nr';
+import defineConfig from '@darkobits/nr';
 
-export default nr({ command, script }) => {
-  // Lint the project using ESLint.
+export default defineConfig(({ command }) => {
+  // Examples using single primitive arguments.
+  command('echo', { args: 'Hello world!' });
+  command('sleep', { args: 5 });
+
+  // Example using a single object of named arguments and disabling
+  // conversion to kebab-case.
+  command('tsc', {
+    args: { emitDeclarationOnly: true },
+    preserveArgumentCasing: true
+  });
+
+  // Example using a mix of positional and named arguments.
   command('eslint', {
     args: ['src', { ext: '.ts,.tsx,.js,.jsx' }]
   });
 
-  // Type-check and emit type declarations for the project.
-  command('tsc', {
-    args: { emitDeclarationOnly: true },
-    // Do not convert flags to kebab-case.
-    preserveArgumentCasing: true
+  // Execa's default configuration for stdio is 'pipe'. To support interactivity
+  // when using Vitest in watch mode, we can easily set stdio to 'inherit' in
+  // our options.
+  command('vitest', {
+    stdio: 'inherit'
   });
-};
+});
 ```
 
 #### `command.node`
@@ -232,9 +245,9 @@ the format `task:name` where name is the value provided in `options.name`.
 > `nr.config.ts`
 
 ```ts
-import nr from '@darkobits/nr';
+import defineConfig from '@darkobits/nr';
 
-export default nr({ task, script }) => {
+export default defineConfig(({ task, script }) => {
   const helloWorldTask = task(() => {
     console.log('Hello world!');
   }, {
@@ -260,7 +273,7 @@ export default nr({ task, script }) => {
     'task:helloWorld',
     'task:done'
   ]);
-};
+});
 ```
 
 ---
@@ -306,9 +319,9 @@ need more complex parallelization, define separate, smaller scripts and compose 
 > `nr.config.ts`
 
 ```ts
-import nr from '@darkobits/nr';
+import defineConfig from '@darkobits/nr';
 
-export default nr({ command, task, script }) => {
+export default defineConfig(({ command, task, script }) => {
   command('babel', {
     args: ['src', { outDir: 'dist' }],
     name: 'babel'
@@ -343,7 +356,7 @@ export default nr({ command, task, script }) => {
   ], {
     description: 'Run unit tests and generate a coverage report.'
   });
-};
+});
 ```
 
 > **Warning**
@@ -362,7 +375,7 @@ export default nr({ command, task, script }) => {
 For users who want to ensure their configuration file is type-safe, or who want IntelliSense, you may
 use a JSDoc annotation in a JavaScript configuration file:
 
-> `nr.config.js`
+> `nr.config.ts`
 
 ```ts
 /** @type { import('@darkobits/nr').UserConfigurationExport } */
@@ -386,7 +399,7 @@ export default (({ command, task, script }) => {
 Or, `nr` exports a helper which provides type-safety and IntelliSense without requiring a JSDoc or
 explicit type annotation.
 
-> `nr.config.js`
+> `nr.config.ts`
 
 ```ts
 import defineConfig from '@darkobits/nr';

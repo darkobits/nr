@@ -2,25 +2,28 @@ import type { Options as ExecaOptions, NodeOptions as ExecaNodeOptions } from 'e
 import type log from 'lib/log';
 
 
+type Primitive = string | number | boolean;
+
+
 /**
  * Defines how arguments are specified for commands.
  */
 export type CommandArguments =
   /**
-   * A string may be used if passing only a single argument, or if the user
-   * wishes to provide all positional arguments and flags as a string.
+   * A single primitive may be used if passing only one argument. Or, a string
+   * may be used if the user wishes to provide all arguments string.
    */
-  | string
+  | Primitive
   /**
-   * An object may be used if the user only needs to provide a set of named
-   * arguments.
+   * An object may be used if the user only needs to provide a collection of
+   * named arguments.
    */
-  | Record<string, any>
+  | Record<string, Primitive>
   /**
-   * An array containing strings and objects may be used to represent a mixture
-   * of positionals and named arguments.
+   * An array containing primitives and objects may be used to represent both
+   * positional and named arguments.
    */
-  | Array<string | Record<string, any>>;
+  | Array<Primitive | Record<string, Primitive>>;
 
 
 export interface CommonCommandOptions {
