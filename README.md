@@ -143,8 +143,6 @@ We can then invoke the `build` script thusly:
 nr build
 ```
 
-The next sections detail how to create and compose commands, tasks, and scripts.
-
 ### `command`
 
 | Parameter       | Type                                                | Description                           |
