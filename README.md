@@ -110,8 +110,8 @@ A configuration file is responsible for creating **commands**, **tasks**, and **
   as any configuration related to how the command will run, such as environment variables and how STDIN
   and STDOUT will be handled.
 - **Tasks** are JavaScript functions that may execute arbitrary code. They may be synchronous or
-  asynchronous. Tasks can be used to interface with another program's Node API, or to perform any
-  in-process work that does not rely on the invocation of an external CLI.
+  asynchronous. Tasks can be used to interface with another application's [Node API](https://vitejs.dev/guide/api-javascript),
+  or to perform any in-process work that does not rely on the invocation of an external CLI.
 - **Scripts** describe a set of instructions composed of commands, tasks, and other scripts. These
   instructions may be run in serial, in parallel, or a combination of both.
 
@@ -142,6 +142,8 @@ We can then invoke the `build` script thusly:
 ```
 nr build
 ```
+
+The next sections detail how to create and compose commands, tasks, and scripts.
 
 ### `command`
 
