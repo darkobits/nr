@@ -1,3 +1,30 @@
+# Changelog
+
+All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+## [0.17.0-beta.5](https://github.com/darkobits/nr/compare/v0.17.0-beta.4...v0.17.0-beta.5) (2024-02-01)
+
+
+### ✨ Features
+
+* Allow primitives in command arguments. ([5a3e848](https://github.com/darkobits/nr/commit/5a3e8486f2aed232b4b1b149ace0b433cf5a8f91))
+
+
+### 🏗 Chores
+
+* **deps:** Update dependencies. ([81194ca](https://github.com/darkobits/nr/commit/81194caab664bd3f540bb2c6728b2b2886e1ddef))
+
+
+### 📖 Documentation
+
+* Update README. ([dd154e6](https://github.com/darkobits/nr/commit/dd154e689c0aaa8999f98ab454c93ce1f88863b5))
+* Update README. ([b42bbec](https://github.com/darkobits/nr/commit/b42bbec39159a38eb52497c2942d5383c04151de))
+
+
+### 🛠 Refactoring
+
+* Rename tasks to functions. ([ac9eaf8](https://github.com/darkobits/nr/commit/ac9eaf8efa9dafce3139dd50e4dc114d629608f3))
+
 ## [0.17.0-beta.4](https://github.com/darkobits/nr/compare/v0.17.0-beta.2...v0.17.0-beta.4) (2024-01-12)
 
 
