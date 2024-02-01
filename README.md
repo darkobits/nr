@@ -170,7 +170,7 @@ format `cmd:name` where name is the value provided in `options.name`.
 Assuming the type `Primitive` refers to the union of `string | number | boolean`, [`CommandArguments`](src/etc/types/CommandOptions.ts)
 may take one the following three forms:
 
-* `Primitive` to pass a singular positional argument or to list all arguments as a string.
+* `Primitive` to pass a singular positional argument or to list all arguments as a `string``
 * `Record<string, Primitive>` to provide named arguments only
 * `Array<Primitive | Record<string, Primitive>>` to mix positional and named arguments
 
@@ -191,25 +191,25 @@ such cases, set the `preserveArgumentCasing` option to `true` in the commands' o
 import defineConfig from '@darkobits/nr';
 
 export default defineConfig(({ command }) => {
-  // Examples using single primitive arguments.
-  command('echo', { args: 'Hello world!' });
-  command('sleep', { args: 5 });
+  // Using single primitive arguments. These commands will invoke
+  command('echo', { args: 'Hello world!' }); // echo "Hello world!"
+  command('sleep', { args: 5 }); // sleep 5
 
-  // Example using a single object of named arguments and disabling
-  // conversion to kebab-case.
+  // Example using a single object of named arguments and preserving argument
+  // casing.
   command('tsc', {
     args: { emitDeclarationOnly: true },
     preserveArgumentCasing: true
-  });
+  }); // tsc --emitDeclarationOnly=true
 
   // Example using a mix of positional and named arguments.
   command('eslint', {
     args: ['src', { ext: '.ts,.tsx,.js,.jsx' }]
-  });
+  }); // eslint src --ext=".ts,.tsx,.js,.jsx"
 
-  // Execa's default configuration for stdio is 'pipe'. To support interactivity
-  // when using Vitest in watch mode, we can easily set stdio to 'inherit' in
-  // our options.
+  // Execa's default configuration for stdio is 'pipe'. If a command opens an
+  // application that involves interactivity, you'll need to set Execa's stdio
+  // option to 'inherit':
   command('vitest', {
     stdio: 'inherit'
   });
@@ -235,7 +235,7 @@ and the options argument supports all `execaNode` options.
 |---------------------------------------|-------------------------------------------------------------|
 | [`FnThunk`](src/etc/types/FnThunk.ts) | Value that may be provided to `script` to run the function. |
 
-This function accepts a function, [`Fn`](src/etc/types/Fn.ts), and an optional `options` object.
+This function accepts a function `userFn` and an optional `options` object.
 
 To reference a function in a script, use either the return value from `fn` directly or a string in the
 format `fn:name` where name is the value provided in `options.name`.
@@ -280,11 +280,11 @@ export default defineConfig(({ fn, script }) => {
 
 ### `script`
 
-| Parameter      | Type                                              | Description                                               |
-|----------------|---------------------------------------------------|-----------------------------------------------------------|
-| `name`         | `string`                                          | Name of the script.                                       |
-| `instructions` | [`InstructionSet`](src/etc/types/Instruction.ts)  | List of other commands, functions, or scripts to execute. |
-| `options?`     | [`ScriptOptions`](src/etc/types/ScriptOptions.ts) | Optional script configuration.                            |
+| Parameter      | Type                                              | Description                                                                                        |
+|----------------|---------------------------------------------------|----------------------------------------------------------------------------------------------------|
+| `name`         | `string`                                          | Name of the script.                                                                                |
+| `instructions` | [`Instruction`](src/etc/types/Instruction.ts)     | `Instruction` or `Array<Instruction>`; commands, functions, or other scripts to execute in serial. |
+| `options?`     | [`ScriptOptions`](src/etc/types/ScriptOptions.ts) | Optional script configuration.                                                                     |
 
 | Return Type                                   | Description                                               |
 |-----------------------------------------------|-----------------------------------------------------------|
@@ -296,8 +296,8 @@ It will register the script using the provided `name` and return a value.
 To reference a script in another script, use either the return value from `script` directly or a string
 in the format `script:name`.
 
-The second argument may be an array of [`Instruction`](src/etc/types/Instruction.ts) whose elements may
-consist of:
+The second argument must be an [`Instruction`](src/etc/types/Instruction.ts) or array of Instructions.
+For reference, an Instruction may be one of:
 
 * A reference to a command by name using a `string` in the format `cmd:name` or by value using the value
   returned by `command`.
@@ -305,8 +305,6 @@ consist of:
   returned by `fn`.
 * A reference to another script by name using a `string` in the format `script:name` or by value using
   the value returned by `script`.
-
-However, if a script contains only a single instruction, it does not need to be wrapped in an array.
 
 #### Parallelization
 
@@ -332,6 +330,8 @@ export default defineConfig(({ command, fn, script }) => {
     name: 'lint'
   });
 
+  // This script runs a single command, so its second argument need not be
+  // wrapped in an array.
   script('test', command('vitest'), {
     description: 'Run unit tests with Vitest.'
   });
@@ -349,11 +349,9 @@ export default defineConfig(({ command, fn, script }) => {
     description: 'Build and lint in parallel, then run unit tests.'
   });
 
-  script('test.coverage', [
-    command('vitest', {
-      args: ['run', { coverage: true }]
-    })
-  ], {
+  script('test.coverage', command('vitest', {
+    args: ['run', { coverage: true }]
+  }), {
     description: 'Run unit tests and generate a coverage report.'
   });
 });
