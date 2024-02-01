@@ -53,7 +53,7 @@ It can serve as a replacement for or complement to traditional [NPM package scri
 - [Philosophy](#philosophy)
 - [Configure](#configure)
   - [`command`](#command)
-  - [`task`](#task)
+  - [`fn`](#fn)
   - [`script`](#script)
   - [Type-safe Configuration & IntelliSense](#type-safe-configuration--intellisense)
 - [Use](#use)
@@ -104,32 +104,32 @@ and a means to formalize these invocations in a JavaScript configuration file.
 file, `nr.config.ts`. `nr` will search for this file in the directory from which it was invoked, and
 then every directory above it until a configuration file is found.
 
-A configuration file is responsible for creating **commands**, **tasks**, and **scripts**:
+A configuration file is responsible for creating **commands**, **functions**, and **scripts**:
 
 - **Commands** describe the invocation of a single executable and any arguments provided to it, as well
   as any configuration related to how the command will run, such as environment variables and how STDIN
   and STDOUT will be handled.
-- **Tasks** are JavaScript functions that may execute arbitrary code. They may be synchronous or
-  asynchronous. Tasks can be used to interface with another application's [Node API](https://vitejs.dev/guide/api-javascript),
+- **Functions** are JavaScript functions that may execute arbitrary code. They may be synchronous or
+  asynchronous. Functions can be used to interface with another application's [Node API](https://vitejs.dev/guide/api-javascript),
   or to perform any in-process work that does not rely on the invocation of an external CLI.
-- **Scripts** describe a set of instructions composed of commands, tasks, and other scripts. These
+- **Scripts** describe a set of instructions composed of commands, functions, and other scripts. These
   instructions may be run in serial, in parallel, or a combination of both.
 
 A configuration file must default-export a function that will be passed a context object that contains
 the following keys:
 
-| Key                   | Type       | Description           |
-|-----------------------|------------|-----------------------|
-| [`command`](#command) | `function` | Create a new command. |
-| [`task`](#task)       | `function` | Create a new task.    |
-| [`script`](#script)   | `function` | Create a new script.  |
+| Key                   | Type       | Description            |
+|-----------------------|------------|------------------------|
+| [`command`](#command) | `function` | Create a new command.  |
+| [`fn`](#fn)           | `function` | Create a new function. |
+| [`script`](#script)   | `function` | Create a new script.   |
 
 **Example:**
 
 > `nr.config.ts`
 
 ```ts
-export default ({ command, task, script }) => {
+export default ({ command, fn, script }) => {
   script('build', [
     command('babel', { args: ['src', { outDir: 'dist' }] }),
     command('eslint', { args: 'src' })
@@ -143,7 +143,7 @@ We can then invoke the `build` script thusly:
 nr build
 ```
 
-The next sections detail how to create and compose commands, tasks, and scripts.
+The next sections detail how to create and compose commands, functions, and scripts.
 
 ### `command`
 
@@ -224,21 +224,21 @@ and the options argument supports all `execaNode` options.
 
 ---
 
-### `task`
+### `fn`
 
-| Parameter  | Type                                          | Description          |
-|------------|-----------------------------------------------|----------------------|
-| `taskFn`   | [`TaskFn`](src/etc/types/TaskFn.ts)           | Function to execute. |
-| `options?` | [`TaskOptions`](src/etc/types/TaskOptions.ts) | Task options.        |
+| Parameter  | Type                                      | Description          |
+|------------|-------------------------------------------|----------------------|
+| `userFn`   | [`Fn`](src/etc/types/Fn.ts)               | Function to execute. |
+| `options?` | [`FnOptions`](src/etc/types/FnOptions.ts) | Function options.    |
 
-| Return Type                               | Description                                             |
-|-------------------------------------------|---------------------------------------------------------|
-| [`TaskThunk`](src/etc/types/TaskThunk.ts) | Value that may be provided to `script` to run the task. |
+| Return Type                           | Description                                                 |
+|---------------------------------------|-------------------------------------------------------------|
+| [`FnThunk`](src/etc/types/FnThunk.ts) | Value that may be provided to `script` to run the function. |
 
-This function accepts a function, [`TaskFn`](src/etc/types/TaskFn.ts), and an optional `options` object.
+This function accepts a function, [`Fn`](src/etc/types/Fn.ts), and an optional `options` object.
 
-To reference a task in a script, use either the return value from `task` directly or a string in
-the format `task:name` where name is the value provided in `options.name`.
+To reference a function in a script, use either the return value from `fn` directly or a string in the
+format `fn:name` where name is the value provided in `options.name`.
 
 **Example:**
 
@@ -247,31 +247,31 @@ the format `task:name` where name is the value provided in `options.name`.
 ```ts
 import defineConfig from '@darkobits/nr';
 
-export default defineConfig(({ task, script }) => {
-  const helloWorldTask = task(() => {
+export default defineConfig(({ fn, script }) => {
+  const helloWorldFn = fn(() => {
     console.log('Hello world!');
   }, {
     name: 'helloWorld'
   });
 
-  const doneTask = task(() => {
+  const doneFn = fn(() => {
     console.log('Done.');
   }, {
     name: 'done'
   });
 
-  // Just like commands, tasks may be referenced in a script by value (and thus
-  // defined inline) or using a string with the prefix 'task:'. The following
-  // two examples are functionally equivalent:
+  // Just like commands, functions may be referenced in a script by value (and
+  // thus defined inline) or using a string with the prefix 'fn:'. The following
+  // two examples are therefore equivalent:
 
   script('myAwesomeScript', [
-    helloWorldTask,
-    doneTask
+    helloWorldFn,
+    doneFn
   ]);
 
   script('myAwesomeScript', [
-    'task:helloWorld',
-    'task:done'
+    'fn:helloWorld',
+    'fn:done'
   ]);
 });
 ```
@@ -280,11 +280,11 @@ export default defineConfig(({ task, script }) => {
 
 ### `script`
 
-| Parameter      | Type                                              | Description                                           |
-|----------------|---------------------------------------------------|-------------------------------------------------------|
-| `name`         | `string`                                          | Name of the script.                                   |
-| `instructions` | [`InstructionSet`](src/etc/types/Instruction.ts)  | List of other commands, tasks, or scripts to execute. |
-| `options?`     | [`ScriptOptions`](src/etc/types/ScriptOptions.ts) | Optional script configuration.                        |
+| Parameter      | Type                                              | Description                                               |
+|----------------|---------------------------------------------------|-----------------------------------------------------------|
+| `name`         | `string`                                          | Name of the script.                                       |
+| `instructions` | [`InstructionSet`](src/etc/types/Instruction.ts)  | List of other commands, functions, or scripts to execute. |
+| `options?`     | [`ScriptOptions`](src/etc/types/ScriptOptions.ts) | Optional script configuration.                            |
 
 | Return Type                                   | Description                                               |
 |-----------------------------------------------|-----------------------------------------------------------|
@@ -301,8 +301,8 @@ consist of:
 
 * A reference to a command by name using a `string` in the format `cmd:name` or by value using the value
   returned by `command`.
-* A reference to a task by name using a `string` in the format `task:name` or by value using the value
-  returned by `task`.
+* A reference to a function by name using a `string` in the format `fn:name` or by value using the value
+  returned by `fn`.
 * A reference to another script by name using a `string` in the format `script:name` or by value using
   the value returned by `script`.
 
@@ -321,7 +321,7 @@ need more complex parallelization, define separate, smaller scripts and compose 
 ```ts
 import defineConfig from '@darkobits/nr';
 
-export default defineConfig(({ command, task, script }) => {
+export default defineConfig(({ command, fn, script }) => {
   command('babel', {
     args: ['src', { outDir: 'dist' }],
     name: 'babel'
@@ -336,15 +336,15 @@ export default defineConfig(({ command, task, script }) => {
     description: 'Run unit tests with Vitest.'
   });
 
-  const doneTask = task(() => console.log('Done!'));
+  const doneFn = fn(() => console.log('Done!'));
 
   script('prepare', [
     // 1. Run these two commands in parallel.
     ['cmd:babel', 'cmd:lint']
     // 2. Then, run this script.
     'script:test',
-    // 3. Finally, run this task.
-    doneTask
+    // 3. Finally, run this function.
+    doneFn
   ], {
     description: 'Build and lint in parallel, then run unit tests.'
   });
@@ -379,7 +379,7 @@ use a JSDoc annotation in a JavaScript configuration file:
 
 ```ts
 /** @type { import('@darkobits/nr').UserConfigurationExport } */
-export default ({ command, task, script }) => {
+export default ({ command, fn, script }) => {
 
 };
 ```
@@ -391,7 +391,7 @@ If using a TypeScript configuration file, you can use the `satisfies` operator:
 ```ts
 import type { UserConfigurationExport } from '@darkobits/nr';
 
-export default (({ command, task, script }) => {
+export default (({ command, fn, script }) => {
   // Define configuration here.
 }) satisfies UserConfigurationExport;
 ```
@@ -404,15 +404,15 @@ explicit type annotation.
 ```ts
 import defineConfig from '@darkobits/nr';
 
-export default defineConfig(({ command, task, script }) => {
+export default defineConfig(({ command, fn, script }) => {
   // Define configuration here.
 });
 ```
 
 # Use
 
-Once you have created an `nr.config.(ts|js)` file in your project and registered commands, tasks, and
-scripts, you may invoke a registered script using the `nr` CLI:
+Once you have created an `nr.config.(ts|js)` file in your project and registered commands, functions,
+and scripts, you may invoke a registered script using the `nr` CLI:
 
 ```
 nr test.coverage
@@ -463,13 +463,13 @@ be run before and after the matched script, respectively.
 ## Discoverability
 
 Discoverability and self-documentation are encouraged with `nr`. While optional, consider leveraging the
-`name`, `group`, and `description` options where available when defining commands, tasks, and scripts.
-Thoughtfully organizing your scripts and documenting what they do can go a long way in reducing friction
-for new contributors.
+`name`, `group`, and `description` options where available when defining commands, functions, and
+scripts. Thoughtfully organizing your scripts and documenting what they do can go a long way in reducing
+friction for new contributors.
 
-The `--commands`, `--tasks`, and `--scripts` flags may be passed to list information about all known
-entities of that type. If `nr` detects that a command, task, or script was registered from a third-party
-package, it will indicate the name of the package that created it.
+The `--commands`, `--functions`, and `--scripts` flags may be passed to list information about all known
+entities of that type. If `nr` detects that a command, function, or script was registered from a
+third-party package, it will indicate the name of the package that created it.
 
 A new contributor to a project may want an overview of available scripts, and may not be familiar with
 with the `nr` CLI. To make this feature easily accessible, consider adding an NPM script to the

@@ -131,8 +131,8 @@ export function resolveCommand(cmd: string, cwd = process.cwd()) {
 
 
 /**
- * Standard way for scripts, commands, and tasks to generate log prefixes for
- * themselves based on the entity's name.
+ * Standard way for scripts, commands, and functions to generate log prefixes
+ * for themselves based on the entity's name.
  */
 export function getPrefixedInstructionName(prefix: string, name: string | undefined) {
   if (typeof name !== 'string' || name === '') return `${prefix}:anonymous`;

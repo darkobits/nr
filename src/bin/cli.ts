@@ -5,9 +5,9 @@ import { EOL } from 'node:os';
 import * as cli from '@darkobits/saffron';
 
 import { command, commands, printCommandInfo } from 'lib/commands';
+import { fn, functions, printFunctionInfo } from 'lib/functions';
 import log from 'lib/log';
 import { script, scripts, matchScript, printScriptInfo } from 'lib/scripts';
-import { task, tasks, printTaskInfo } from 'lib/tasks';
 import { parseError, heroLog } from 'lib/utils';
 
 import type { CLIArguments, UserConfigurationExport } from 'etc/types';
@@ -31,20 +31,20 @@ cli.command<CLIArguments, UserConfigurationExport>({
     command.positional('query', {
       type: 'string',
       description: 'Script name or query.',
-      conflicts: ['commands', 'tasks', 'scripts']
+      conflicts: ['commands', 'functions', 'scripts']
     });
 
     command.option('scripts', {
       group: 'Introspection:',
       required: false,
       description: 'Show all registered scripts.',
-      conflicts: ['commands', 'tasks']
+      conflicts: ['commands', 'functions']
     });
 
-    command.option('tasks', {
+    command.option('functions', {
       group: 'Introspection:',
       required: false,
-      description: 'Show all registered tasks.',
+      description: 'Show all registered functions.',
       conflicts: ['commands', 'scripts']
     });
 
@@ -52,7 +52,7 @@ cli.command<CLIArguments, UserConfigurationExport>({
       group: 'Introspection:',
       required: false,
       description: 'Show all registered commands.',
-      conflicts: ['tasks', 'scripts']
+      conflicts: ['functions', 'scripts']
     });
 
     command.option('config', {
@@ -83,23 +83,23 @@ cli.command<CLIArguments, UserConfigurationExport>({
       // Invoke the user's configuration function(s) with the necessary context.
       // The result should create at least 1 non-empty script.
       if (typeof userConfigExport === 'function') {
-        await userConfigExport({ command, script, task });
+        await userConfigExport({ command, script, fn });
       } else if (Array.isArray(userConfigExport)) {
         for await (const userConfigFn of userConfigExport) {
-          await userConfigFn({ command, script, task });
+          await userConfigFn({ command, script, fn });
         }
       }
 
       // If the user's configuration file did not register anything, this is
       // likely an error; bail.
-      if (commands.size === 0 && tasks.size === 0 && scripts.size === 0) throw new Error(
-        `Configuration file ${chalk.green(configPath)} did not register any commands, tasks, or scripts.`
+      if (commands.size === 0 && functions.size === 0 && scripts.size === 0) throw new Error(
+        `Configuration file ${chalk.green(configPath)} did not register any commands, functions, or scripts.`
       );
 
-      // If the --commands, --tasks, or --scripts flags were used, print info
-      // about the indicated instruction type, then bail.
+      // If the --commands, --functions, or --scripts flags were used, print
+      // info about the indicated instruction type, then bail.
       if (argv.commands) return printCommandInfo(saffronContext);
-      if (argv.tasks) return printTaskInfo(saffronContext);
+      if (argv.functions) return printFunctionInfo(saffronContext);
       if (argv.scripts) return printScriptInfo(saffronContext);
 
       // If none of the above flags were used, then `query` becomes a required

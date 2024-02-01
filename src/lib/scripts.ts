@@ -9,13 +9,13 @@ import * as R from 'ramda';
 
 import {
   IS_COMMAND_THUNK,
-  IS_TASK_THUNK,
+  IS_FUNCTION_THUNK,
   IS_SCRIPT_THUNK
 } from 'etc/constants';
 import { commands } from 'lib/commands';
+import { functions } from 'lib/functions';
 import log from 'lib/log';
 import matchSegmentedName from 'lib/matcher';
-import { tasks } from 'lib/tasks';
 import {
   caseInsensitiveGet,
   heroLog,
@@ -45,7 +45,7 @@ const chalk = log.chalk;
  * following shape.
  */
 export interface ParsedInstruction {
-  type: 'cmd' | 'task' | 'script';
+  type: 'cmd' | 'fn' | 'script';
   name: string;
 }
 
@@ -66,13 +66,13 @@ function parseStringInstruction(value: string): ParsedInstruction {
   if (!value.includes(':')) {
     throw new Error([
       `Invalid instruction identifier: "${value}".`,
-      'Prefix commands with "cmd:", tasks with "task:", and scripts with "script:".'
+      'Prefix commands with "cmd:", functions with "fn:", and scripts with "script:".'
     ].join(EOL));
   }
 
   const [type, name] = value.split(':') as any;
 
-  if (!['script', 'cmd', 'task'].includes(type)) {
+  if (!['script', 'cmd', 'fn'].includes(type)) {
     throw new Error(`Invalid type: "${type}" in instruction "${value}".`);
   }
 
@@ -83,13 +83,13 @@ function parseStringInstruction(value: string): ParsedInstruction {
 /**
  * @private
  *
- * Returns `true` if the provided value is a script, command, or task thunk.
+ * Returns `true` if the provided value is a script, command, or function thunk.
  */
 function isThunk(value: any): value is Thunk {
   if (
     Reflect.has(value, IS_SCRIPT_THUNK) ||
     Reflect.has(value, IS_COMMAND_THUNK) ||
-    Reflect.has(value, IS_TASK_THUNK)
+    Reflect.has(value, IS_FUNCTION_THUNK)
   ) return true;
 
   return false;
@@ -99,9 +99,9 @@ function isThunk(value: any): value is Thunk {
 /**
  * @private
  *
- * If provided a CommandThunk, TaskThunk, or ScriptThunk, returns the value
+ * If provided a CommandThunk, FnThunk, or ScriptThunk, returns the value
  * as-is. If provided a string, attempts to resolve it to one of the above.
- * Strings may begin with 'cmd:', 'task:', or 'script:' to indicate the type to
+ * Strings may begin with 'cmd:', 'fn:', or 'script:' to indicate the type to
  * be resolved.
  */
 function resolveInstructionToThunk(value: Instruction): Thunk {
@@ -109,11 +109,11 @@ function resolveInstructionToThunk(value: Instruction): Thunk {
   // up in the registry.
   if (typeof value === 'function') {
     if (isThunk(value)) return value;
-    throw new TypeError('[resolveInstructionToThunk] Provided function is not a command, task, or script.');
+    throw new TypeError('[resolveInstructionToThunk] Provided function is not a command, function, or script.');
   }
 
   // If the user provided a string, parse it and look-up the indicated command,
-  // task, or script.
+  // function, or script.
   if (typeof value === 'string') {
     const { type, name } = parseStringInstruction(value);
 
@@ -123,10 +123,10 @@ function resolveInstructionToThunk(value: Instruction): Thunk {
       return commandDescriptor.thunk;
     }
 
-    if (type === 'task') {
-      const taskDescriptor = caseInsensitiveGet(name, tasks);
-      if (!taskDescriptor) throw new Error(`[resolveInstructionToThunk] Unknown task: "${name}"`);
-      return taskDescriptor.thunk;
+    if (type === 'fn') {
+      const FunctionDescriptor = caseInsensitiveGet(name, functions);
+      if (!FunctionDescriptor) throw new Error(`[resolveInstructionToThunk] Unknown function: "${name}"`);
+      return FunctionDescriptor.thunk;
     }
 
     if (type === 'script') {
@@ -150,8 +150,8 @@ function resolveInstructionToThunk(value: Instruction): Thunk {
  * Valid values for a script's instruction(s) may be:
  *
  * 1. A single string, indicating a reference to another Script, Command, or
- *    Task by name.
- * 2. A single ScriptThunk, CommandThunk, or TaskThunk.
+ *    Function by name.
+ * 2. A single ScriptThunk, CommandThunk, or FnThunk.
  * 3. An Array of the above.
  * 4. A nested Array within (3) containing only items (1-2).
  */
@@ -373,8 +373,8 @@ export function script(name: string, instructions: InstructionSet, options: Scri
       const runTime = log.createTimer();
 
       // Map each entry in the instruction sequence to its corresponding
-      // command, task, or script. For nested arrays, map the array to a thunk
-      // that runs each entry in parallel.
+      // command, function, or script. For nested arrays, map the array to a
+      // thunk that runs each entry in parallel.
       const resolvedInstructions = filteredInstructions.map(instruction => {
         if (Array.isArray(instruction)) {
           const instructionThunks = instruction.map(resolveInstructionToThunk);

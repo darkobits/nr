@@ -29,9 +29,9 @@ export interface CLIArguments extends Arguments {
   /**
    * [Flag]
    *
-   * If set, will list the names, groups, and descriptions of all tasks.
+   * If set, will list the names, groups, and descriptions of all functions.
    */
-  tasks: boolean | undefined;
+  functions: boolean | undefined;
 
   /**
    * [Flag]

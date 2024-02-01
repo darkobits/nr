@@ -1,6 +1,6 @@
 import type { command } from 'lib/commands';
+import type { fn } from 'lib/functions';
 import type { script } from 'lib/scripts';
-import type { task } from 'lib/tasks';
 
 
 /**
@@ -14,10 +14,10 @@ export interface UserConfigurationFnContext {
   command: typeof command;
 
   /**
-   * Provided a name and a task function, registers the task and returns a
-   * `TaskThunk`.
+   * Provided a name and a function, registers the function and returns a
+   * `FnThunk`.
    */
-  task: typeof task;
+  fn: typeof fn;
 
   /**
    * Provided a name and a script configuration, registers the script and
