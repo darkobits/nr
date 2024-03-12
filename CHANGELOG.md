@@ -1,3 +1,20 @@
+## [0.17.1](https://github.com/darkobits/nr/compare/v0.17.0...v0.17.1) (2024-03-12)
+
+
+### 🏗 Chores
+
+* **deps:** Update dependencies. ([17ede77](https://github.com/darkobits/nr/commit/17ede77788cbd8a915c838753a29d36a0f46c350))
+
+
+### 📖 Documentation
+
+* Update README. ([7e7a814](https://github.com/darkobits/nr/commit/7e7a814859e3c717e4be722d1e69a97b8de4e460))
+
+
+### 🛠 Refactoring
+
+* Command thunks return execa results. ([36e79ec](https://github.com/darkobits/nr/commit/36e79ecd2fe31ef800a98f870009c9ef9829b806))
+
 # Changelog
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
