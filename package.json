@@ -42,7 +42,7 @@
     "execa": "~8.0.1",
     "kebabcase-keys": "^1.0.0",
     "micromatch": "^4.0.5",
-    "npm-run-path": "~5.2.0",
+    "npm-run-path": "~5.3.0",
     "ow": "~1.1.1",
     "p-all": "~5.0.0",
     "p-series": "~3.0.0",
@@ -52,11 +52,11 @@
     "yargs-unparser": "^2.0.0"
   },
   "devDependencies": {
-    "@darkobits/ts": "0.20.4-beta.0",
+    "@darkobits/ts": "~0.20.7",
     "@types/kebabcase-keys": "^1.0.5",
     "@types/micromatch": "^4.0.6",
     "@types/node-emoji": "^1.8.2",
-    "@types/ramda": "^0.29.9",
+    "@types/ramda": "^0.29.11",
     "@types/which": "^3.0.3",
     "is-ci": "^3.0.1"
   }
