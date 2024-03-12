@@ -218,7 +218,6 @@ function commandBuilder(builderOptions: CommandBuilderOptions): CommandThunk {
       executable: ow.string,
       name: ow.optional.string,
       args: ow.optional.any(
-        //
         ow.string,
         ow.number,
         ow.boolean,
@@ -308,7 +307,7 @@ function commandBuilder(builderOptions: CommandBuilderOptions): CommandThunk {
         //   chalk.gray(getEscapedCommand(executable, childProcess.spawnargs))
         // );
 
-        await childProcess;
+        return await childProcess;
       } catch (err: any) {
         throw new Error(`${prefixedName} failed • ${err.message}`, { cause: err });
       }

@@ -408,7 +408,7 @@ export function script(name: string, instructions: InstructionSet, options: Scri
           log.verbose(log.prefix(logPrefix), '•', chalk.green('start'));
         }
 
-        await pSeries(resolvedInstructions);
+        await pSeries<any>(resolvedInstructions);
 
         if (timing) {
           heroLog([
