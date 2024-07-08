@@ -1,3 +1,35 @@
+# Changelog
+
+All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+## [0.18.0](https://github.com/darkobits/nr/compare/v0.17.2...v0.18.0) (2024-07-08)
+
+
+### ⚠ BREAKING CHANGES
+
+* Before:
+
+```ts
+import defineConfig from '@darkobits/nr'
+```
+
+After:
+
+```ts
+import { defineConfig } from '@darkobits/nr'
+```
+
+### 🏗 Chores
+
+* **deps:** Update dependencies. ([d5c71a2](https://github.com/darkobits/nr/commit/d5c71a233a50cbe281ced8f55d29d5656c446287))
+* Misc. cleanup. ([8dbe3f5](https://github.com/darkobits/nr/commit/8dbe3f542ab7eb11471864cded2ee07f66d0ca7c))
+
+
+### 🛠 Refactoring
+
+* Make `defineConfig` a named export. ([f17bd79](https://github.com/darkobits/nr/commit/f17bd79efe8cde8e543fa1d70591d9a4621fa477))
+* Require Node 18. ([bfc0192](https://github.com/darkobits/nr/commit/bfc019289cae5690b265a9fdcd8ece2aac712650))
+
 ## [0.17.2](https://github.com/darkobits/nr/compare/v0.17.1...v0.17.2) (2024-07-08)
 
 
