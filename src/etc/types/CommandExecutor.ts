@@ -1,6 +1,5 @@
 import type { CommandBuilderOptions } from './CommandBuilderOptions';
-import type { ExecaChildProcess } from 'execa';
-
+import type { ResultPromise } from 'execa';
 
 export interface CommandExecutorOptions extends Omit<CommandBuilderOptions, 'preserveArgumentCasing' | 'prefix'> {
   /**
@@ -25,4 +24,4 @@ export interface CommandExecutorOptions extends Omit<CommandBuilderOptions, 'pre
  * Signature of a command executor. Returns an execa invocation using different
  * strategies.
  */
-export type CommandExecutor = (options: CommandExecutorOptions) => ExecaChildProcess;
+export type CommandExecutor = (options: CommandExecutorOptions) => ResultPromise<typeof options>;

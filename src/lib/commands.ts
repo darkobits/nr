@@ -31,7 +31,6 @@ import type {
   CommandExecutor,
   CommandExecutorOptions,
   CommandOptions,
-  CommandOptionsNode,
   CommandThunk,
   UserConfigurationExport
 } from 'etc/types';
@@ -168,6 +167,8 @@ export function printCommandInfo(context: SaffronHandlerContext<CLIArguments, Us
         right: 1,
         bottom: 0
       },
+      // Makes the box full-width, auto height.
+      fullscreen: width => [width, 0],
       margin: 0,
       borderColor: '#242424'
     }));
@@ -420,7 +421,7 @@ export function command(executable: string, opts: CommandOptions = {}) {
  *
  * See: https://github.com/sindresorhus/execa#execanodescriptpath-arguments-options
  */
-command.node = (nodeScript: string, opts: CommandOptionsNode = {}) => {
+command.node = (nodeScript: string, opts: CommandOptions = {}) => {
   ow(nodeScript, 'nodeScript', ow.string);
 
   // Get the name of the package that defined this command.

@@ -1,11 +1,10 @@
 import type { IS_COMMAND_THUNK } from 'etc/constants';
-import type { ExecaReturnValue } from 'execa';
-
+import type { Options as ExecaOptions, ResultPromise } from 'execa';
 
 /**
  * Return type of `command`.
  */
-export interface CommandThunk {
-  (): Promise<ExecaReturnValue>;
+export interface CommandThunk<O extends ExecaOptions = ExecaOptions> {
+  (): ResultPromise<O>;
   [IS_COMMAND_THUNK]: true;
 }

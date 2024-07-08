@@ -109,7 +109,7 @@ function resolveInstructionToThunk(value: Instruction): Thunk {
   // up in the registry.
   if (typeof value === 'function') {
     if (isThunk(value)) return value;
-    throw new TypeError('[resolveInstructionToThunk] Provided function is not a command, function, or script.');
+    throw new TypeError('[resolveInstructionToThunk] Provided value is not a command, function, or script.');
   }
 
   // If the user provided a string, parse it and look-up the indicated command,
@@ -234,12 +234,15 @@ export function printScriptInfo(context: SaffronHandlerContext<CLIArguments, Use
 
     console.log(boxen(finalDescription, {
       title,
+      borderStyle: 'round',
       padding: {
         top: 0,
         left: 1,
         right: 1,
         bottom: 0
       },
+      // Makes the box full-width, auto height.
+      fullscreen: width => [width, 0],
       margin: 0,
       borderColor: '#242424'
     }));
@@ -253,16 +256,16 @@ export function printScriptInfo(context: SaffronHandlerContext<CLIArguments, Use
   if (groupsUsed) {
     const groupedScripts = R.groupBy<ScriptDescriptor>(descriptor => descriptor.options.group ?? 'Other', allScripts);
 
-    R.forEachObjIndexed((scriptConfigs, groupName) => {
+    for (const [groupName, scriptConfigs] of Object.entries(groupedScripts)) {
       if (!scriptConfigs) return;
-
-      console.log('');
-      console.log(`${chalk.bold(groupName)}\n`);
-      R.forEach(printScript, scriptConfigs);
-    }, groupedScripts);
+      const groupHasVisibleScripts = scriptConfigs.some(script => !script.options.hidden);
+      if (!groupHasVisibleScripts) return;
+      console.log(`\n${chalk.bold(groupName)}\n`);
+      scriptConfigs.forEach(printScript);
+    }
   } else {
     console.log('');
-    R.forEach(printScript, allScripts);
+    allScripts.forEach(printScript);
   }
 
   console.log('');

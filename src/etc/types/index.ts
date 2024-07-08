@@ -3,7 +3,7 @@ export type { CLIArguments } from './CliArguments';
 export type { CommandBuilderOptions } from './CommandBuilderOptions';
 export type { CommandDescriptor } from './CommandDescriptor';
 export type { CommandExecutor, CommandExecutorOptions } from './CommandExecutor';
-export type { CommandOptions, CommandOptionsNode, CommandArguments } from './CommandOptions';
+export type { CommandOptions, CommandArguments } from './CommandOptions';
 export type { CommandThunk } from './CommandThunk';
 
 export type { UserConfigurationFn } from './UserConfigurationFn';

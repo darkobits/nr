@@ -1,9 +1,9 @@
-import type { Options as ExecaOptions, NodeOptions as ExecaNodeOptions } from 'execa';
+import type {
+  Options as ExecaOptions
+} from 'execa';
 import type log from 'lib/log';
 
-
 type Primitive = string | number | boolean;
-
 
 /**
  * Defines how arguments are specified for commands.
@@ -63,7 +63,6 @@ export interface CommonCommandOptions {
   timing?: boolean;
 }
 
-
 /**
  * Options that may be provided to `command`. Accepts all `CommonCommandOptions`
  * and all Execa options.
@@ -71,12 +70,3 @@ export interface CommonCommandOptions {
  * See: See: https://github.com/sindresorhus/execa#execafile-arguments-options
  */
 export type CommandOptions = CommonCommandOptions & ExecaOptions;
-
-
-/**
- * Options that may be provided to `command.node`. Accepts all
- * `CommonCommandOptions` and all ExecaNode options.
- *
- * See: See: https://github.com/sindresorhus/execa#execanodescriptpath-arguments-options
- */
-export type CommandOptionsNode = CommonCommandOptions & ExecaNodeOptions;

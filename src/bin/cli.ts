@@ -12,9 +12,7 @@ import { parseError, heroLog } from 'lib/utils';
 
 import type { CLIArguments, UserConfigurationExport } from 'etc/types';
 
-
 const chalk = log.chalk;
-
 
 cli.command<CLIArguments, UserConfigurationExport>({
   command: '* [query]',
