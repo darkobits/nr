@@ -2,10 +2,12 @@ import { EOL } from 'node:os';
 
 import boxen from 'boxen';
 import callsites from 'callsites';
+import { npmRunPath } from 'npm-run-path';
 import ow from 'ow';
 import pAll from 'p-all';
 import pSeries from 'p-series';
 import * as R from 'ramda';
+import which from 'which';
 
 import {
   IS_COMMAND_THUNK,
@@ -20,8 +22,7 @@ import {
   caseInsensitiveGet,
   heroLog,
   getPackageNameFromCallsite,
-  getPrefixedInstructionName,
-  resolveCommand
+  getPrefixedInstructionName
 } from 'lib/utils';
 
 import type { SaffronHandlerContext } from '@darkobits/saffron';
@@ -36,9 +37,7 @@ import type {
   Thunk
 } from 'etc/types';
 
-
 const chalk = log.chalk;
-
 
 /**
  * An `Instruction` in `string` form will be converted into an object of the
@@ -49,12 +48,10 @@ export interface ParsedInstruction {
   name: string;
 }
 
-
 /**
  * Map of registered script names to their descriptors.
  */
 export const scripts = new Map<string, ScriptDescriptor>();
-
 
 /**
  * @private
@@ -79,7 +76,6 @@ function parseStringInstruction(value: string): ParsedInstruction {
   return { type, name };
 }
 
-
 /**
  * @private
  *
@@ -94,7 +90,6 @@ function isThunk(value: any): value is Thunk {
 
   return false;
 }
-
 
 /**
  * @private
@@ -138,7 +133,6 @@ function resolveInstructionToThunk(value: Instruction): Thunk {
 
   throw new TypeError(`[resolveInstructionToThunk] Expected instruction to be of type "string" or "function", got "${typeof value}".`);
 }
-
 
 /**
  * @private
@@ -188,7 +182,6 @@ function validateInstructions(instructions: InstructionSet) {
 
   return true;
 }
-
 
 /**
  * Prints all available scripts and their descriptions. Also determines if `nr`
@@ -277,7 +270,7 @@ export function printScriptInfo(context: SaffronHandlerContext<CLIArguments, Use
   let nrIsInPath = false;
 
   try {
-    resolveCommand('nr');
+    which.sync('nr', { path: npmRunPath({ cwd: process.cwd() }) });
     nrIsInPath = true;
   } catch {
     // nr is not in $PATH.
@@ -318,7 +311,6 @@ export function printScriptInfo(context: SaffronHandlerContext<CLIArguments, Use
   }
 }
 
-
 /**
  * Provided a search query, matches the query to a registered script and returns
  * its descriptor.
@@ -336,7 +328,6 @@ export function matchScript(value?: string) {
 
   return descriptor;
 }
-
 
 /**
  * Provided a name, instruction set, and optional options object, returns a
