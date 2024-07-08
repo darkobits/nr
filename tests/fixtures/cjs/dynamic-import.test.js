@@ -6,8 +6,8 @@ const log = LogFactory({ heading: 'smokeTest' });
 // Note: This is how nr must be imported from a CJS context when it is compiled
 // as ESM.
 async function main() {
-  const nr = (await import('../../../dist/index.js')).default;
-  if (typeof nr !== 'function') throw new Error('Dynamic import of this package failed.');
+  const { defineConfig } = await import('../../../dist/index.js');
+  if (typeof defineConfig !== 'function') throw new Error('Dynamic import of this package failed.');
 }
 
 
