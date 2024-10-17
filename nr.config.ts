@@ -1,7 +1,7 @@
-import { defaultPackageScripts } from '@darkobits/ts';
-import IS_CI from 'is-ci';
+import { defaultPackageScripts } from '@darkobits/ts'
+import IS_CI from 'is-ci'
 
-import type { UserConfigurationExport } from '@darkobits/nr';
+import type { UserConfigurationExport } from '@darkobits/nr'
 
 export default [
   defaultPackageScripts,
@@ -14,11 +14,11 @@ export default [
       group: 'Test',
       description: 'Run smoke tests.',
       timing: true
-    });
+    })
 
     if (!IS_CI) script('postBuild', 'script:test.smoke', {
       group: 'Lifecycle',
       description: '[hook] If not in a CI environment, run smoke tests after building the project.'
-    });
+    })
   }
-] satisfies UserConfigurationExport;
+] satisfies UserConfigurationExport

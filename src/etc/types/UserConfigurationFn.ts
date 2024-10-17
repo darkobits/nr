@@ -1,5 +1,4 @@
-import type { UserConfigurationFnContext } from './UserConfigurationFnContext';
-
+import type { UserConfigurationFnContext } from './UserConfigurationFnContext'
 
 /**
  * Signature of configuration factory functions.

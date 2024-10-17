@@ -1,5 +1,4 @@
-import type { Thunk } from './Thunk';
-
+import type { Thunk } from './Thunk'
 
 /**
  * An `Instruction` indicates what a script should do. Scripts may run commands,
@@ -11,7 +10,6 @@ import type { Thunk } from './Thunk';
  * - the value returned by `command`, `fn`, or `script`
  */
 export type Instruction = string | Thunk | false | undefined;
-
 
 /**
  * Array of Instructions that this script will run.

@@ -1,7 +1,7 @@
 import type {
   Options as ExecaOptions
-} from 'execa';
-import type log from 'lib/log';
+} from 'execa'
+import type log from 'lib/log'
 
 type Primitive = string | number | boolean;
 
@@ -25,19 +25,18 @@ export type CommandArguments =
    */
   | Array<Primitive | Record<string, Primitive>>;
 
-
 export interface CommonCommandOptions {
   /**
    * Descriptive name to use for the command. This is required to allow the
    * command to be referenced using a string token and will be used for error
    * reporting.
    */
-  name?: string;
+  name?: string
 
   /**
    * Optional arguments to pass to the command.
    */
-  args?: CommandArguments;
+  args?: CommandArguments
 
   /**
    * Function that will be passed a Chalk instance and should return a string.
@@ -45,7 +44,7 @@ export interface CommonCommandOptions {
    *
    * See: https://github.com/chalk/chalk
    */
-  prefix?: (chalk: typeof log.chalk) => string;
+  prefix?: (chalk: typeof log.chalk) => string
 
   /**
    * Set this option to `true` to disable the default behavior of converting
@@ -53,14 +52,14 @@ export interface CommonCommandOptions {
    *
    * @default false
    */
-  preserveArgumentCasing?: boolean;
+  preserveArgumentCasing?: boolean
 
   /**
    * Set to `true` to print a commands's total run time once it has finished.
    *
    * @default false
    */
-  timing?: boolean;
+  timing?: boolean
 }
 
 /**

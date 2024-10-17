@@ -1,4 +1,4 @@
-import { ts } from '@darkobits/eslint-plugin';
+import { ts } from '@darkobits/eslint-plugin'
 
 export default [
   {
@@ -18,4 +18,4 @@ export default [
       'unicorn/no-process-exit': 'off'
     }
   }
-];
+]

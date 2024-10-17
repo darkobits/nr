@@ -1,31 +1,31 @@
-import { EOL } from 'node:os';
+import { EOL } from 'node:os'
 
-import boxen from 'boxen';
-import callsites from 'callsites';
-import { npmRunPath } from 'npm-run-path';
-import ow from 'ow';
-import pAll from 'p-all';
-import pSeries from 'p-series';
-import * as R from 'ramda';
-import which from 'which';
+import boxen from 'boxen'
+import callsites from 'callsites'
+import { npmRunPath } from 'npm-run-path'
+import ow from 'ow'
+import pAll from 'p-all'
+import pSeries from 'p-series'
+import * as R from 'ramda'
+import which from 'which'
 
 import {
   IS_COMMAND_THUNK,
   IS_FUNCTION_THUNK,
   IS_SCRIPT_THUNK
-} from 'etc/constants';
-import { commands } from 'lib/commands';
-import { functions } from 'lib/functions';
-import log from 'lib/log';
-import matchSegmentedName from 'lib/matcher';
+} from 'etc/constants'
+import { commands } from 'lib/commands'
+import { functions } from 'lib/functions'
+import log from 'lib/log'
+import matchSegmentedName from 'lib/matcher'
 import {
   caseInsensitiveGet,
   heroLog,
   getPackageNameFromCallsite,
   getPrefixedInstructionName
-} from 'lib/utils';
+} from 'lib/utils'
 
-import type { SaffronHandlerContext } from '@darkobits/saffron';
+import type { SaffronHandlerContext } from '@darkobits/saffron'
 import type {
   CLIArguments,
   UserConfigurationExport,
@@ -35,23 +35,23 @@ import type {
   ScriptDescriptor,
   ScriptThunk,
   Thunk
-} from 'etc/types';
+} from 'etc/types'
 
-const chalk = log.chalk;
+const chalk = log.chalk
 
 /**
  * An `Instruction` in `string` form will be converted into an object of the
  * following shape.
  */
 export interface ParsedInstruction {
-  type: 'cmd' | 'fn' | 'script';
-  name: string;
+  type: 'cmd' | 'fn' | 'script'
+  name: string
 }
 
 /**
  * Map of registered script names to their descriptors.
  */
-export const scripts = new Map<string, ScriptDescriptor>();
+export const scripts = new Map<string, ScriptDescriptor>()
 
 /**
  * @private
@@ -64,16 +64,16 @@ function parseStringInstruction(value: string): ParsedInstruction {
     throw new Error([
       `Invalid instruction identifier: "${value}".`,
       'Prefix commands with "cmd:", functions with "fn:", and scripts with "script:".'
-    ].join(EOL));
+    ].join(EOL))
   }
 
-  const [type, name] = value.split(':') as any;
+  const [type, name] = value.split(':') as any
 
   if (!['script', 'cmd', 'fn'].includes(type)) {
-    throw new Error(`Invalid type: "${type}" in instruction "${value}".`);
+    throw new Error(`Invalid type: "${type}" in instruction "${value}".`)
   }
 
-  return { type, name };
+  return { type, name }
 }
 
 /**
@@ -86,9 +86,9 @@ function isThunk(value: any): value is Thunk {
     Reflect.has(value, IS_SCRIPT_THUNK) ||
     Reflect.has(value, IS_COMMAND_THUNK) ||
     Reflect.has(value, IS_FUNCTION_THUNK)
-  ) return true;
+  ) return true
 
-  return false;
+  return false
 }
 
 /**
@@ -103,35 +103,35 @@ function resolveInstructionToThunk(value: Instruction): Thunk {
   // If the user provided a thunk directly in a script, we don't need to look it
   // up in the registry.
   if (typeof value === 'function') {
-    if (isThunk(value)) return value;
-    throw new TypeError('[resolveInstructionToThunk] Provided value is not a command, function, or script.');
+    if (isThunk(value)) return value
+    throw new TypeError('[resolveInstructionToThunk] Provided value is not a command, function, or script.')
   }
 
   // If the user provided a string, parse it and look-up the indicated command,
   // function, or script.
   if (typeof value === 'string') {
-    const { type, name } = parseStringInstruction(value);
+    const { type, name } = parseStringInstruction(value)
 
     if (type === 'cmd') {
-      const commandDescriptor = caseInsensitiveGet(name, commands);
-      if (!commandDescriptor) throw new Error(`[resolveInstructionToThunk] Unknown command: "${name}"`);
-      return commandDescriptor.thunk;
+      const commandDescriptor = caseInsensitiveGet(name, commands)
+      if (!commandDescriptor) throw new Error(`[resolveInstructionToThunk] Unknown command: "${name}"`)
+      return commandDescriptor.thunk
     }
 
     if (type === 'fn') {
-      const FunctionDescriptor = caseInsensitiveGet(name, functions);
-      if (!FunctionDescriptor) throw new Error(`[resolveInstructionToThunk] Unknown function: "${name}"`);
-      return FunctionDescriptor.thunk;
+      const FunctionDescriptor = caseInsensitiveGet(name, functions)
+      if (!FunctionDescriptor) throw new Error(`[resolveInstructionToThunk] Unknown function: "${name}"`)
+      return FunctionDescriptor.thunk
     }
 
     if (type === 'script') {
-      const scriptDescriptor = caseInsensitiveGet(name, scripts);
-      if (!scriptDescriptor) throw new Error(`[resolveInstructionToThunk] Unknown script: "${name}"`);
-      return scriptDescriptor.thunk;
+      const scriptDescriptor = caseInsensitiveGet(name, scripts)
+      if (!scriptDescriptor) throw new Error(`[resolveInstructionToThunk] Unknown script: "${name}"`)
+      return scriptDescriptor.thunk
     }
   }
 
-  throw new TypeError(`[resolveInstructionToThunk] Expected instruction to be of type "string" or "function", got "${typeof value}".`);
+  throw new TypeError(`[resolveInstructionToThunk] Expected instruction to be of type "string" or "function", got "${typeof value}".`)
 }
 
 /**
@@ -151,16 +151,16 @@ function resolveInstructionToThunk(value: Instruction): Thunk {
  */
 function validateInstructions(instructions: InstructionSet) {
   // Falsy values are valid.
-  if (!instructions) return true;
+  if (!instructions) return true
 
   // Single-value strings and single-value thunks are valid.
-  if (typeof instructions === 'string' || isThunk(instructions)) return true;
+  if (typeof instructions === 'string' || isThunk(instructions)) return true
 
   // By now we can assume that the scripts instructions are an Array. Remove 1
   // level of nesting and check each member. If any is an Array, we have too
   // many levels of nesting and the instructions are invalid.
   for (const instruction of R.unnest(instructions)) {
-    if (Array.isArray(instruction)) return false;
+    if (Array.isArray(instruction)) return false
   }
 
   // Finally, validate instructions using ow.
@@ -178,9 +178,9 @@ function validateInstructions(instructions: InstructionSet) {
         ow.function
       ))
     ))
-  ));
+  ))
 
-  return true;
+  return true
 }
 
 /**
@@ -189,41 +189,41 @@ function validateInstructions(instructions: InstructionSet) {
  * use `npx`.
  */
 export function printScriptInfo(context: SaffronHandlerContext<CLIArguments, UserConfigurationExport>) {
-  const allScripts = Array.from(scripts.values());
+  const allScripts = Array.from(scripts.values())
 
   if (allScripts.length === 0) {
-    log.info('No scripts are registered.');
+    log.info('No scripts are registered.')
     if (context.configPath) {
-      log.info(`Configuration file: ${context.configPath}`);
+      log.info(`Configuration file: ${context.configPath}`)
     } else {
-      log.warn('No configuration file found.');
+      log.warn('No configuration file found.')
     }
-    return;
+    return
   }
 
   const printScript = (descriptor: ScriptDescriptor) => {
-    const { name, sourcePackage, options: { description, hidden } } = descriptor;
+    const { name, sourcePackage, options: { description, hidden } } = descriptor
 
-    if (hidden) return;
+    if (hidden) return
 
-    let title = chalk.green.bold(name);
+    let title = chalk.green.bold(name)
 
     // Build script name, including package of origin.
-    const scriptSources = R.uniq(R.map(R.path(['sourcePackage']), allScripts));
+    const scriptSources = R.uniq(R.map(R.path(['sourcePackage']), allScripts))
     // Hide origin descriptors if all packages are local.
-    const hideOriginDescriptors = scriptSources.length === 1 && scriptSources[0] === 'local';
+    const hideOriginDescriptors = scriptSources.length === 1 && scriptSources[0] === 'local'
 
     if (!hideOriginDescriptors && sourcePackage !== 'unknown') {
       title += sourcePackage === 'local'
         // Scripts from the local package.
         ? ` ${chalk.green.dim('local')}`
         // Scripts from third-party packages.
-        : ` ${chalk.green.dim(`via ${sourcePackage}`)}`;
+        : ` ${chalk.green.dim(`via ${sourcePackage}`)}`
     }
 
     const finalDescription = description
       ? chalk.gray(description.trim())
-      : chalk.cyan.dim('No description available.');
+      : chalk.cyan.dim('No description available.')
 
     console.log(boxen(finalDescription, {
       title,
@@ -238,50 +238,49 @@ export function printScriptInfo(context: SaffronHandlerContext<CLIArguments, Use
       fullscreen: width => [width, 0],
       margin: 0,
       borderColor: '#242424'
-    }));
-  };
-
-  console.log('');
-  heroLog('• available scripts');
-
-  const groupsUsed = R.any(R.hasPath(['options', 'group']), allScripts);
-
-  if (groupsUsed) {
-    const groupedScripts = R.groupBy<ScriptDescriptor>(descriptor => descriptor.options.group ?? 'Other', allScripts);
-
-    for (const [groupName, scriptConfigs] of Object.entries(groupedScripts)) {
-      if (!scriptConfigs) return;
-      const groupHasVisibleScripts = scriptConfigs.some(script => !script.options.hidden);
-      if (!groupHasVisibleScripts) return;
-      console.log(`\n${chalk.bold(groupName)}\n`);
-      scriptConfigs.forEach(printScript);
-    }
-  } else {
-    console.log('');
-    allScripts.forEach(printScript);
+    }))
   }
 
-  console.log('');
-  heroLog(chalk.gray.dim('• see: https://github.com/darkobits/nr for documentation'));
+  console.log('')
+  heroLog('• available scripts')
 
+  const groupsUsed = R.any(R.hasPath(['options', 'group']), allScripts)
+
+  if (groupsUsed) {
+    const groupedScripts = R.groupBy<ScriptDescriptor>(descriptor => descriptor.options.group ?? 'Other', allScripts)
+
+    for (const [groupName, scriptConfigs] of Object.entries(groupedScripts)) {
+      if (!scriptConfigs) return
+      const groupHasVisibleScripts = scriptConfigs.some(script => !script.options.hidden)
+      if (!groupHasVisibleScripts) return
+      console.log(`\n${chalk.bold(groupName)}\n`)
+      scriptConfigs.forEach(printScript)
+    }
+  } else {
+    console.log('')
+    allScripts.forEach(printScript)
+  }
+
+  console.log('')
+  heroLog(chalk.gray.dim('• see: https://github.com/darkobits/nr for documentation'))
 
   // ----- Determine if nr is in PATH ------------------------------------------
 
-  let nrIsInPath = false;
+  let nrIsInPath = false
 
   try {
-    which.sync('nr', { path: npmRunPath({ cwd: process.cwd() }) });
-    nrIsInPath = true;
+    which.sync('nr', { path: npmRunPath({ cwd: process.cwd() }) })
+    nrIsInPath = true
   } catch {
     // nr is not in $PATH.
   }
 
-  console.log('');
+  console.log('')
 
   // 🟩 🟨
   if (nrIsInPath) {
-    const contents = chalk.gray(`• ${chalk.green(`${chalk.bold('nr')} is in your PATH`)}; you can use the CLI directly: ${chalk.bold('nr query')}.`);
-    heroLog(contents);
+    const contents = chalk.gray(`• ${chalk.green(`${chalk.bold('nr')} is in your PATH`)}; you can use the CLI directly: ${chalk.bold('nr query')}.`)
+    heroLog(contents)
 
     // console.log(boxen(contents, {
     //   padding: {
@@ -293,11 +292,11 @@ export function printScriptInfo(context: SaffronHandlerContext<CLIArguments, Use
     //   borderColor: '#242424'
     // }));
   } else {
-    const contents = chalk.gray(`• ${chalk.yellow.dim(`${chalk.bold('nr')} is not in your PATH`)}; you must use the CLI with npx: ${chalk.bold('npx nr query')}.`);
-    heroLog(contents);
+    const contents = chalk.gray(`• ${chalk.yellow.dim(`${chalk.bold('nr')} is not in your PATH`)}; you must use the CLI with npx: ${chalk.bold('npx nr query')}.`)
+    heroLog(contents)
 
-    const pathDocs = chalk.gray.dim('• see: https://darkobits.gitbook.io/nr/getting-started/environment');
-    heroLog(pathDocs);
+    const pathDocs = chalk.gray.dim('• see: https://darkobits.gitbook.io/nr/getting-started/environment')
+    heroLog(pathDocs)
 
     // console.log(boxen(contents, {
     //   padding: {
@@ -316,17 +315,17 @@ export function printScriptInfo(context: SaffronHandlerContext<CLIArguments, Use
  * its descriptor.
  */
 export function matchScript(value?: string) {
-  const scriptNames = [...scripts.keys()];
-  if (scriptNames.length === 0) throw new Error(`[matchScript] Unable to match query ${chalk.green(value)}; no scripts have been registered.`);
+  const scriptNames = [...scripts.keys()]
+  if (scriptNames.length === 0) throw new Error(`[matchScript] Unable to match query ${chalk.green(value)}; no scripts have been registered.`)
 
-  const scriptName = matchSegmentedName(scriptNames, value);
+  const scriptName = matchSegmentedName(scriptNames, value)
 
-  const descriptor = scripts.get(scriptName ?? '');
-  if (!descriptor) throw new Error(`[matchScript] "${value}" did not match any scripts.`);
+  const descriptor = scripts.get(scriptName ?? '')
+  if (!descriptor) throw new Error(`[matchScript] "${value}" did not match any scripts.`)
 
-  log.verbose(log.prefix('matchScript'), `Query ${chalk.green(value)} matched script ${chalk.green(scriptName)}.`);
+  log.verbose(log.prefix('matchScript'), `Query ${chalk.green(value)} matched script ${chalk.green(scriptName)}.`)
 
-  return descriptor;
+  return descriptor
 }
 
 /**
@@ -335,7 +334,7 @@ export function matchScript(value?: string) {
  * added to the scripts registry by name.
  */
 export function script(name: string, instructions: InstructionSet, options: ScriptOptions = {}) {
-  const { timing } = options;
+  const { timing } = options
 
   try {
     // ----- [1] Validate Options ----------------------------------------------
@@ -345,100 +344,99 @@ export function script(name: string, instructions: InstructionSet, options: Scri
       group: ow.optional.string,
       timing: ow.optional.boolean,
       hidden: ow.optional.boolean
-    }));
+    }))
 
-    const scriptDisplayName = name ?? 'anonymous';
-    const logPrefix = getPrefixedInstructionName('script', scriptDisplayName);
+    const scriptDisplayName = name ?? 'anonymous'
+    const logPrefix = getPrefixedInstructionName('script', scriptDisplayName)
 
     const filteredInstructions = Array.isArray(instructions)
       ? instructions.filter(Boolean)
       : instructions
         ? [instructions]
-        : [];
+        : []
 
     if (!validateInstructions(filteredInstructions)) {
-      throw new Error(`Script ${scriptDisplayName} contains too many layers of nesting for instructions; max 2.`);
+      throw new Error(`Script ${scriptDisplayName} contains too many layers of nesting for instructions; max 2.`)
     }
-
 
     // ----- [2] Create Script Thunk -------------------------------------------
 
     const scriptThunk = async () => {
-      const runTime = log.createTimer();
+      const runTime = log.createTimer()
 
       // Map each entry in the instruction sequence to its corresponding
       // command, function, or script. For nested arrays, map the array to a
       // thunk that runs each entry in parallel.
       const resolvedInstructions = filteredInstructions.map(instruction => {
         if (Array.isArray(instruction)) {
-          const instructionThunks = instruction.map(resolveInstructionToThunk);
+          const instructionThunks = instruction.map(resolveInstructionToThunk)
 
           return async () => {
-            await pAll(instructionThunks);
-          };
+            await pAll(instructionThunks)
+          }
         }
 
-        return resolveInstructionToThunk(instruction);
-      });
+        return resolveInstructionToThunk(instruction)
+      })
 
       // Instructions may be added to a script definition dynamically, meaning
       // it is possible that a script has zero instructions under certain
       // conditions. When this is the case, issue a warning and bail.
       if (resolvedInstructions.length === 0) {
-        log.warn(log.prefix(logPrefix), chalk.yellow.bold(`Script "${scriptDisplayName}" contains no instructions.`));
-        return;
+        log.warn(log.prefix(logPrefix), chalk.yellow.bold(`Script "${scriptDisplayName}" contains no instructions.`))
+        return
       }
 
       // Run any pre-script, if defined.
-      const preScript = caseInsensitiveGet(`pre${name}`, scripts);
-      if (preScript) await preScript.thunk();
+      const preScript = caseInsensitiveGet(`pre${name}`, scripts)
+      if (preScript) await preScript.thunk()
 
       // Run each Instruction in series. If an Instruction is an Array, all
       // commands in that Instruction will be run in parallel.
       try {
         if (timing) {
-          heroLog(chalk.gray.dim(`○ ${scriptDisplayName}`));
+          heroLog(chalk.gray.dim(`○ ${scriptDisplayName}`))
         } else {
-          log.verbose(log.prefix(logPrefix), '•', chalk.green('start'));
+          log.verbose(log.prefix(logPrefix), '•', chalk.green('start'))
         }
 
-        await pSeries<any>(resolvedInstructions);
+        await pSeries<any>(resolvedInstructions)
 
         if (timing) {
           heroLog([
             chalk.greenBright('⏺'),
             chalk.gray.dim(`${scriptDisplayName} •`),
             log.chalk.greenBright(runTime)
-          ].join(' '));
+          ].join(' '))
         } else {
-          log.verbose(log.prefix(logPrefix), '•', chalk.green(runTime));
+          log.verbose(log.prefix(logPrefix), '•', chalk.green(runTime))
         }
       } catch (err: any) {
-        throw new Error(`${logPrefix} failed • ${err.message}`, { cause: err });
+        throw new Error(`${logPrefix} failed • ${err.message}`, { cause: err })
       }
 
       // Run post-script, if defined.
-      const postScript = caseInsensitiveGet(`post${name}`, scripts);
-      if (postScript) await postScript.thunk();
-    };
+      const postScript = caseInsensitiveGet(`post${name}`, scripts)
+      if (postScript) await postScript.thunk()
+    }
 
     Object.defineProperties(scriptThunk, {
       name: { value: name },
       [IS_SCRIPT_THUNK]: { value: true as const }
-    });
+    })
 
     // Get the name of the package that defined this script.
-    const sourcePackage = getPackageNameFromCallsite(callsites()[1]);
+    const sourcePackage = getPackageNameFromCallsite(callsites()[1])
 
     scripts.set(scriptDisplayName, {
       name,
       sourcePackage,
       options,
       thunk: scriptThunk as ScriptThunk
-    });
+    })
 
-    return scriptThunk as ScriptThunk;
+    return scriptThunk as ScriptThunk
   } catch (err: any) {
-    throw new Error(`Unable to create script "${name}": ${err.message}`);
+    throw new Error(`Unable to create script "${name}": ${err.message}`)
   }
 }

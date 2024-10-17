@@ -1,5 +1,5 @@
-import { CommandExecutor } from './CommandExecutor';
-import { CommandOptions } from './CommandOptions';
+import { CommandExecutor } from './CommandExecutor'
+import { CommandOptions } from './CommandOptions'
 
 /**
  * Once a command is received by command creation function (ie: `command`,
@@ -9,7 +9,7 @@ import { CommandOptions } from './CommandOptions';
  * to the command builder for further processing.
  */
 export interface CommandBuilderOptions extends CommandOptions {
-  executable: string;
-  executor: CommandExecutor;
-  sourcePackage: string;
+  executable: string
+  executor: CommandExecutor
+  sourcePackage: string
 }
