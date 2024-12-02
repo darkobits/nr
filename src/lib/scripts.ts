@@ -323,7 +323,7 @@ export function matchScript(value?: string) {
   const descriptor = scripts.get(scriptName ?? '')
   if (!descriptor) throw new Error(`[matchScript] "${value}" did not match any scripts.`)
 
-  log.verbose(log.prefix('matchScript'), `Query ${chalk.green(value)} matched script ${chalk.green(scriptName)}.`)
+  log.verbose(log.chalk.dim.cyan('matchScript'), `Query ${chalk.green(value)} matched script ${chalk.green(scriptName)}.`)
 
   return descriptor
 }
@@ -362,7 +362,7 @@ export function script(name: string, instructions: InstructionSet, options: Scri
     // ----- [2] Create Script Thunk -------------------------------------------
 
     const scriptThunk = async () => {
-      const runTime = log.createTimer()
+      const runTime = log.chronograph()
 
       // Map each entry in the instruction sequence to its corresponding
       // command, function, or script. For nested arrays, map the array to a
@@ -383,7 +383,7 @@ export function script(name: string, instructions: InstructionSet, options: Scri
       // it is possible that a script has zero instructions under certain
       // conditions. When this is the case, issue a warning and bail.
       if (resolvedInstructions.length === 0) {
-        log.warn(log.prefix(logPrefix), chalk.yellow.bold(`Script "${scriptDisplayName}" contains no instructions.`))
+        log.warn(log.chalk.dim.cyan(logPrefix), chalk.yellow.bold(`Script "${scriptDisplayName}" contains no instructions.`))
         return
       }
 
@@ -397,7 +397,7 @@ export function script(name: string, instructions: InstructionSet, options: Scri
         if (timing) {
           heroLog(chalk.gray.dim(`○ ${scriptDisplayName}`))
         } else {
-          log.verbose(log.prefix(logPrefix), '•', chalk.green('start'))
+          log.verbose(log.chalk.dim.cyan(logPrefix), '•', chalk.green('start'))
         }
 
         await pSeries<any>(resolvedInstructions)
@@ -409,7 +409,7 @@ export function script(name: string, instructions: InstructionSet, options: Scri
             log.chalk.greenBright(runTime)
           ].join(' '))
         } else {
-          log.verbose(log.prefix(logPrefix), '•', chalk.green(runTime))
+          log.verbose(log.chalk.green(logPrefix), '•', chalk.green(runTime))
         }
       } catch (err: any) {
         throw new Error(`${logPrefix} failed • ${err.message}`, { cause: err })

@@ -270,7 +270,7 @@ function commandBuilder(builderOptions: CommandBuilderOptions): CommandThunk {
 
     const commandThunk = async () => {
       try {
-        const runTime = log.createTimer()
+        const runTime = log.chronograph()
         const childProcess = executor(commandExecutorOptions)
 
         // If the user provided a custom prefix function, generate it now.
@@ -292,12 +292,12 @@ function commandBuilder(builderOptions: CommandBuilderOptions): CommandThunk {
           if (code === 0 || reject === false) {
             // If the command exited successfully or if we are ignoring failed
             // commands, log completion time.
-            log.verbose(log.prefix(prefixedName), '•', chalk.gray(runTime))
+            log.verbose(log.chalk.dim.cyan(prefixedName), '•', chalk.gray(runTime))
           }
         })
 
         // log.verbose(
-        //   log.prefix(prefixedName),
+        //   log.chalk.dim.cyan(prefixedName),
         //   '•',
         //   chalk.gray(getEscapedCommand(executable, childProcess.spawnargs))
         // );
@@ -345,7 +345,7 @@ const executeCommand: CommandExecutor = (options: CommandExecutorOptions) => {
 
   // Print the exact command we are about to run.
   log.verbose(
-    log.prefix(prefixedName),
+    log.chalk.dim.cyan(prefixedName),
     '•',
     chalk.gray(getEscapedCommand(executable, unParsedArguments))
   )
@@ -371,7 +371,7 @@ const executeNodeCommand: CommandExecutor = (options: CommandExecutorOptions) =>
 
   // Print the exact command we are about to run.
   log.verbose(
-    log.prefix(prefixedName),
+    log.chalk.dim.cyan(prefixedName),
     '•',
     chalk.gray('node'),
     chalk.gray(getEscapedCommand(executable, unParsedArguments))

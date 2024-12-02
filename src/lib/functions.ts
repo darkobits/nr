@@ -89,10 +89,10 @@ export function fn(fn: Fn, options: FnOptions = {}) {
 
     const FnThunk = async () => {
       try {
-        const runTime = log.createTimer()
-        log.verbose(log.prefix(prefixedName), '•', chalk.cyan('start'))
+        const runTime = log.chronograph()
+        log.verbose(log.chalk.dim.cyan(prefixedName), '•', chalk.cyan('start'))
         await fn()
-        log.verbose(log.prefix(prefixedName), '•', chalk.cyan(runTime))
+        log.verbose(log.chalk.dim.cyan(prefixedName), '•', chalk.cyan(runTime))
       } catch (err: any) {
         throw new Error(`${prefixedName} failed • ${err.message}`, { cause: err })
       }

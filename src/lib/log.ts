@@ -1,5 +1,5 @@
-import LogFactory from '@darkobits/log'
+import { createLogger } from '@darkobits/log'
 
-export { default as LogPipe } from '@darkobits/log/dist/lib/log-pipe.js'
+export { LogPipe } from '@darkobits/log/dist/lib/log-pipe.js'
 
-export default LogFactory({ heading: 'nr' })
+export default createLogger({ heading: 'nr' })
