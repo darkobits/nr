@@ -1,3 +1,9 @@
+## [0.18.4](https://github.com/darkobits/nr/compare/v0.18.3...v0.18.4) (2025-01-05)
+
+### 🏗 Chores
+
+* **deps:** Update dependencies. ([f166da2](https://github.com/darkobits/nr/commit/f166da26171890297cddb48ead16fd74c5598a08))
+
 ## [0.18.3](https://github.com/darkobits/nr/compare/v0.18.2...v0.18.3) (2025-01-05)
 
 ### 🐞 Bug Fixes
