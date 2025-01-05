@@ -1,3 +1,9 @@
+## [0.18.3](https://github.com/darkobits/nr/compare/v0.18.2...v0.18.3) (2025-01-05)
+
+### 🐞 Bug Fixes
+
+* Remove `rootDir` from `tsconfig`. ([a73b1ca](https://github.com/darkobits/nr/commit/a73b1ca8e1bf27fead2af794db74f51188072783))
+
 ## [0.18.2](https://github.com/darkobits/nr/compare/v0.18.1...v0.18.2) (2024-12-07)
 
 ### 🏗 Chores
