@@ -50,7 +50,7 @@
     "yargs-unparser": "^2.0.0"
   },
   "devDependencies": {
-    "@darkobits/ts": "~0.23.6",
+    "@darkobits/ts": "~0.23.7",
     "@types/is-ci": "^3.0.4",
     "@types/kebabcase-keys": "^1.0.5",
     "@types/micromatch": "^4.0.9",
