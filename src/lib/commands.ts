@@ -1,20 +1,24 @@
 import path from 'node:path'
 
+import adeiu from '@darkobits/adeiu'
 import boxen from 'boxen'
 import callsites from 'callsites'
 import merge from 'deepmerge'
 import {
   execa,
   execaNode,
-  type Options as ExecaOptions
+  ExecaError,
+  type Options as ExecaOptions,
+  type Result as ExecaResult
 } from 'execa'
 import kebabCaseKeys from 'kebabcase-keys'
 import ow from 'ow'
 import * as R from 'ramda'
 import yargsUnparser from 'yargs-unparser'
 
-import { IS_COMMAND_THUNK } from 'etc/constants'
-import log, { LogPipe } from 'lib/log'
+import { IS_COMMAND_THUNK, SIGNALS } from 'etc/constants'
+import log from 'lib/log'
+import { LogPipe } from 'lib/log-pipe'
 import {
   getEscapedCommand,
   getPackageNameFromCallsite,
@@ -269,12 +273,29 @@ function commandBuilder(builderOptions: CommandBuilderOptions): CommandThunk {
     }
 
     const commandThunk = async () => {
+      let unregisterSignalHandler: ReturnType<typeof adeiu> | undefined
+
       try {
         const runTime = log.chronograph()
         const childProcess = executor(commandExecutorOptions)
 
         // If the user provided a custom prefix function, generate it now.
         const commandPrefix = prefix ? prefix(chalk) : ''
+
+        // Register a POSIX signal handler that will forward signals to this
+        // child process (if necessary) and wait for it to exit.
+        adeiu(async signal => {
+          const { pid } = childProcess
+
+          if (commandExecutorOptions.stdin === 'inherit' || commandExecutorOptions.stdio === 'inherit') {
+            log.verbose(`Signal ${chalk.green(signal)} sent to process ${chalk.yellow(pid)} via shared input stream.`)
+          } else {
+            log.verbose(`Sending signal ${chalk.green(signal)} to process ${chalk.yellow(pid)}.`)
+            childProcess.kill(signal)
+          }
+
+          await childProcess
+        })
 
         if (childProcess.stdout) {
           childProcess.stdout.pipe(new LogPipe((...args: Array<any>) => {
@@ -288,7 +309,7 @@ function commandBuilder(builderOptions: CommandBuilderOptions): CommandThunk {
           }))
         }
 
-        void childProcess.on('exit', code => {
+        childProcess.on('exit', code => {
           if (code === 0 || reject === false) {
             // If the command exited successfully or if we are ignoring failed
             // commands, log completion time.
@@ -304,7 +325,18 @@ function commandBuilder(builderOptions: CommandBuilderOptions): CommandThunk {
 
         return await childProcess
       } catch (err: any) {
+        // By default, Execa will throw when a process exits with any non-zero
+        // code. However, signal-related exits should not be considered
+        if (err instanceof ExecaError && R.includes(err.exitCode, R.values(SIGNALS))) {
+          // Execa errors extend from Execa results, so we can actually just
+          // return the error here and it will contain all the same properties
+          // that a successful result would.
+          return err as ExecaResult
+        }
+
         throw new Error(`${prefixedName} failed • ${err.message}`, { cause: err })
+      } finally {
+        unregisterSignalHandler?.()
       }
     }
 
