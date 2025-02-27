@@ -1,5 +1,6 @@
-import { EOL } from 'node:os'
+import { constants, EOL } from 'node:os'
 
+import * as R from 'ramda'
 import { readPackageUpSync } from 'read-package-up'
 
 import { NR_RED } from 'etc/constants'
@@ -85,6 +86,18 @@ export function caseInsensitiveGet<M extends Map<string, any>>(key: string, map:
 export function getPrefixedInstructionName(prefix: string, name: string | undefined) {
   if (typeof name !== 'string' || name === '') return `${prefix}:anonymous`
   return `${prefix}:${name}`
+}
+
+/**
+ * Provided a process exit code, returns the POSIX signal typically correlated
+ * with that code.
+ */
+export function exitCodeToSignal(exitCode?: number) {
+  if (!exitCode) return
+  return R.prop(
+    String(exitCode - 128),
+    R.invert(constants.signals)
+  )?.[0] as NodeJS.Signals | undefined
 }
 
 /**

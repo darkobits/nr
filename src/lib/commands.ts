@@ -16,13 +16,14 @@ import ow from 'ow'
 import * as R from 'ramda'
 import yargsUnparser from 'yargs-unparser'
 
-import { IS_COMMAND_THUNK, SIGNALS } from 'etc/constants'
+import { IS_COMMAND_THUNK } from 'etc/constants'
 import log from 'lib/log'
 import { LogPipe } from 'lib/log-pipe'
 import {
   getEscapedCommand,
   getPackageNameFromCallsite,
   getPrefixedInstructionName,
+  exitCodeToSignal,
   heroLog
 } from 'lib/utils'
 
@@ -326,8 +327,15 @@ function commandBuilder(builderOptions: CommandBuilderOptions): CommandThunk {
         return await childProcess
       } catch (err: any) {
         // By default, Execa will throw when a process exits with any non-zero
-        // code. However, signal-related exits should not be considered
-        if (err instanceof ExecaError && R.includes(err.exitCode, R.values(SIGNALS))) {
+        // code. However, signal-related exits should not be considered a
+        // failure.
+        if (err instanceof ExecaError && (
+          // For some signals, Execa will set this flag.
+          err.isTerminated ||
+          // Otherwise, check if the exit code corresponds to a known signal.
+          // R.includes(err.exitCode, R.values(SIGNALS))
+          exitCodeToSignal(err.exitCode)
+        )) {
           // Execa errors extend from Execa results, so we can actually just
           // return the error here and it will contain all the same properties
           // that a successful result would.
