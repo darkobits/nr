@@ -285,7 +285,7 @@ function commandBuilder(builderOptions: CommandBuilderOptions): CommandThunk {
 
         // Register a POSIX signal handler that will forward signals to this
         // child process (if necessary) and wait for it to exit.
-        adeiu(async signal => {
+        adeiu(signal => {
           const { pid } = childProcess
 
           if (commandExecutorOptions.stdin === 'inherit' || commandExecutorOptions.stdio === 'inherit') {
@@ -294,8 +294,6 @@ function commandBuilder(builderOptions: CommandBuilderOptions): CommandThunk {
             log.verbose(`Sending signal ${chalk.green(signal)} to process ${chalk.yellow(pid)}.`)
             childProcess.kill(signal)
           }
-
-          await childProcess
         })
 
         if (childProcess.stdout) {
