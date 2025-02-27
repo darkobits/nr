@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.18.6](https://github.com/darkobits/nr/compare/v0.18.5...v0.18.6) (2025-02-27)
+
+
+### Bug Fixes
+
+* Improve error handling for processes killed via POSIX signals. ([55f7611](https://github.com/darkobits/nr/commit/55f76115d97b55bdfad0d943c5aa9a02da5ca8ab))
+
 ### [0.18.5](https://github.com/darkobits/nr/compare/v0.18.4...v0.18.5) (2025-02-22)
 
 ## [0.18.4](https://github.com/darkobits/nr/compare/v0.18.3...v0.18.4) (2025-01-05)
