@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.18.7](https://github.com/darkobits/nr/compare/v0.18.6...v0.18.7) (2025-02-27)
+
+
+### Bug Fixes
+
+* Do not await killed child process. ([f688f0c](https://github.com/darkobits/nr/commit/f688f0c9cd16d0b82429be186647b746ddafec6c))
+
 ### [0.18.6](https://github.com/darkobits/nr/compare/v0.18.5...v0.18.6) (2025-02-27)
 
 
