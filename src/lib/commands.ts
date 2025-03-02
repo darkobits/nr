@@ -214,7 +214,7 @@ function commandBuilder(builderOptions: CommandBuilderOptions): CommandThunk {
     ow(name, 'command name', ow.optional.string)
 
     // Validate other options.
-    ow<Required<CommandBuilderOptions>>(builderOptions, ow.optional.object.partialShape({
+    ow(builderOptions, ow.optional.object.partialShape({
       executable: ow.string,
       name: ow.optional.string,
       args: ow.optional.any(

@@ -1,9 +1,9 @@
 import { defaultPackageScripts } from '@darkobits/ts'
 import IS_CI from 'is-ci'
 
-import type { UserConfigurationExport } from '@darkobits/nr'
+import { defineConfig } from '@darkobits/nr'
 
-export default [
+export default defineConfig([
   defaultPackageScripts,
   ({ command, script }) => {
     script('test.smoke', [[
@@ -21,4 +21,4 @@ export default [
       description: '[hook] If not in a CI environment, run smoke tests after building the project.'
     })
   }
-] satisfies UserConfigurationExport
+])

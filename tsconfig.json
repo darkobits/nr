@@ -2,6 +2,12 @@
   "extends": "@darkobits/ts/tsconfig.json",
   "compilerOptions": {
     "baseUrl": "src",
-    "outDir": "dist"
+    "outDir": "dist",
+    "preserveSymlinks": true,
+    "paths": {
+      // This ensures that when we import from '@darkobits/nr', TypeScript
+      // resolves the copy from node_modules and not our copy in 'src'.
+      "@darkobits/nr": ["../node_modules/@darkobits/nr"]
+    }
   }
 }
