@@ -363,5 +363,18 @@ between them for this License. This License cannot be modified or amended except
 in a writing signed by Licensor and Licensee.
 
 8.8. Successors and Assigns: This License shall be binding upon and inure to the
-benefit of the Licensor’s and Licensee’s respective heirs, successors, and
+benefit of the Licensor's and Licensee's respective heirs, successors, and
 assigns.
+
+9. ADDENDA:
+
+This License is supplemented by one or more addenda, each of which is
+incorporated by reference and constitutes a legally binding part of this
+License. In the event of any conflict between the terms of this License and
+the terms of an addendum, the terms of the addendum shall control with
+respect to the matters addressed therein.
+
+9.1. Age Verification Compliance Restriction Notice (AGELESS.md, Version 1.0):
+Prohibits exercise of rights granted by this License in any jurisdiction
+where an Age Verification Law (as defined therein) is in effect. See
+AGELESS.md for full terms.
