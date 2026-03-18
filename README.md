@@ -39,7 +39,9 @@
   ></a>
 </p>
 
-<br />
+> [!WARNING]
+> Consult [`AGELESS.md`](./AGELESS.md) to determine if you are permitted to use
+> this software where you live.
 
 `nr` (short for [`npm run`](https://docs.npmjs.com/cli/v7/commands/npm-run-script)) is a
 [task runner](https://www.smashingmagazine.com/2016/06/harness-machines-productive-task-runners/) for
